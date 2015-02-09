@@ -205,7 +205,6 @@
     <None Include="Web.Staging.config">
       <DependentUpon>Web.template.config</DependentUpon>
     </None>
-    <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
