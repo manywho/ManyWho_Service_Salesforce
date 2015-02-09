@@ -193,15 +193,18 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config">
+    <Content Include="Web.config" />
+    <None Include="Web.template.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.template.config</DependentUpon>
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.template.config</DependentUpon>
+    </None>
+    <None Include="Web.Staging.config">
+      <DependentUpon>Web.template.config</DependentUpon>
+    </None>
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +220,15 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <BuildDependsOn>  
+    CustomWebConfigTransform;  
+    $(BuildDependsOn);  
+  </BuildDependsOn>
+  </PropertyGroup>
+  <Target Name="CustomWebConfigTransform">
+    <TransformXml source="Web.template.config" transform="Web.$(Configuration).config" destination="Web.config" />
+  </Target>
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
