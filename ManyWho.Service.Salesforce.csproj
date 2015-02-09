@@ -40,8 +40,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ManyWho.Flow.SDK">
-      <HintPath>..\..\..\..\..\GitHub\ManyWho_Flow\ManyWho.Flow.SDK\bin\Debug\ManyWho.Flow.SDK.dll</HintPath>
+    <Reference Include="manywho.flow.sdk">
+      <HintPath>packages\ManyWho.SDK.1.2.6\lib\manywho.flow.sdk.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
