@@ -335,7 +335,18 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Finally, decide on the authentication mode
             if (loginUsingOAuth2 == true)
             {
-                String loginUrl = String.Format("https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id={0}", clientId);
+                String loginUrl = "";
+
+                if (String.IsNullOrWhiteSpace(authenticationUrl) == true)
+                {
+                    loginUrl = "https://login.salesforce.com";
+                }
+                else
+                {
+                    loginUrl = authenticationUrl;
+                }
+
+                loginUrl = String.Format(loginUrl + "/services/oauth2/authorize?response_type=code&client_id={0}", clientId);
 
                 objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_AUTHENTICATION_TYPE, ManyWhoConstants.AUTHENTICATION_TYPE_OAUTH2));
                 objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LOGIN_URL, loginUrl));
