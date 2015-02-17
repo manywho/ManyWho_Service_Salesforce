@@ -1273,7 +1273,7 @@ namespace ManyWho.Service.Salesforce
                         String result = null;
                         String identityUrl = null;
 
-                        String endpoint = "https://login.salesforce.com/services/oauth2/token";
+                        String endpoint = loginUrl + "/services/oauth2/token";
                         Dictionary<String, String> body = null;
 
                         body = new Dictionary<String, String>();
