@@ -165,7 +165,7 @@ namespace ManyWho.Service.Salesforce.Utils
             httpResponseMessage = new HttpResponseMessage(statusCode);
 
             // Reason phrases cannot have carriage returns
-            httpResponseMessage.ReasonPhrase = reasonPhrase.Replace(Environment.NewLine, " ");
+            httpResponseMessage.ReasonPhrase = reasonPhrase.Replace("\n", " ").Replace("\r", " ").Replace(Environment.NewLine, " ");
 
             // Add the response message to the exception
             httpResponseException = new HttpResponseException(httpResponseMessage);
