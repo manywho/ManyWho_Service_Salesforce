@@ -368,6 +368,20 @@ namespace ManyWho.Flow.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ActionName("Notification")]
+        public void Notification(ServiceNotificationRequestAPI serviceNotificationRequestAPI)
+        {
+            try
+            {
+                SalesforceServiceSingleton.GetInstance().Notify(EmailNotifier.GetInstance(this.GetWho(), serviceNotificationRequestAPI.configurationValues, "PluginSalesforceController.Notification"), this.GetWho(), serviceNotificationRequestAPI);
+            }
+            catch (Exception exception)
+            {
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+            }
+        }
+
         [HttpPut]
         [ActionName("Save")]
         public ObjectDataResponseAPI Save(ObjectDataRequestAPI objectDataRequestAPI)
@@ -416,8 +430,7 @@ namespace ManyWho.Flow.Web.Controllers
         {
             try
             {
-                throw new NotImplementedException();
-                //return SalesforceServiceSingleton.GetInstance().LoadFiles(this.GetWho(), fileDataRequestAPI);
+                return SalesforceServiceSingleton.GetInstance().LoadFiles(this.GetWho(), fileDataRequestAPI);
             }
             catch (Exception exception)
             {
@@ -431,8 +444,7 @@ namespace ManyWho.Flow.Web.Controllers
         {
             try
             {
-                throw new NotImplementedException();
-                //return SalesforceServiceSingleton.GetInstance().DeleteFile(this.GetWho(), fileDataRequestAPI);
+                throw new NotImplementedException("File delete is not currently enabled.");
             }
             catch (Exception exception)
             {
@@ -442,12 +454,11 @@ namespace ManyWho.Flow.Web.Controllers
 
         [HttpPost]
         [ActionName("UploadFile")]
-        public ObjectDataResponseAPI UploadFile()
+        public Task<ObjectDataResponseAPI> UploadFile()
         {
             try
             {
-                throw new NotImplementedException();
-                //return SalesforceServiceSingleton.GetInstance().UploadFile(this.GetWho(), Request.Content);
+                return SalesforceServiceSingleton.GetInstance().UploadFile(this.GetWho(), Request.Content);
             }
             catch (Exception exception)
             {

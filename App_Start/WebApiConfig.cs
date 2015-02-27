@@ -231,6 +231,17 @@ namespace ManyWho.Service.Salesforce
             );
 
             config.Routes.MapHttpRoute(
+                name: "PluginSalesforceNotification",
+                constraints: new { httpMethod = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Post) },
+                routeTemplate: "plugins/api/salesforce/1/notification",
+                defaults: new
+                {
+                    controller = "PluginSalesforce",
+                    action = "Notification"
+                }
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "PluginSalesforceLoad",
                 constraints: new { httpMethod = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Post) },
                 routeTemplate: "plugins/api/salesforce/1/data",

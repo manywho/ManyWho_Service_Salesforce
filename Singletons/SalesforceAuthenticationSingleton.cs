@@ -318,18 +318,41 @@ namespace ManyWho.Service.Salesforce.Singletons
             // If we're here and the user object is null, then they did not manage to authenticate
             if (objectAPI == null)
             {
-                // Create the standard user object
-                objectAPI = CreateUserObject(sforceService);
+                // Check to see if this user is a directory user at all - if so we want to return their details
+                if (authenticatedWho.UserId != null &&
+                    authenticatedWho.UserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.InvariantCultureIgnoreCase) == false)
+                {
+                    // Check to see if the user is in fact a user in the org. We do this by checking the authenticated who object as this is the user actually
+                    // requesting access
+                    objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
 
-                // Apply some default settings
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USER_ID, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USERNAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_EMAIL, null));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_FIRST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LAST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    // Set the status of this user to not authorized, but we do want to return their details
+                    foreach (PropertyAPI property in objectAPI.properties)
+                    {
+                        if (property.developerName.Equals(ManyWhoConstants.MANYWHO_USER_PROPERTY_STATUS, StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            property.contentValue = ManyWhoConstants.AUTHORIZATION_STATUS_NOT_AUTHORIZED;
+                            break;
+                        }
+                    }
+                }
 
-                // Tell ManyWho the user is not authorized to proceed
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_STATUS, ManyWhoConstants.AUTHORIZATION_STATUS_NOT_AUTHORIZED));
+                // If the object is still null, then this is not a user of the directory
+                if (objectAPI == null)
+                {
+                    // Create the standard user object
+                    objectAPI = CreateUserObject(sforceService);
+
+                    // Apply some default settings
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USER_ID, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USERNAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_EMAIL, null));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_FIRST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LAST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+
+                    // Tell ManyWho the user is not authorized to proceed
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_STATUS, ManyWhoConstants.AUTHORIZATION_STATUS_NOT_AUTHORIZED));
+                }
             }
 
             // Finally, decide on the authentication mode
@@ -431,6 +454,7 @@ namespace ManyWho.Service.Salesforce.Singletons
         {
             List<String> groupMemberEmails = null;
             QueryResult queryResult = null;
+            String[] userIds = null;
             String soql = null;
             String where = String.Empty;
 
@@ -465,39 +489,58 @@ namespace ManyWho.Service.Salesforce.Singletons
                 queryResult.records != null &&
                 queryResult.records.Length > 0)
             {
+                userIds = new String[queryResult.records.Length];
+
                 for (int i = 0; i < queryResult.records.Length; i++)
                 {
                     // Get the identifier out of the record, we'll need this to get our user list
-                    where += "Id = '" + queryResult.records[i].Any[0].InnerText + "' OR ";
-
-                    if (i >= 25)
-                    {
-                        notifier.AddLogEntry("Query has returned too many users (max 25) - sending to the first 25.");
-                        break;
-                    }
+                    userIds[i] = queryResult.records[i].Any[0].InnerText;
                 }
 
-                // Trim the where clause back
-                where = where.Substring(0, (where.Length - " OR ".Length));
-
-                // Query salesforce again with this new where clause
-                queryResult = sforceService.query("SELECT Email FROM User WHERE " + where);
-
-                if (queryResult != null &&
-                    queryResult.records != null &&
-                    queryResult.records.Length > 0)
-                {
-                    groupMemberEmails = new List<String>();
-
-                    // Now that we have the user, we need to get the properties from the object so we can map them to a manywho user
-                    for (int j = 0; j < queryResult.records.Length; j++)
-                    {
-                        groupMemberEmails.Add(queryResult.records[j].Any[0].InnerText);
-                    }
-                }
+                groupMemberEmails = this.GetEmailsForUserIds(notifier, sforceService, userIds);
             }
 
             return groupMemberEmails;
+        }
+
+        public List<String> GetEmailsForUserIds(INotifier notifier, SforceService sforceService, String[] userIds)
+        {
+            List<String> userEmails = null;
+            QueryResult queryResult = null;
+            String where = String.Empty;
+
+            for (int i = 0; i < userIds.Length; i++)
+            {
+                // Get the identifier out of the record, we'll need this to get our user list
+                where += "Id = '" + userIds[i] + "' OR ";
+
+                if (i >= 25)
+                {
+                    notifier.AddLogEntry("Too many users need notification (max 25) - sending to the first 25.");
+                    break;
+                }
+            }
+
+            // Trim the where clause back
+            where = where.Substring(0, (where.Length - " OR ".Length));
+
+            // Query salesforce again with this new where clause
+            queryResult = sforceService.query("SELECT Email FROM User WHERE " + where);
+
+            if (queryResult != null &&
+                queryResult.records != null &&
+                queryResult.records.Length > 0)
+            {
+                userEmails = new List<String>();
+
+                // Now that we have the user, we need to get the properties from the object so we can map them to a manywho user
+                for (int j = 0; j < queryResult.records.Length; j++)
+                {
+                    userEmails.Add(queryResult.records[j].Any[0].InnerText);
+                }
+            }
+
+            return userEmails;
         }
 
         /// <summary>
