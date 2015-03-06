@@ -62,7 +62,7 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
             return manyWhoUtilsSingleton;
         }
 
-        public Boolean SendEmail(INotifier notifier, ServiceRequestAPI serviceRequest, Boolean includeTracking)
+        public Boolean SendEmail(INotifier notifier, IAuthenticatedWho authenticatedWho, ServiceRequestAPI serviceRequest, Boolean includeTracking)
         {
             SforceService sforceService = null;
             List<String> toEmails = null;
@@ -113,36 +113,28 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 includeOutcomesAsButtons = Boolean.Parse(includeOutcomesAsButtonsString);
             }
 
-            //if (String.IsNullOrWhiteSpace(toEmail) == false)
-            //{
-                // The user has explicitly provided the "to" person for the email
-            //    toEmails.Add(toEmail);
-            //}
-            //else
-            //{
-                if (serviceRequest.authorization.groups == null ||
-                    serviceRequest.authorization.groups.Count == 0)
-                {
-                    throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot be null or empty as we will not know who to send the email to.");
-                }
+            if (serviceRequest.authorization.groups == null ||
+                serviceRequest.authorization.groups.Count == 0)
+            {
+                throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot be null or empty as we will not know who to send the email to.");
+            }
 
-                if (serviceRequest.authorization.groups.Count > 1)
-                {
-                    throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot contain more than one group currently.");
-                }
+            if (serviceRequest.authorization.groups.Count > 1)
+            {
+                throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot contain more than one group currently.");
+            }
 
-                // We need to get the users from salesforce
-                sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+            // We need to get the users from salesforce
+            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
 
-                // Get the to emails from Salesforce
-                toEmails = SalesforceAuthenticationSingleton.GetInstance().GetGroupMemberEmails(notifier, sforceService, serviceRequest, serviceRequest.authorization.groups[0].authenticationId);
+            // Get the to emails from Salesforce
+            toEmails = SalesforceAuthenticationSingleton.GetInstance().GetGroupMemberEmails(notifier, sforceService, serviceRequest, serviceRequest.authorization.groups[0].authenticationId);
 
-                if (toEmails == null ||
-                    toEmails.Count == 0)
-                {
-                    throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups configuration is not returning any users to send the email to.");
-                }
-            //}
+            if (toEmails == null ||
+                toEmails.Count == 0)
+            {
+                throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups configuration is not returning any users to send the email to.");
+            }
             
             if (includeOutcomesAsButtons == false)
             {

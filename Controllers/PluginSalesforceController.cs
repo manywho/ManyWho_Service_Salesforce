@@ -283,7 +283,7 @@ namespace ManyWho.Flow.Web.Controllers
         {
             try
             {
-                return SalesforceServiceSingleton.GetInstance().Describe(describeServiceRequest);
+                return SalesforceServiceSingleton.GetInstance().Describe(this.GetWho(), describeServiceRequest);
             }
             catch (Exception exception)
             {
@@ -297,7 +297,7 @@ namespace ManyWho.Flow.Web.Controllers
         {
             try
             {
-                return SalesforceServiceSingleton.GetInstance().DescribeTables(objectDataRequestAPI);
+                return SalesforceServiceSingleton.GetInstance().DescribeTables(this.GetWho(), objectDataRequestAPI);
             }
             catch (Exception exception)
             {
@@ -311,7 +311,7 @@ namespace ManyWho.Flow.Web.Controllers
         {
             try
             {
-                return SalesforceServiceSingleton.GetInstance().DescribeFields(objectDataRequestAPI);
+                return SalesforceServiceSingleton.GetInstance().DescribeFields(this.GetWho(), objectDataRequestAPI);
             }
             catch (Exception exception)
             {

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using ManyWho.Flow.SDK;
 using ManyWho.Flow.SDK.Utils;
 using ManyWho.Flow.SDK.Security;
+using ManyWho.Flow.SDK.Run;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Service.Salesforce.Utils;
@@ -61,7 +62,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return salesforceAuthenticationSingleton;
         }
 
-        public Int32 GetAuthorizationContextCount(INotifier notifier, IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, AuthorizationAPI authorization)
+        public Int32 GetAuthorizationContextCount(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, AuthorizationAPI authorization)
         {
             SforceService sforceService = null;
             Int32 authorizationContextCount = 0;
@@ -89,7 +90,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             // Login to the service
-            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, configurationValues, true, false);
 
             if (authorization.groups != null &&
                 authorization.groups.Count > 0)
@@ -129,14 +130,35 @@ namespace ManyWho.Service.Salesforce.Singletons
             return authorizationContextCount;
         }
 
-        public List<ObjectAPI> GetUserInAuthorizationContext(INotifier notifier, IAuthenticatedWho authenticatedWho, String alertEmail, String authenticationUrl, String chatterBaseUrl, String username, String password, String securityToken, String clientId, Boolean loginUsingOAuth2, ObjectDataRequestAPI objectDataRequest)
+        public List<ObjectAPI> GetUserInAuthorizationContext(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, ObjectDataRequestAPI objectDataRequest)
         {
             SforceService sforceService = null;
-            ObjectAPI objectAPI = null;
             List<ObjectAPI> objectAPIs = null;
+            ObjectAPI objectAPI = null;
+            Boolean loginUsingOAuth2 = false;
+            String authenticationUrl = null;
+            String chatterBaseUrl = null;
+            String alertEmail = null;
+            String consumerSecret = null;
+            String consumerKey = null;
+
+            // Get the configuration values out
+            authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, configurationValues, false);
+            chatterBaseUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CHATTER_BASE_URL, configurationValues, false);
+            alertEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, configurationValues, false);
+            consumerSecret = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CONSUMER_SECRET, configurationValues, false);
+            consumerKey = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CONSUMER_KEY, configurationValues, false);
 
             // Login to the service
-            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, configurationValues, true, false);
+
+            // Check to see if the admin wants users to login using oauth2
+            if (String.IsNullOrWhiteSpace(consumerSecret) == false &&
+                String.IsNullOrWhiteSpace(consumerKey) == false)
+            {
+                // We have the consumer information, we should login using oauth
+                loginUsingOAuth2 = true;
+            }
 
             // We start by checking if the request is based on public users. Despite this seeming a little odd, it does give the plugin the opportunity
             // to assign information to the public user that may be helpful for other operations - e.g. anoymous collaboration.
@@ -369,7 +391,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     loginUrl = authenticationUrl;
                 }
 
-                loginUrl = String.Format(loginUrl + "/services/oauth2/authorize?response_type=code&client_id={0}", clientId);
+                loginUrl = String.Format(loginUrl + "/services/oauth2/authorize?response_type=code&client_id={0}", consumerKey);
 
                 objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_AUTHENTICATION_TYPE, ManyWhoConstants.AUTHENTICATION_TYPE_OAUTH2));
                 objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LOGIN_URL, loginUrl));

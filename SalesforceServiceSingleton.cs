@@ -69,7 +69,11 @@ namespace ManyWho.Service.Salesforce
         public const String SERVICE_VALUE_ADMIN_EMAIL = "AdminEmail";
         public const String SERVICE_VALUE_CONSUMER_SECRET = "Consumer Secret";
         public const String SERVICE_VALUE_CONSUMER_KEY = "Consumer Key";
-        public const String SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS = "Data Access Using Stored Credentials";
+        public const String SERVICE_VALUE_AUTHENTICATION_STRATEGY = "Authentication Strategy";
+
+        public const String AUTHENTICATION_STRATEGY_STANDARD = "Standard";
+        public const String AUTHENTICATION_STRATEGY_SUPER_USER = "SuperUser";
+        public const String AUTHENTICATION_STRATEGY_ACTIVE_USER = "ActiveUser";
 
         public const String SERVICE_VALUE_COLLEAGUES = "COLLEAGUES";
         public const String SERVICE_VALUE_DELEGATES = "DELEGATES";
@@ -136,11 +140,12 @@ namespace ManyWho.Service.Salesforce
         /// <summary>
         /// This method performs the actual describe for the service setup. The code here provides the configuration information needed to use the salesforce.com plugin.
         /// </summary>
-        public DescribeServiceResponseAPI Describe(DescribeServiceRequestAPI describeServiceRequest)
+        public DescribeServiceResponseAPI Describe(IAuthenticatedWho authenticatedWho, DescribeServiceRequestAPI describeServiceRequest)
         {
             DescribeServiceInstallResponseAPI describeServiceInstallResponse = null;
             DescribeServiceActionResponseAPI describeServiceAction = null;
             DescribeServiceResponseAPI describeServiceResponse = null;
+            String authenticationStrategy = null;
             String chatterBaseUrl = null;
             String authenticationUrl = null;
             String username = null;
@@ -174,7 +179,7 @@ namespace ManyWho.Service.Salesforce
                 securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, describeServiceRequest.configurationValues, false);
                 consumerSecret = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_SECRET, describeServiceRequest.configurationValues, false);
                 consumerKey = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_KEY, describeServiceRequest.configurationValues, false);
-                //dataAccessUsingStoredCredentials = Boolean.Parse(ValueUtils.GetContentValue(SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS, describeServiceRequest.configurationValues, false));
+                authenticationStrategy = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_STRATEGY, describeServiceRequest.configurationValues, false);
 
                 // Get the optional email properties
                 defaultEmail = ValueUtils.GetContentValue(ManyWhoUtilsSingleton.APP_SETTING_DEFAULT_FROM_EMAIL, describeServiceRequest.configurationValues, false);
@@ -207,7 +212,7 @@ namespace ManyWho.Service.Salesforce
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_SECURITY_TOKEN, securityToken, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_CONSUMER_SECRET, consumerSecret, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CONSUMER_KEY, consumerKey, false));
-            //describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_BOOLEAN, SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS, dataAccessUsingStoredCredentials.ToString(), false));
+            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_STRATEGY, authenticationStrategy, false));
 
             // The configuration values for the email stuff
             describeServiceResponse.configurationValues.Add(new DescribeValueAPI() { contentType = ManyWhoConstants.CONTENT_TYPE_STRING, developerName = ManyWhoUtilsSingleton.APP_SETTING_DEFAULT_FROM_EMAIL, contentValue = defaultEmail, isRequired = false });
@@ -336,7 +341,7 @@ namespace ManyWho.Service.Salesforce
                 // We now create the associated things for this service that we'd like to install into the manywho account
                 describeServiceInstallResponse = new DescribeServiceInstallResponseAPI();
                 describeServiceInstallResponse.typeElements = new List<TypeElementRequestAPI>();
-                describeServiceInstallResponse.typeElements = SalesforceDataSingleton.GetInstance().GetTypeElements(authenticationUrl, username, password, securityToken);
+                describeServiceInstallResponse.typeElements = SalesforceDataSingleton.GetInstance().GetTypeElements(authenticatedWho, describeServiceRequest.configurationValues);
 
                 // Assign the installation object to our main describe response
                 describeServiceResponse.install = describeServiceInstallResponse;
@@ -348,13 +353,9 @@ namespace ManyWho.Service.Salesforce
         /// <summary>
         /// This method returns the list of tables available for the org being queried.
         /// </summary>
-        public List<TypeElementBindingAPI> DescribeTables(ObjectDataRequestAPI objectDataRequestAPI)
+        public List<TypeElementBindingAPI> DescribeTables(IAuthenticatedWho authenticatedWho, ObjectDataRequestAPI objectDataRequestAPI)
         {
             List<TypeElementBindingAPI> typeElementBindings = null;
-            String authenticationUrl = null;
-            String username = null;
-            String password = null;
-            String securityToken = null;
 
             if (objectDataRequestAPI == null)
             {
@@ -367,14 +368,8 @@ namespace ManyWho.Service.Salesforce
                 throw new ArgumentNullException("ObjectDataRequest", "ObjectDataRequest.ConfigurationValues cannot be null or empty.");
             }
 
-            // Pull out the configuration values that are needed to query for tables
-            authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
-            securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
-
             // Grab the table description
-            typeElementBindings = SalesforceDataSingleton.GetInstance().DescribeTables(authenticationUrl, username, password, securityToken);
+            typeElementBindings = SalesforceDataSingleton.GetInstance().DescribeTables(authenticatedWho, objectDataRequestAPI.configurationValues);
 
             return typeElementBindings;
         }
@@ -382,13 +377,9 @@ namespace ManyWho.Service.Salesforce
         /// <summary>
         /// This method returns the list of fields for the specified object and org being queried.
         /// </summary>
-        public List<TypeElementPropertyBindingAPI> DescribeFields(ObjectDataRequestAPI objectDataRequestAPI)
+        public List<TypeElementPropertyBindingAPI> DescribeFields(IAuthenticatedWho authenticatedWho, ObjectDataRequestAPI objectDataRequestAPI)
         {
             List<TypeElementPropertyBindingAPI> typeElementFieldBindings = null;
-            String authenticationUrl = null;
-            String username = null;
-            String password = null;
-            String securityToken = null;
             String tableName = null;
 
             if (objectDataRequestAPI == null)
@@ -408,12 +399,6 @@ namespace ManyWho.Service.Salesforce
             {
                 throw new ArgumentNullException("ObjectDataReqeust.ListFilter.Where", "ObjectDataRequest.ListFilter.Where cannot be null or empty.");
             }
-
-            // Pull out the configuration values that are needed to query for fields
-            authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
-            securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
 
             // We send the name of the table through as part of the where query
             foreach (ListFilterWhereAPI listFilterWhere in objectDataRequestAPI.listFilter.where)
@@ -435,7 +420,7 @@ namespace ManyWho.Service.Salesforce
             }
 
             // Grab the fields for the provided table 
-            typeElementFieldBindings = SalesforceDataSingleton.GetInstance().DescribeFields(authenticationUrl, username, password, securityToken, tableName);
+            typeElementFieldBindings = SalesforceDataSingleton.GetInstance().DescribeFields(authenticatedWho, objectDataRequestAPI.configurationValues, tableName);
 
             return typeElementFieldBindings;
         }
@@ -485,7 +470,7 @@ namespace ManyWho.Service.Salesforce
                 serviceResponse.token = serviceRequest.token;
 
                 // Send the email with our task identifier added
-                if (ManyWhoUtilsSingleton.GetInstance().SendEmail(notifier, serviceRequest, false) == true)
+                if (ManyWhoUtilsSingleton.GetInstance().SendEmail(notifier, authenticatedWho, serviceRequest, false) == true)
                 {
                     // Store this email task request so we have it for any replies from the user - getting back the unique identifier for the task
                     ManyWhoUtilsSingleton.GetInstance().StoreTaskRequest(authenticatedWho, serviceRequest);
@@ -577,7 +562,7 @@ namespace ManyWho.Service.Salesforce
                 else
                 {
                     // Get the count of users for this authorization context
-                    userCount = SalesforceAuthenticationSingleton.GetInstance().GetAuthorizationContextCount(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, voteRequestAPI.authorization);
+                    userCount = SalesforceAuthenticationSingleton.GetInstance().GetAuthorizationContextCount(notifier, authenticatedWho, voteRequestAPI.configurationValues, voteRequestAPI.authorization);
 
                     // Round the percentage up to the nearest whole digit
                     percentage = (Int32)Math.Ceiling((double)(((double)outcomeCount / (double)userCount) * 100));
@@ -700,7 +685,7 @@ namespace ManyWho.Service.Salesforce
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, serviceNotificationRequestAPI.configurationValues, false);
 
             // We need to get the users from salesforce
-            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceNotificationRequestAPI.configurationValues, true, false);
 
             if (serviceNotificationRequestAPI.notificationMessages != null &&
                 serviceNotificationRequestAPI.notificationMessages.Count > 0)
@@ -760,7 +745,7 @@ namespace ManyWho.Service.Salesforce
                 objectDataRequestAPI.objectData.Count > 0)
             {
                 // Save the data back to salesforce.com
-                objectDataRequestAPI.objectData = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, objectDataRequestAPI.objectData);
+                objectDataRequestAPI.objectData = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, objectDataRequestAPI.configurationValues, objectDataRequestAPI.objectData);
             }
 
             // Create the object data response object
@@ -846,12 +831,12 @@ namespace ManyWho.Service.Salesforce
                 }
 
                 // Execute the soql command
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, authenticationUrl, username, password, securityToken, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter, soql);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter, soql);
             }
             else
             {
                 // Do the actual selection to populate one or many of these object types
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, authenticationUrl, username, password, securityToken, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter);
             }
 
             // Assign the has more results and clean up the data slightly
@@ -890,16 +875,6 @@ namespace ManyWho.Service.Salesforce
         public ObjectDataResponseAPI GetUserInAuthorizationContext(INotifier notifier, IAuthenticatedWho authenticatedWho, ObjectDataRequestAPI objectDataRequestAPI)
         {
             ObjectDataResponseAPI objectDataResponseAPI = null;
-            Boolean dataAccessUsingStoredCredentials = false;
-            Boolean loginUsingOAuth2 = false;
-            String authenticationUrl = null;
-            String chatterBaseUrl = null;
-            String username = null;
-            String password = null;
-            String securityToken = null;
-            String adminEmail = null;
-            String consumerSecret = null;
-            String consumerKey = null;
 
             if (authenticatedWho == null)
             {
@@ -917,29 +892,6 @@ namespace ManyWho.Service.Salesforce
                 throw new ArgumentNullException("ObjectDataRequest.ConfigurationValues", "ObjectDataRequest.ConfigurationValues cannot be null or empty.");
             }
 
-            // Get the configuration values out that are needed for the context lookup
-            authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            chatterBaseUrl = ValueUtils.GetContentValue(SERVICE_VALUE_CHATTER_BASE_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
-            adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, objectDataRequestAPI.configurationValues, true);
-            securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
-            consumerSecret = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_SECRET, objectDataRequestAPI.configurationValues, false);
-            consumerKey = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_KEY, objectDataRequestAPI.configurationValues, false);
-
-            if (String.IsNullOrWhiteSpace(ValueUtils.GetContentValue(SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS, objectDataRequestAPI.configurationValues, false)) == false)
-            {
-                dataAccessUsingStoredCredentials = Boolean.Parse(ValueUtils.GetContentValue(SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS, objectDataRequestAPI.configurationValues, false));
-            }
-
-            // Check to see if the admin wants users to login using oauth2
-            if (String.IsNullOrWhiteSpace(consumerSecret) == false &&
-                String.IsNullOrWhiteSpace(consumerKey) == false)
-            {
-                // We have the consumer information, we should login using oauth
-                loginUsingOAuth2 = true;
-            }
-
             // Create a new response object to house our results
             objectDataResponseAPI = new ObjectDataResponseAPI();
 
@@ -952,7 +904,7 @@ namespace ManyWho.Service.Salesforce
             ObjectDataTypeAPI objectDataType = objectDataRequestAPI.objectDataType;
 
             // Do the actual selection to populate one or many of these object types
-            objectDataResponseAPI.objectData = SalesforceAuthenticationSingleton.GetInstance().GetUserInAuthorizationContext(notifier, authenticatedWho, adminEmail, authenticationUrl, chatterBaseUrl, username, password, securityToken, consumerKey, loginUsingOAuth2, objectDataRequestAPI);
+            objectDataResponseAPI.objectData = SalesforceAuthenticationSingleton.GetInstance().GetUserInAuthorizationContext(notifier, authenticatedWho, objectDataRequestAPI.configurationValues, objectDataRequestAPI);
 
             return objectDataResponseAPI;
         }
@@ -1082,7 +1034,7 @@ namespace ManyWho.Service.Salesforce
 
                 // Do the actual selection to populate one or many of these object types
                 // TODO: For now, we pass in a null for the filter
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, authenticationUrl, username, password, securityToken, "User", typePropertyAPIs, listFilterAPI);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "User", typePropertyAPIs, listFilterAPI);
 
                 // Check to see if the query returned any data
                 if (objectDataResponseAPI.objectData != null &&
@@ -1219,7 +1171,7 @@ namespace ManyWho.Service.Salesforce
 
                 // Do the actual selection to populate one or many of these object types
                 // TODO: For now, we pass in a null for the filter
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, authenticationUrl, username, password, securityToken, "CollaborationGroup", typePropertyAPIs, listFilterAPI);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "CollaborationGroup", typePropertyAPIs, listFilterAPI);
 
                 // Check to see if the query returned any data
                 if (objectDataResponseAPI.objectData != null &&
@@ -1268,7 +1220,6 @@ namespace ManyWho.Service.Salesforce
             AuthenticatedWhoResultAPI authenticatedUser = null;
             GetUserInfoResult userInfoResult = null;
             SforceService sforceService = null;
-            Boolean dataAccessUsingStoredCredentials = false;
             String chatterBaseUrl = null;
             String loginUrl = null;
             String consumerSecret = null;
@@ -1315,11 +1266,6 @@ namespace ManyWho.Service.Salesforce
                 chatterBaseUrl = ValueUtils.GetContentValue(SERVICE_VALUE_CHATTER_BASE_URL, authenticationCredentialsAPI.configurationValues, true);
                 consumerSecret = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_SECRET, authenticationCredentialsAPI.configurationValues, false);
                 consumerKey = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_KEY, authenticationCredentialsAPI.configurationValues, false);
-
-                if (String.IsNullOrWhiteSpace(ValueUtils.GetContentValue(SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS, authenticationCredentialsAPI.configurationValues, false)) == false)
-                {
-                    dataAccessUsingStoredCredentials = Boolean.Parse(ValueUtils.GetContentValue(SERVICE_VALUE_DATA_ACCESS_USING_STORED_CREDENTIALS, authenticationCredentialsAPI.configurationValues, false));
-                }
 
                 authenticatedUser.identityProvider = loginUrl;
             }
@@ -1408,12 +1354,12 @@ namespace ManyWho.Service.Salesforce
                     if (String.IsNullOrWhiteSpace(authenticationCredentialsAPI.sessionToken) == false)
                     {
                         // The user has already logged into salesforce so we simply check them against the session
-                        sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationCredentialsAPI.sessionToken, authenticationCredentialsAPI.sessionUrl);
+                        sforceService = SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(authenticationCredentialsAPI.sessionToken, authenticationCredentialsAPI.sessionUrl);
                     }
                     else
                     {
                         // Log the user into salesforce using the details provided
-                        sforceService = SalesforceDataSingleton.GetInstance().Login(loginUrl, authenticationCredentialsAPI.username, authenticationCredentialsAPI.password, authenticationCredentialsAPI.token);
+                        sforceService = SalesforceDataSingleton.GetInstance().LoginUsingCredentials(loginUrl, authenticationCredentialsAPI.username, authenticationCredentialsAPI.password, authenticationCredentialsAPI.token);
                     }
 
                     // Make sure the web service object is not null
@@ -1498,7 +1444,7 @@ namespace ManyWho.Service.Salesforce
             manywhoObjects.Add(manywhoObject);
 
             // Save the manywho object to salesforce
-            manywhoObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, manywhoObjects);
+            manywhoObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, socialServiceRequestAPI.configurationValues, manywhoObjects);
 
             // Check to see if anything came back as part of the save - it should unless there was a fault
             if (manywhoObjects != null &&
@@ -2746,7 +2692,7 @@ namespace ManyWho.Service.Salesforce
             objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "LastModifiedDate" });
 
             // Construct the query so we get the right objects back from Salesforce
-            attachments = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, authenticationUrl, username, password, securityToken, "Attachment", objectDataTypeProperties, listFilter);
+            attachments = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, fileDataRequest.configurationValues, "Attachment", objectDataTypeProperties, listFilter);
 
             // The attachments objects now need to be translated to the standardized ManyWho properties
             if (attachments != null &&
@@ -2864,7 +2810,7 @@ namespace ManyWho.Service.Salesforce
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, fileDataRequest.configurationValues, false);
 
             // Login to the salesforce service
-            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, fileDataRequest.configurationValues, false, false);
 
             // Now we have the file data request, we grab out the data that needs to be uploaded to the service
             if (multipartFormDataStreamProvider.FileData != null &&

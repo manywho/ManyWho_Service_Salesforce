@@ -16,6 +16,7 @@ using ManyWho.Flow.SDK.Describe;
 using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Draw.Elements.Type;
 using ManyWho.Flow.SDK.Draw.Elements.Group;
+using ManyWho.Flow.SDK.Run;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Service.Salesforce.Utils;
@@ -69,7 +70,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return salesforceDataSingleton;
         }
 
-        public List<TypeElementBindingAPI> DescribeTables(String authenticationUrl, String username, String password, String securityToken)
+        public List<TypeElementBindingAPI> DescribeTables(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
         {
             TypeElementBindingAPI typeElementBinding = null;
             List<TypeElementBindingAPI> typeElementBindings = null;
@@ -77,7 +78,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             DescribeGlobalResult describeGlobalResult = null;
 
             // Login to the service
-            sforceService = this.Login(authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
@@ -112,7 +113,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElementBindings;
         }
 
-        public List<TypeElementPropertyBindingAPI> DescribeFields(String authenticationUrl, String username, String password, String securityToken, String tableName)
+        public List<TypeElementPropertyBindingAPI> DescribeFields(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String tableName)
         {
             TypeElementPropertyBindingAPI typeElementFieldBinding = null;
             List<TypeElementPropertyBindingAPI> typeElementFieldBindings = null;
@@ -121,7 +122,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Field[] fields = null;
 
             // Login to the service
-            sforceService = this.Login(authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
             // Grab the object description and pull out the fields
             describeSObjectResult = sforceService.describeSObject(tableName);
@@ -159,7 +160,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElementFieldBindings;
         }
 
-        public List<TypeElementRequestAPI> GetTypeElements(String authenticationUrl, String username, String password, String securityToken)
+        public List<TypeElementRequestAPI> GetTypeElements(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
         {
             TypeElementRequestAPI typeElement = null;
             List<TypeElementRequestAPI> typeElements = null;
@@ -175,7 +176,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Int32 entryCounter = 0;
 
             // Login to the service
-            sforceService = this.Login(authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
@@ -346,7 +347,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElements;
         }
 
-        public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, List<ObjectAPI> objectAPIs)
+        public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectAPI> objectAPIs)
         {
             List<ObjectDataTypePropertyAPI> objectDataTypeProperties = null;
             DescribeSObjectResult describeSObjectResult = null;
@@ -366,7 +367,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 objectAPIs.Count > 0)
             {
                 // Step 1: Login to the service so we can do a bunch of things
-                sforceService = this.Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+                sforceService = this.Login(authenticatedWho, configurationValues, false, false);
                 
                 // Step 2: in the save is to get the latest information about the object from salesforce
                 // TODO: this should definitely be cached and operate under a rolling nightly refresh
@@ -854,13 +855,13 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
 
             // Login to the service
-            sforceService = this.Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, false);
 
             // If the request has a search query, we need to alter the SOQL to SOSL
             if (listFilterAPI != null &&
@@ -898,7 +899,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
@@ -906,7 +907,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Boolean includesId = false;
 
             // Login to the service
-            sforceService = this.Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, false);
 
             soqlQuery = "";
 
@@ -1441,7 +1442,69 @@ namespace ManyWho.Service.Salesforce.Singletons
             return soql;
         }
 
-        public SforceService Login(String sessionToken, String sessionUrl)
+        public SforceService Login(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, Boolean preferElevatedAccess, Boolean isModelingOperation)
+        {
+            SforceService sforceService = null;
+            String authenticationStrategy = null;
+            String authenticationUrl = null;
+            String securityToken = null;
+            String username = null;
+            String password = null;
+
+            if (authenticatedWho == null)
+            {
+                throw new ArgumentNullException("AuthenticatedWho", "The AuthenticatedWho object cannot be null.");
+            }
+
+            if (configurationValues == null ||
+                configurationValues.Count == 0)
+            {
+                throw new ArgumentNullException("ConfigurationValues", "The ConfigurationValues cannot be null or empty.");
+            }
+
+            // Get the authentication strategy out
+            authenticationStrategy = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY, configurationValues, false);
+
+            // If we don't have an authentication strategy, we use a standard configuration
+            if (String.IsNullOrWhiteSpace(authenticationStrategy) == true)
+            {
+                authenticationStrategy = SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD;
+            }
+
+            // This path should be used for all users when executing a workflow, unless this is a system operation that needs higher level
+            // credentials
+            if (isModelingOperation == true ||
+                authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_SUPER_USER, StringComparison.OrdinalIgnoreCase) == true ||
+                (preferElevatedAccess == true &&
+                 authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true))
+            {
+                // Grab the actual configuration values out
+                authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, configurationValues, true);
+                username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, configurationValues, true);
+                password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, configurationValues, true);
+                securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, configurationValues, false);
+
+                sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
+            }
+            else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
+                     authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                // We should log the user in using their session information that's been provided via a previous explicit login
+                sforceService = this.LogUserInBasedOnSession(
+                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
+                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
+                );
+            }
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
+            return sforceService;
+        }
+
+        public SforceService LogUserInBasedOnSession(String sessionToken, String sessionUrl)
         {
             SforceService sforceService = null;
 
@@ -1454,35 +1517,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return sforceService;
         }
 
-        public SforceService Login(IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken)
-        {
-            SforceService sforceService = null;
-
-            // Check to see if the calling user is a public user - if so, we login using the stored credentials or if the user is logged
-            // into a different directory than Salesforce (so is ostensibly a public user to SFDC).
-            if (authenticatedWho.ManyWhoUserId == ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_MANYWHO_USER_ID ||
-                authenticatedWho.Token.IndexOf("Salesforce:", StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                sforceService = this.Login(authenticationUrl, username, password, securityToken);
-            }
-            else if (String.IsNullOrWhiteSpace(authenticatedWho.Token) == false &&
-                     authenticatedWho.Token.IndexOf("||") > 0)
-            {
-                // We should log the user in using their session information
-                sforceService = this.Login(
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
-                );
-            }
-            else
-            {
-                throw new ArgumentNullException("Authentication", "Cannot login to Salesforce without the correct authentication information.");
-            }
-
-            return sforceService;
-        }
-
-        public SforceService Login(String authenticationUrl, String username, String password, String securityToken)
+        public SforceService LoginUsingCredentials(String authenticationUrl, String username, String password, String securityToken)
         {
             LoginResult loginResult = null;
             SforceService sforceService = null;

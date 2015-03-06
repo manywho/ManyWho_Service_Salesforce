@@ -95,7 +95,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                             groupAuthenticationToken.Trim().Length == 0)
                         {
                             // Login as the API user
-                            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+                            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
 
                             // Get the session id out as we'll use that for the oauth login
                             groupAuthenticationToken = sforceService.SessionHeaderValue.sessionId;
@@ -246,7 +246,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 taskObjects.Add(taskObject);
 
                 // Save the task object to salesforce
-                taskObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, taskObjects);
+                taskObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, serviceRequest.configurationValues, taskObjects);
 
                 // Check to see if anything came back as part of the save - it should unless there was a fault
                 if (taskObjects != null &&
@@ -347,7 +347,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 eventObjects.Add(eventObject);
 
                 // Save the event object to salesforce
-                eventObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, eventObjects);
+                eventObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, serviceRequest.configurationValues, eventObjects);
 
                 // Check to see if anything came back as part of the save - it should unless there was a fault
                 if (eventObjects != null &&
