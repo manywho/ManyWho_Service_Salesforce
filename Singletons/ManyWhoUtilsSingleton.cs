@@ -79,11 +79,6 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
             String securityToken = null;
             String redirectUri = null;
 
-            if (serviceRequest.authorization == null)
-            {
-                throw new ArgumentNullException("ServiceRequest.Authorization", "The ServiceRequest.Authorization property cannot be null as we will not know who to send the email to.");
-            }
-
             // Get the configuration information for salesforce
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
             username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
@@ -113,27 +108,40 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 includeOutcomesAsButtons = Boolean.Parse(includeOutcomesAsButtonsString);
             }
 
-            if (serviceRequest.authorization.groups == null ||
-                serviceRequest.authorization.groups.Count == 0)
+            if (String.IsNullOrWhiteSpace(toEmail) == true)
             {
-                throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot be null or empty as we will not know who to send the email to.");
+                if (serviceRequest.authorization == null)
+                {
+                    throw new ArgumentNullException("ServiceRequest.Authorization", "The ServiceRequest.Authorization property cannot be null as we will not know who to send the email to.");
+                }
+
+                if (serviceRequest.authorization.groups == null ||
+                    serviceRequest.authorization.groups.Count == 0)
+                {
+                    throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot be null or empty as we will not know who to send the email to.");
+                }
+
+                if (serviceRequest.authorization.groups.Count > 1)
+                {
+                    throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot contain more than one group currently.");
+                }
+
+                // We need to get the users from salesforce
+                sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
+
+                // Get the to emails from Salesforce
+                toEmails = SalesforceAuthenticationSingleton.GetInstance().GetGroupMemberEmails(notifier, sforceService, serviceRequest, serviceRequest.authorization.groups[0].authenticationId);
+
+                if (toEmails == null ||
+                    toEmails.Count == 0)
+                {
+                    throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups configuration is not returning any users to send the email to.");
+                }
             }
-
-            if (serviceRequest.authorization.groups.Count > 1)
+            else
             {
-                throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups property cannot contain more than one group currently.");
-            }
-
-            // We need to get the users from salesforce
-            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
-
-            // Get the to emails from Salesforce
-            toEmails = SalesforceAuthenticationSingleton.GetInstance().GetGroupMemberEmails(notifier, sforceService, serviceRequest, serviceRequest.authorization.groups[0].authenticationId);
-
-            if (toEmails == null ||
-                toEmails.Count == 0)
-            {
-                throw new ArgumentNullException("ServiceRequest.Authorization.Groups", "The ServiceRequest.Authorization.Groups configuration is not returning any users to send the email to.");
+                // The user is explicitly setting the to email
+                toEmails.Add(toEmail);
             }
             
             if (includeOutcomesAsButtons == false)
