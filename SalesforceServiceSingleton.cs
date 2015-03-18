@@ -836,7 +836,7 @@ namespace ManyWho.Service.Salesforce
             else
             {
                 // Do the actual selection to populate one or many of these object types
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter, false);
             }
 
             // Assign the has more results and clean up the data slightly
@@ -1034,7 +1034,7 @@ namespace ManyWho.Service.Salesforce
 
                 // Do the actual selection to populate one or many of these object types
                 // TODO: For now, we pass in a null for the filter
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "User", typePropertyAPIs, listFilterAPI);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "User", typePropertyAPIs, listFilterAPI, true);
 
                 // Check to see if the query returned any data
                 if (objectDataResponseAPI.objectData != null &&
@@ -1171,7 +1171,7 @@ namespace ManyWho.Service.Salesforce
 
                 // Do the actual selection to populate one or many of these object types
                 // TODO: For now, we pass in a null for the filter
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "CollaborationGroup", typePropertyAPIs, listFilterAPI);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "CollaborationGroup", typePropertyAPIs, listFilterAPI, true);
 
                 // Check to see if the query returned any data
                 if (objectDataResponseAPI.objectData != null &&
@@ -1359,7 +1359,7 @@ namespace ManyWho.Service.Salesforce
                     else
                     {
                         // Log the user into salesforce using the details provided
-                        sforceService = SalesforceDataSingleton.GetInstance().LoginUsingCredentials(loginUrl, authenticationCredentialsAPI.username, authenticationCredentialsAPI.password, authenticationCredentialsAPI.token);
+                        sforceService = SalesforceDataSingleton.GetInstance().LoginUsingCredentials(loginUrl, authenticationCredentialsAPI.username, authenticationCredentialsAPI.password, null);
                     }
 
                     // Make sure the web service object is not null
@@ -2692,7 +2692,7 @@ namespace ManyWho.Service.Salesforce
             objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "LastModifiedDate" });
 
             // Construct the query so we get the right objects back from Salesforce
-            attachments = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, fileDataRequest.configurationValues, "Attachment", objectDataTypeProperties, listFilter);
+            attachments = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, fileDataRequest.configurationValues, "Attachment", objectDataTypeProperties, listFilter, false);
 
             // The attachments objects now need to be translated to the standardized ManyWho properties
             if (attachments != null &&

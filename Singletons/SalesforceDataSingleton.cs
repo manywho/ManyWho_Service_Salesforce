@@ -899,7 +899,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, Boolean isModelingOperation)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
@@ -907,7 +907,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Boolean includesId = false;
 
             // Login to the service
-            sforceService = this.Login(authenticatedWho, configurationValues, false, false);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, isModelingOperation);
 
             soqlQuery = "";
 
