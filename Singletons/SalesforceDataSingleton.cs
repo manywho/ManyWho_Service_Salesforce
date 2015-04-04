@@ -347,9 +347,9 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElements;
         }
 
-        public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectAPI> objectAPIs)
+        public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, List<ObjectAPI> objectAPIs)
         {
-            List<ObjectDataTypePropertyAPI> objectDataTypeProperties = null;
+            List<ObjectDataTypePropertyAPI> objectDataTypePropertiesToSelect = null;
             DescribeSObjectResult describeSObjectResult = null;
             Field[] fields = null;
             String selectSoql = null;
@@ -600,10 +600,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                                         continue;
                                     }
                                 }
-                                // The field is not nillable, so we need to check we have a value
-                                else if (referencedPropertyAPI == null ||
-                                         referencedPropertyAPI.contentValue == null ||
-                                         referencedPropertyAPI.contentValue.Trim().Length == 0)
+                                // The field is not nillable, so we need to check we have a value if the user is passing one in - the previous logic
+                                // will not include this field if the data coming in has not been included
+                                else if (referencedPropertyAPI != null &&
+                                         (referencedPropertyAPI.contentValue == null ||
+                                          referencedPropertyAPI.contentValue.Trim().Length == 0))
                                 {
                                     if ((field.updateable == false &&
                                          field.createable == false) ||
@@ -821,16 +822,25 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Get rid of the trailing OR
                 idWhere = idWhere.Substring(0, idWhere.Length - " OR ".Length);
 
-                // Create the list of object data type properties so we do the select correctly
-                objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+                //// Create the list of object data type properties so we do the select correctly
+                objectDataTypePropertiesToSelect = new List<ObjectDataTypePropertyAPI>();
 
-                // Now we use the properties to get the selection columns
-                foreach (PropertyAPI propertyAPI in propertyAPIs)
+                //// Now we use the properties to get the selection columns
+                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
                 {
-                    selectSoql += propertyAPI.developerName + ", ";
-                    objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = propertyAPI.developerName });
+                    // Go through each of the fields to check that it exists in the metadata
+                    foreach (Field field in describeSObjectResult.fields)
+                    {
+                        if (field.name.Equals(objectDataTypeProperty.developerName, StringComparison.InvariantCultureIgnoreCase) == true)
+                        {
+                            // The field in the object data exists, so we'll have validated the content value in the above algorithm
+                            selectSoql += field.name + ", ";
+                            objectDataTypePropertiesToSelect.Add(objectDataTypeProperty);
+                            break;
+                        }
+                    }
 
-                    if (propertyAPI.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
+                    if (objectDataTypeProperty.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                     {
                         includesId = true;
                     }
@@ -849,7 +859,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Dispatch the query and get the results.  We do this because salesforce may have done more
                 // than simply complete the id field.  Workflow rules and other assignment features may have manipulated the
                 // object values and all of this needs to be reflected in the result we send back to the user
-                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, selectSoql, includesId, objectDataTypeProperties);
+                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, selectSoql, includesId, objectDataTypePropertiesToSelect);
             }
 
             return objectAPIs;
@@ -942,7 +952,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI) + ")";
 
                 // Dispatch the search and get the results
-                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, listFilterAPI);
+                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, propertyAPIs, listFilterAPI);
             }
             else
             {
@@ -1062,23 +1072,43 @@ namespace ManyWho.Service.Salesforce.Singletons
                     objectAPI.developerName = objectName;
                     objectAPI.properties = new List<PropertyAPI>();
 
+                    if (queryObject.Any.Length > properties.Count)
+                    {
+                        throw new ArgumentNullException("ObjectData.Properties", "The list of properties being requested does not match the number of properties being returned by Salesforce.");
+                    }
+
                     for (int y = 0; y < queryObject.Any.Length; y++)
                     {
                         XmlElement element = queryObject.Any[y];
                         PropertyAPI propertyAPI = new PropertyAPI();
 
-                        propertyAPI.developerName = element.LocalName;
+                        // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
+                        // field names from a standard select which confuses the binding logic
+                        //propertyAPI.developerName = element.LocalName;
 
                         // This only works because the SOQL columns will have been generated from the ordered list of properties
                         // If the user has a final column of Id that's been added, we just keep the local name. The purpose of this
                         // is to preserve the deep name references that are difficult to resolve as they can be blank and have no
                         // child fields to do detection. This is much more explicit.
-                        if (properties.Count >= y)
-                        {
-                            propertyAPI.developerName = properties[y].developerName;
-                        }
+                        //if (properties.Count >= y)
+                        //{
+                        // Always use the name as defined by the binding properties as this will be consistent in all situations
+                        propertyAPI.developerName = properties[y].developerName;
+                        //}
 
-                        propertyAPI.contentValue = element.InnerText;
+                        if (propertyAPI.developerName.EndsWith(".name", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
+                            // additional XML
+                            if (element.LastChild != null)
+                            {
+                                propertyAPI.contentValue = element.LastChild.InnerText;
+                            }
+                        }
+                        else
+                        {
+                            propertyAPI.contentValue = element.InnerText;
+                        }
 
                         if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                         {
@@ -1135,7 +1165,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, ListFilterAPI listFilterAPI)
+        private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, ListFilterAPI listFilterAPI)
         {
             SearchResult searchResult = null;
             SearchRecord searchRecord = null;
@@ -1171,13 +1201,40 @@ namespace ManyWho.Service.Salesforce.Singletons
                         objectAPI.developerName = objectName;
                         objectAPI.properties = new List<PropertyAPI>();
 
+                        if (searchRecord.record.Any.Length > properties.Count)
+                        {
+                            throw new ArgumentNullException("ObjectData.Properties", "The list of properties being requested does not match the number of properties being returned by Salesforce.");
+                        }
+
                         for (int y = 0; y < searchRecord.record.Any.Length; y++)
                         {
                             XmlElement element = searchRecord.record.Any[y];
                             PropertyAPI propertyAPI = new PropertyAPI();
 
-                            propertyAPI.developerName = element.LocalName;
-                            propertyAPI.contentValue = element.InnerText;
+                            // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
+                            // field names from a standard select which confuses the binding logic
+                            //propertyAPI.developerName = element.LocalName;
+
+                            // This only works because the SOQL columns will have been generated from the ordered list of properties
+                            // If the user has a final column of Id that's been added, we just keep the local name. The purpose of this
+                            // is to preserve the deep name references that are difficult to resolve as they can be blank and have no
+                            // child fields to do detection. This is much more explicit.
+                            // Always use the name as defined by the binding properties as this will be consistent in all situations
+                            propertyAPI.developerName = properties[y].developerName;
+
+                            if (propertyAPI.developerName.EndsWith(".name", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
+                                // additional XML
+                                if (element.LastChild != null)
+                                {
+                                    propertyAPI.contentValue = element.LastChild.InnerText;
+                                }
+                            }
+                            else
+                            {
+                                propertyAPI.contentValue = element.InnerText;
+                            }
 
                             if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                             {

@@ -744,8 +744,13 @@ namespace ManyWho.Service.Salesforce
             if (objectDataRequestAPI.objectData != null &&
                 objectDataRequestAPI.objectData.Count > 0)
             {
+                if (objectDataRequestAPI.objectDataType == null)
+                {
+                    throw new ArgumentNullException("ObjectDataRequest.ObjectDataType", "The ObjectDataRequest.ObjectDataType property cannot be null as the Service needs a description of the fields to use for the Save.");
+                }
+
                 // Save the data back to salesforce.com
-                objectDataRequestAPI.objectData = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, objectDataRequestAPI.configurationValues, objectDataRequestAPI.objectData);
+                objectDataRequestAPI.objectData = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, objectDataRequestAPI.configurationValues, objectDataRequestAPI.objectDataType.properties, objectDataRequestAPI.objectData);
             }
 
             // Create the object data response object
@@ -1400,6 +1405,7 @@ namespace ManyWho.Service.Salesforce
         /// </summary>
         public String CreateStream(INotifier notifier, IAuthenticatedWho authenticatedWho, SocialServiceRequestAPI socialServiceRequestAPI)
         {
+            List<ObjectDataTypePropertyAPI> objectDataTypeProperties = null;
             List<ObjectAPI> manywhoObjects = null;
             ObjectAPI manywhoObject = null;
             String authenticationUrl = null;
@@ -1443,8 +1449,13 @@ namespace ManyWho.Service.Salesforce
             manywhoObjects = new List<ObjectAPI>();
             manywhoObjects.Add(manywhoObject);
 
+            // Create the object data type properties for this object so the system knows what we're selecting
+            objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+            objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
+            objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Id" });
+
             // Save the manywho object to salesforce
-            manywhoObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, socialServiceRequestAPI.configurationValues, manywhoObjects);
+            manywhoObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, socialServiceRequestAPI.configurationValues, objectDataTypeProperties, manywhoObjects);
 
             // Check to see if anything came back as part of the save - it should unless there was a fault
             if (manywhoObjects != null &&
