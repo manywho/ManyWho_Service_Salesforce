@@ -475,10 +475,19 @@ namespace ManyWho.Service.Salesforce.Singletons
                 attachment.iconUrl = string.Format("{0}{1}", 
                                                     SettingUtils.GetStringSetting("ManyWho.CDNBasePath"),
                                                     SalesforceServiceSingleton.CHATTER_DEFAULT_FILE_IMAGE_URL);
-                attachment.downloadUrl = chatterMessage.Attachment.DownloadUrl;
                 attachment.description = chatterMessage.Attachment.Description;
                 attachment.type = chatterMessage.Attachment.FileType;
                 attachment.size = chatterMessage.Attachment.FileSize;
+
+                // We need to scrub the download url as this url is the REST API that does not work through the browser
+                if (string.IsNullOrWhiteSpace(chatterMessage.Attachment.DownloadUrl) == false)
+                {
+                    // E.g. https://c.cs80.visual.force.com/services/data/v27.0/chatter/files/069250000000iiDAAQ/content?versionNumber=1
+                    String[] urlParts = chatterMessage.Attachment.DownloadUrl.Split('/');
+
+                    // Get the file identifier, and make sure it's pointing to the correct instance
+                    attachment.downloadUrl = chatterBaseUrl + "/" + urlParts[8];
+                }
 
                 message.attachments = new List<AttachmentAPI>();
                 message.attachments.Add(attachment);
