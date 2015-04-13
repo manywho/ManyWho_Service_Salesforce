@@ -149,9 +149,6 @@ namespace ManyWho.Service.Salesforce.Singletons
             consumerSecret = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CONSUMER_SECRET, configurationValues, false);
             consumerKey = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CONSUMER_KEY, configurationValues, false);
 
-            // Login to the service
-            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, configurationValues, true, false);
-
             // Check to see if the admin wants users to login using oauth2
             if (String.IsNullOrWhiteSpace(consumerSecret) == false &&
                 String.IsNullOrWhiteSpace(consumerKey) == false)
@@ -160,177 +157,184 @@ namespace ManyWho.Service.Salesforce.Singletons
                 loginUsingOAuth2 = true;
             }
 
-            // We start by checking if the request is based on public users. Despite this seeming a little odd, it does give the plugin the opportunity
-            // to assign information to the public user that may be helpful for other operations - e.g. anoymous collaboration.
-            if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_PUBIC, StringComparison.InvariantCultureIgnoreCase) == true)
-            {
-                // Create the standard user object
-                objectAPI = CreateUserObject(sforceService);
+            // Login to the service
+            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, configurationValues, true, false);
 
-                // Apply some default settings
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USER_ID, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USERNAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_EMAIL, null));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_FIRST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LAST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
-
-                // Tell ManyWho the user is authorized to proceed
-                objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_STATUS, ManyWhoConstants.AUTHORIZATION_STATUS_AUTHORIZED));
-            }
-            else if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_ALL_USERS, StringComparison.InvariantCultureIgnoreCase) == true)
+            // We can get a null salesforce service if the user is using active user authentication and the user has not yet logged in successfully via their token
+            if (sforceService != null)
             {
-                // Only bother doing the lookup if we have an actual user id that's valid for this type of operation (e.g. not public)
-                if (authenticatedWho.UserId != null &&
-                    authenticatedWho.UserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.InvariantCultureIgnoreCase) == false)
+                // We start by checking if the request is based on public users. Despite this seeming a little odd, it does give the plugin the opportunity
+                // to assign information to the public user that may be helpful for other operations - e.g. anoymous collaboration.
+                if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_PUBIC, StringComparison.InvariantCultureIgnoreCase) == true)
                 {
-                    // Check to see if the user is in fact a user in the org. We do this by checking the authenticated who object as this is the user actually
-                    // requesting access
-                    objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                    // Create the standard user object
+                    objectAPI = CreateUserObject(sforceService);
+
+                    // Apply some default settings
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USER_ID, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_USERNAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_EMAIL, null));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_FIRST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LAST_NAME, ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID));
+
+                    // Tell ManyWho the user is authorized to proceed
+                    objectAPI.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_STATUS, ManyWhoConstants.AUTHORIZATION_STATUS_AUTHORIZED));
                 }
-            }
-            else if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_SPECIFIED, StringComparison.InvariantCultureIgnoreCase) == true)
-            {
-                Boolean doMoreWork = true;
-
-                // Specified permissions is a bit more complicated as we need to do a little more analysis depending on the configuration. We assume
-                // the user is authenticated if any of the specified criteria evaluate to true. First we check to see if the author of the flow has
-                // specified permissions based on specific user references (which is not recommended - but is supported).
-                if (objectDataRequest.authorization.users != null &&
-                    objectDataRequest.authorization.users.Count > 0)
+                else if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_ALL_USERS, StringComparison.InvariantCultureIgnoreCase) == true)
                 {
-                    // Go through each of the specified users and attempt to match the currently authenticated user with the criteria
-                    foreach (UserAPI user in objectDataRequest.authorization.users)
+                    // Only bother doing the lookup if we have an actual user id that's valid for this type of operation (e.g. not public)
+                    if (authenticatedWho.UserId != null &&
+                        authenticatedWho.UserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.InvariantCultureIgnoreCase) == false)
                     {
-                        // First - check to see if the author explicitly decided this user should have access. This is the default setting if the
-                        // attribute is null.
-                        if (user.attribute == null ||
-                            user.attribute.Trim().Length == 0 ||
-                            user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_USER, StringComparison.InvariantCultureIgnoreCase) == true)
-                        {
-                            // This is a hard-coded user permission - so we simply check if this user matches the current user
-                            if (user.authenticationId.Equals(authenticatedWho.UserId, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Get the user object from salesforce (which may not exist)
-                                objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                        // Check to see if the user is in fact a user in the org. We do this by checking the authenticated who object as this is the user actually
+                        // requesting access
+                        objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                    }
+                }
+                else if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_SPECIFIED, StringComparison.InvariantCultureIgnoreCase) == true)
+                {
+                    Boolean doMoreWork = true;
 
-                                // This is our user - no need to do anything else as the lookup will now determine if they have access
-                                doMoreWork = false;
-                                break;
-                            }
-                        }
-                        else
+                    // Specified permissions is a bit more complicated as we need to do a little more analysis depending on the configuration. We assume
+                    // the user is authenticated if any of the specified criteria evaluate to true. First we check to see if the author of the flow has
+                    // specified permissions based on specific user references (which is not recommended - but is supported).
+                    if (objectDataRequest.authorization.users != null &&
+                        objectDataRequest.authorization.users.Count > 0)
+                    {
+                        // Go through each of the specified users and attempt to match the currently authenticated user with the criteria
+                        foreach (UserAPI user in objectDataRequest.authorization.users)
                         {
-                            // We use the utils response object as it makes it a little easier to manage conditions that fail
-                            AuthenticationUtilsResponse authenticationUtilsResponse = null;
-                            String userAuthenticationId = null;
-
-                            if (user.runningUser == true)
+                            // First - check to see if the author explicitly decided this user should have access. This is the default setting if the
+                            // attribute is null.
+                            if (user.attribute == null ||
+                                user.attribute.Trim().Length == 0 ||
+                                user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_USER, StringComparison.InvariantCultureIgnoreCase) == true)
                             {
-                                userAuthenticationId = objectDataRequest.authorization.runningAuthenticationId;
+                                // This is a hard-coded user permission - so we simply check if this user matches the current user
+                                if (user.authenticationId.Equals(authenticatedWho.UserId, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Get the user object from salesforce (which may not exist)
+                                    objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+
+                                    // This is our user - no need to do anything else as the lookup will now determine if they have access
+                                    doMoreWork = false;
+                                    break;
+                                }
                             }
                             else
                             {
-                                userAuthenticationId = user.authenticationId;
-                            }
+                                // We use the utils response object as it makes it a little easier to manage conditions that fail
+                                AuthenticationUtilsResponse authenticationUtilsResponse = null;
+                                String userAuthenticationId = null;
 
-                            // We are looking at a particular attribute of the user and therefore need to query the system based on that attribute
-                            if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_COLLEAGUES, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the current user is a colleague of the specified user
-                                authenticationUtilsResponse = this.Colleague(sforceService, userAuthenticationId, authenticatedWho.UserId);
-                            }
-                            else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_DELEGATES, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the current user is a delegate of the specified user
-                                authenticationUtilsResponse = this.Delegate(sforceService, userAuthenticationId, authenticatedWho.UserId);
-                            }
-                            else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_DIRECTS, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the current user is a direct of the specified user
-                                authenticationUtilsResponse = this.Direct(sforceService, userAuthenticationId, authenticatedWho.UserId);
-                            }
-                            else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_FOLLOWERS, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the current user is a follower of the specified user
-                                authenticationUtilsResponse = this.Follower(sforceService, notifier, authenticatedWho, alertEmail, chatterBaseUrl, userAuthenticationId);
-                            }
-                            else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_FOLLOWING, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the current user is being followed by the specified user
-                                authenticationUtilsResponse = this.Following(sforceService, notifier, authenticatedWho, alertEmail, chatterBaseUrl, userAuthenticationId);
-                            }
-                            else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_MANAGERS, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the current user is a direct of the specified user
-                                authenticationUtilsResponse = this.Manager(sforceService, userAuthenticationId, authenticatedWho.UserId);
-                            }
-                            else
-                            {
-                                // We don't support the attribute that's being provided
-                                String errorMessage = "The user attribute is not supported: " + user.attribute;
+                                if (user.runningUser == true)
+                                {
+                                    userAuthenticationId = objectDataRequest.authorization.runningAuthenticationId;
+                                }
+                                else
+                                {
+                                    userAuthenticationId = user.authenticationId;
+                                }
 
-                                ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_FAULT, errorMessage);
+                                // We are looking at a particular attribute of the user and therefore need to query the system based on that attribute
+                                if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_COLLEAGUES, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the current user is a colleague of the specified user
+                                    authenticationUtilsResponse = this.Colleague(sforceService, userAuthenticationId, authenticatedWho.UserId);
+                                }
+                                else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_DELEGATES, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the current user is a delegate of the specified user
+                                    authenticationUtilsResponse = this.Delegate(sforceService, userAuthenticationId, authenticatedWho.UserId);
+                                }
+                                else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_DIRECTS, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the current user is a direct of the specified user
+                                    authenticationUtilsResponse = this.Direct(sforceService, userAuthenticationId, authenticatedWho.UserId);
+                                }
+                                else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_FOLLOWERS, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the current user is a follower of the specified user
+                                    authenticationUtilsResponse = this.Follower(sforceService, notifier, authenticatedWho, alertEmail, chatterBaseUrl, userAuthenticationId);
+                                }
+                                else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_FOLLOWING, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the current user is being followed by the specified user
+                                    authenticationUtilsResponse = this.Following(sforceService, notifier, authenticatedWho, alertEmail, chatterBaseUrl, userAuthenticationId);
+                                }
+                                else if (user.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_MANAGERS, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the current user is a direct of the specified user
+                                    authenticationUtilsResponse = this.Manager(sforceService, userAuthenticationId, authenticatedWho.UserId);
+                                }
+                                else
+                                {
+                                    // We don't support the attribute that's being provided
+                                    String errorMessage = "The user attribute is not supported: " + user.attribute;
 
-                                throw new ArgumentNullException("BadRequest", errorMessage);
-                            }
+                                    ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_FAULT, errorMessage);
 
-                            // If the user is in this context, then we don't need to do anything else
-                            if (authenticationUtilsResponse.IsInContext == true)
-                            {
-                                // Grab the user object
-                                objectAPI = authenticationUtilsResponse.UserObject;
+                                    throw new ArgumentNullException("BadRequest", errorMessage);
+                                }
 
-                                // Break out of the user validation
-                                doMoreWork = false;
-                                break;
+                                // If the user is in this context, then we don't need to do anything else
+                                if (authenticationUtilsResponse.IsInContext == true)
+                                {
+                                    // Grab the user object
+                                    objectAPI = authenticationUtilsResponse.UserObject;
+
+                                    // Break out of the user validation
+                                    doMoreWork = false;
+                                    break;
+                                }
                             }
                         }
                     }
-                }
 
-                // No need to do this next bit if we already know we're authorized
-                if (doMoreWork == true)
-                {
-                    // If the user has not been matched by the user configuration, we need to move into the groups to see if they're included
-                    // in any of the specified groups - if any group configuration has been provided
-                    if (objectDataRequest.authorization.groups != null &&
-                        objectDataRequest.authorization.groups.Count > 0)
+                    // No need to do this next bit if we already know we're authorized
+                    if (doMoreWork == true)
                     {
-                        // Go through each group in turn
-                        foreach (GroupAPI group in objectDataRequest.authorization.groups)
+                        // If the user has not been matched by the user configuration, we need to move into the groups to see if they're included
+                        // in any of the specified groups - if any group configuration has been provided
+                        if (objectDataRequest.authorization.groups != null &&
+                            objectDataRequest.authorization.groups.Count > 0)
                         {
-                            // We use the utils response object as it makes it a little easier to manage conditions that fail
-                            AuthenticationUtilsResponse authenticationUtilsResponse = null;
-
-                            if (group.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_MEMBERS, StringComparison.InvariantCultureIgnoreCase) == true)
+                            // Go through each group in turn
+                            foreach (GroupAPI group in objectDataRequest.authorization.groups)
                             {
-                                // Check to see if the user is a member of the specified group
-                                authenticationUtilsResponse = this.GroupMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
-                            }
-                            else if (group.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_OWNERS, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                // Check to see if the user is an owner of the specified group
-                                authenticationUtilsResponse = this.GroupOwner(sforceService, group.authenticationId, authenticatedWho.UserId, false);
-                            }
-                            else
-                            {
-                                // We don't support the attribute that's being provided
-                                String errorMessage = "The group attribute is not supported: " + group.attribute;
+                                // We use the utils response object as it makes it a little easier to manage conditions that fail
+                                AuthenticationUtilsResponse authenticationUtilsResponse = null;
 
-                                ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_FAULT, errorMessage);
+                                if (group.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_MEMBERS, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the user is a member of the specified group
+                                    authenticationUtilsResponse = this.GroupMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                }
+                                else if (group.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_OWNERS, StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    // Check to see if the user is an owner of the specified group
+                                    authenticationUtilsResponse = this.GroupOwner(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                }
+                                else
+                                {
+                                    // We don't support the attribute that's being provided
+                                    String errorMessage = "The group attribute is not supported: " + group.attribute;
 
-                                throw new ArgumentNullException("BadRequest", errorMessage);
-                            }
+                                    ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_FAULT, errorMessage);
 
-                            // If the user is in this context, then we don't need to do anything else
-                            if (authenticationUtilsResponse.IsInContext == true)
-                            {
-                                // Grab the user object
-                                objectAPI = authenticationUtilsResponse.UserObject;
+                                    throw new ArgumentNullException("BadRequest", errorMessage);
+                                }
 
-                                // Break out of the user validation
-                                doMoreWork = false;
-                                break;
+                                // If the user is in this context, then we don't need to do anything else
+                                if (authenticationUtilsResponse.IsInContext == true)
+                                {
+                                    // Grab the user object
+                                    objectAPI = authenticationUtilsResponse.UserObject;
+
+                                    // Break out of the user validation
+                                    doMoreWork = false;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -341,7 +345,8 @@ namespace ManyWho.Service.Salesforce.Singletons
             if (objectAPI == null)
             {
                 // Check to see if this user is a directory user at all - if so we want to return their details
-                if (authenticatedWho.UserId != null &&
+                if (sforceService != null &&
+                    authenticatedWho.UserId != null &&
                     authenticatedWho.UserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.InvariantCultureIgnoreCase) == false)
                 {
                     // Check to see if the user is in fact a user in the org. We do this by checking the authenticated who object as this is the user actually
@@ -1121,8 +1126,18 @@ namespace ManyWho.Service.Salesforce.Singletons
             userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_COUNTRY, null));
             userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LANGUAGE, null));
             userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_LOCATION, null));
-            userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_DIRECTORY_ID, sforceService.getUserInfo().organizationId));
-            userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_DIRECTORY_NAME, sforceService.getUserInfo().organizationName));
+
+            // This can be null for active user authentication, so we send back dummy information instead
+            if (sforceService != null)
+            {
+                userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_DIRECTORY_ID, sforceService.getUserInfo().organizationId));
+                userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_DIRECTORY_NAME, sforceService.getUserInfo().organizationName));
+            }
+            else
+            {
+                userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_DIRECTORY_ID, "UNKNOWN"));
+                userObject.properties.Add(CreateProperty(ManyWhoConstants.MANYWHO_USER_PROPERTY_DIRECTORY_NAME, "UNKNOWN"));
+            }
 
             return userObject;
         }
