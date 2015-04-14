@@ -636,7 +636,7 @@ namespace ManyWho.Flow.Web.Controllers
 
         [HttpPost]
         [ActionName("PostNewMessage")]
-        public Task<MessageAPI> PostNewMessage(String streamId)
+        public MessageAPI PostNewMessage(String streamId)
         {
             try
             {
