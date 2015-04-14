@@ -2123,21 +2123,25 @@ namespace ManyWho.Service.Salesforce
                         // Make sure we handle the lack of success properly
                         webException = BaseHttpUtils.HandleUnsuccessfulHttpResponseMessage(notifier, authenticatedWho, i, httpResponseMessage, endpointUrl);
 
-                        if (webException != null)
-                        {
-                            throw webException;
-                        }
+                        // Stop any retries - throw the error immediately
+                        throw new ArgumentNullException("ChatterError", httpResponseMessage.ReasonPhrase);
+                        //if (webException != null)
+                        //{
+                        //    throw webException;
+                        //}
                     }
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
+                    // Simply rethrow the raw error
+                    throw;
                     // Make sure we handle the exception properly
-                    webException = BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
+                    //webException = BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
 
-                    if (webException != null)
-                    {
-                        throw webException;
-                    }
+                    //if (webException != null)
+                    //{
+                    //    throw webException;
+                    //}
                 }
                 finally
                 {
