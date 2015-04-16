@@ -1915,7 +1915,7 @@ namespace ManyWho.Service.Salesforce
         /// <summary>
         /// This method allows the user to post a new message to the stream in chatter.
         /// </summary>
-        public async Task<MessageAPI> PostNewMessage(IAuthenticatedWho authenticatedWho, String streamId, HttpContent httpContent)
+        public MessageAPI PostNewMessage(IAuthenticatedWho authenticatedWho, String streamId, HttpContent httpContent)
         {
             WebException webException = null;
             MultipartFormDataStreamProvider multipartFormDataStreamProvider = null;
@@ -1964,7 +1964,7 @@ namespace ManyWho.Service.Salesforce
                     multipartFormDataStreamProvider = new MultipartFormDataStreamProvider(Path.GetTempPath());
 
                     // Read the content in the request into the stream provider
-                    await httpContent.ReadAsMultipartAsync(multipartFormDataStreamProvider);
+                    multipartFormDataStreamProvider = httpContent.ReadAsMultipartAsync(multipartFormDataStreamProvider).Result;
 
                     // Now we can create the multipart form we're going to post over to salesforce
                     multipartFormDataContent = new MultipartFormDataContent();
@@ -2104,13 +2104,13 @@ namespace ManyWho.Service.Salesforce
                     }
 
                     // Post the message over to chatter
-                    httpResponseMessage = await httpClient.PostAsync(endpointUrl, multipartFormDataContent);
+                    httpResponseMessage = httpClient.PostAsync(endpointUrl, multipartFormDataContent).Result;
 
                     // Check the status of the response and respond appropriately
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         // Grab the chatter message from the post
-                        chatterMessage = await httpResponseMessage.Content.ReadAsAsync<ChatterMessage>();
+                        chatterMessage = httpResponseMessage.Content.ReadAsAsync<ChatterMessage>().Result;
 
                         // Convert it over to a manywho message
                         message = SalesforceSocialSingleton.GetInstance().ChatterMessageToMessageAPI(chatterBaseUrl, null, chatterMessage);
@@ -2123,21 +2123,25 @@ namespace ManyWho.Service.Salesforce
                         // Make sure we handle the lack of success properly
                         webException = BaseHttpUtils.HandleUnsuccessfulHttpResponseMessage(notifier, authenticatedWho, i, httpResponseMessage, endpointUrl);
 
-                        if (webException != null)
-                        {
-                            throw webException;
-                        }
+                        // Stop any retries - throw the error immediately
+                        throw new ArgumentNullException("ChatterError", httpResponseMessage.ReasonPhrase);
+                        //if (webException != null)
+                        //{
+                        //    throw webException;
+                        //}
                     }
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
+                    // Simply rethrow the raw error
+                    throw;
                     // Make sure we handle the exception properly
-                    webException = BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
+                    //webException = BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
 
-                    if (webException != null)
-                    {
-                        throw webException;
-                    }
+                    //if (webException != null)
+                    //{
+                    //    throw webException;
+                    //}
                 }
                 finally
                 {
