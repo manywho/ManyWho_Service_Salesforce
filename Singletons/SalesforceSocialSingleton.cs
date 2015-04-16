@@ -478,9 +478,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                 attachment.description = chatterMessage.Attachment.Description;
                 attachment.type = chatterMessage.Attachment.FileType;
                 attachment.size = chatterMessage.Attachment.FileSize;
+                attachment.downloadUrl = chatterMessage.Attachment.DownloadUrl;
 
                 // We need to scrub the download url as this url is the REST API that does not work through the browser
-                if (string.IsNullOrWhiteSpace(chatterMessage.Attachment.DownloadUrl) == false)
+                if (string.IsNullOrWhiteSpace(chatterMessage.Attachment.DownloadUrl) == false &&
+                    chatterMessage.Attachment.DownloadUrl.IndexOf("servlet.shepherd", StringComparison.OrdinalIgnoreCase) < 0)
                 {
                     // E.g. https://c.cs80.visual.force.com/services/data/v27.0/chatter/files/069250000000iiDAAQ/content?versionNumber=1
                     String[] urlParts = chatterMessage.Attachment.DownloadUrl.Split('/');
