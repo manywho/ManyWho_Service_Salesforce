@@ -105,11 +105,12 @@ namespace ManyWho.Service.Salesforce
             ListenerServiceRequestAPI listenerServiceRequest = null;
             IAuthenticatedWho authenticatedWho = null;
             SforceService sforceService = null;
-            String invokeType = null;
+            String authenticationStrategy = null;
             String authenticationUrl = null;
+            String securityToken = null;
+            String invokeType = null;
             String username = null;
             String password = null;
-            String securityToken = null;
 
             if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing listener notification."); }
 
@@ -165,11 +166,25 @@ namespace ManyWho.Service.Salesforce
                             username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, listenerServiceRequest.configurationValues, true);
                             password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, listenerServiceRequest.configurationValues, true);
                             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, listenerServiceRequest.configurationValues, false);
+                            authenticationStrategy = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY, listenerServiceRequest.configurationValues, false);
 
                             if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Logging into salesforce using: " + username); }
 
-                            // Login to salesforce using the details in the service request
-                            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+                            if (String.IsNullOrWhiteSpace(authenticationStrategy) == true ||
+                                authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
+                                authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                sforceService = SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(workflowRuleNotification.SessionID, workflowRuleNotification.SessionURL);
+                            }
+                            else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_SUPER_USER, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                // Login to salesforce using the details in the service request
+                                sforceService = SalesforceDataSingleton.GetInstance().LoginUsingCredentials(authenticationUrl, username, password, securityToken);
+                            }
+                            else
+                            {
+                                throw new ArgumentNullException("ConfigurationValues", String.Format("The provided authentication strategy is not supported: '{0}'", authenticationStrategy));
+                            }
 
                             if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Getting full sObject for: " + objectId); }
 

@@ -95,7 +95,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                             groupAuthenticationToken.Trim().Length == 0)
                         {
                             // Login as the API user
-                            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticationUrl, username, password, securityToken);
+                            sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
 
                             // Get the session id out as we'll use that for the oauth login
                             groupAuthenticationToken = sforceService.SessionHeaderValue.sessionId;
@@ -188,6 +188,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
         public ServiceResponseAPI InvokeCreateTask(INotifier notifier, IAuthenticatedWho authenticatedWho, ServiceRequestAPI serviceRequest)
         {
+            List<ObjectDataTypePropertyAPI> objectDataTypeProperties = null;
             ServiceResponseAPI serviceResponse = null;
             DateTime whenDate = DateTime.Now;
             List<ObjectAPI> taskObjects = null;
@@ -245,8 +246,21 @@ namespace ManyWho.Service.Salesforce.Singletons
                 taskObjects = new List<ObjectAPI>();
                 taskObjects.Add(taskObject);
 
+                // Create the object data type properties for this object so the system knows what we're selecting
+                objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "ActivityDateTime" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Description" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Priority" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Status" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Subject" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsClosed" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsArchived" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsRecurrence" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsReminderSet" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsVisibleInSelfService" });
+
                 // Save the task object to salesforce
-                taskObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, taskObjects);
+                taskObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, serviceRequest.configurationValues, objectDataTypeProperties, taskObjects);
 
                 // Check to see if anything came back as part of the save - it should unless there was a fault
                 if (taskObjects != null &&
@@ -287,6 +301,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
         public ServiceResponseAPI InvokeCreateEvent(INotifier notifier, IAuthenticatedWho authenticatedWho, ServiceRequestAPI serviceRequest)
         {
+            List<ObjectDataTypePropertyAPI> objectDataTypeProperties = null;
             ServiceResponseAPI serviceResponse = null;
             DateTime whenDate = DateTime.Now;
             List<ObjectAPI> eventObjects = null;
@@ -346,8 +361,23 @@ namespace ManyWho.Service.Salesforce.Singletons
                 eventObjects = new List<ObjectAPI>();
                 eventObjects.Add(eventObject);
 
+                // Create the object data type properties for this object so the system knows what we're selecting
+                objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "ActivityDateTime" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Description" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "DurationInMinutes" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Subject" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsAllDayEvent" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsArchived" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsChild" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsGroupEvent" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsPrivate" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsRecurrence" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsReminderSet" });
+                objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "IsVisibleInSelfService" });
+
                 // Save the event object to salesforce
-                eventObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, authenticationUrl, username, password, securityToken, eventObjects);
+                eventObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, serviceRequest.configurationValues, objectDataTypeProperties, eventObjects);
 
                 // Check to see if anything came back as part of the save - it should unless there was a fault
                 if (eventObjects != null &&

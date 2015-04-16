@@ -35,19 +35,21 @@ namespace ManyWho.Service.Salesforce.Utils
 {
     public class SalesforceHttpUtils : HttpUtils
     {
+        public static String TOKEN_PREFIX = "Salesforce:";
+
         public static AuthenticationDetails GetAuthenticationDetails(String authenticationToken)
         {
             AuthenticationDetails authenticationDetails = null;
 
             authenticationDetails = new AuthenticationDetails();
 
-            if (authenticationToken.IndexOf("Salesforce:") < 0)
+            if (authenticationToken.IndexOf(TOKEN_PREFIX) < 0)
             {
                 authenticationDetails.Token = authenticationToken;
             }
             else
             {
-                authenticationDetails.Token = authenticationToken.Substring("Salesforce:".Length, (authenticationToken.IndexOf("||") - "Salesforce:".Length));
+                authenticationDetails.Token = authenticationToken.Substring(TOKEN_PREFIX.Length, (authenticationToken.IndexOf("||") - TOKEN_PREFIX.Length));
                 authenticationDetails.PartnerUrl = authenticationToken.Substring((authenticationToken.IndexOf("||") + 2), (authenticationToken.Length - (authenticationToken.IndexOf("||") + 2)));
             }
 

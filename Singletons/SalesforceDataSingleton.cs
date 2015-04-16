@@ -16,6 +16,7 @@ using ManyWho.Flow.SDK.Describe;
 using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Draw.Elements.Type;
 using ManyWho.Flow.SDK.Draw.Elements.Group;
+using ManyWho.Flow.SDK.Run;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Service.Salesforce.Utils;
@@ -69,7 +70,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return salesforceDataSingleton;
         }
 
-        public List<TypeElementBindingAPI> DescribeTables(String authenticationUrl, String username, String password, String securityToken)
+        public List<TypeElementBindingAPI> DescribeTables(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
         {
             TypeElementBindingAPI typeElementBinding = null;
             List<TypeElementBindingAPI> typeElementBindings = null;
@@ -77,7 +78,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             DescribeGlobalResult describeGlobalResult = null;
 
             // Login to the service
-            sforceService = this.Login(authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
@@ -112,7 +113,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElementBindings;
         }
 
-        public List<TypeElementPropertyBindingAPI> DescribeFields(String authenticationUrl, String username, String password, String securityToken, String tableName)
+        public List<TypeElementPropertyBindingAPI> DescribeFields(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String tableName)
         {
             TypeElementPropertyBindingAPI typeElementFieldBinding = null;
             List<TypeElementPropertyBindingAPI> typeElementFieldBindings = null;
@@ -121,7 +122,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Field[] fields = null;
 
             // Login to the service
-            sforceService = this.Login(authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
             // Grab the object description and pull out the fields
             describeSObjectResult = sforceService.describeSObject(tableName);
@@ -159,7 +160,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElementFieldBindings;
         }
 
-        public List<TypeElementRequestAPI> GetTypeElements(String authenticationUrl, String username, String password, String securityToken)
+        public List<TypeElementRequestAPI> GetTypeElements(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
         {
             TypeElementRequestAPI typeElement = null;
             List<TypeElementRequestAPI> typeElements = null;
@@ -175,7 +176,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Int32 entryCounter = 0;
 
             // Login to the service
-            sforceService = this.Login(authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
@@ -346,9 +347,9 @@ namespace ManyWho.Service.Salesforce.Singletons
             return typeElements;
         }
 
-        public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, List<ObjectAPI> objectAPIs)
+        public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, List<ObjectAPI> objectAPIs)
         {
-            List<ObjectDataTypePropertyAPI> objectDataTypeProperties = null;
+            List<ObjectDataTypePropertyAPI> objectDataTypePropertiesToSelect = null;
             DescribeSObjectResult describeSObjectResult = null;
             Field[] fields = null;
             String selectSoql = null;
@@ -366,7 +367,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 objectAPIs.Count > 0)
             {
                 // Step 1: Login to the service so we can do a bunch of things
-                sforceService = this.Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+                sforceService = this.Login(authenticatedWho, configurationValues, false, false);
                 
                 // Step 2: in the save is to get the latest information about the object from salesforce
                 // TODO: this should definitely be cached and operate under a rolling nightly refresh
@@ -599,10 +600,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                                         continue;
                                     }
                                 }
-                                // The field is not nillable, so we need to check we have a value
-                                else if (referencedPropertyAPI == null ||
-                                         referencedPropertyAPI.contentValue == null ||
-                                         referencedPropertyAPI.contentValue.Trim().Length == 0)
+                                // The field is not nillable, so we need to check we have a value if the user is passing one in - the previous logic
+                                // will not include this field if the data coming in has not been included
+                                else if (referencedPropertyAPI != null &&
+                                         (referencedPropertyAPI.contentValue == null ||
+                                          referencedPropertyAPI.contentValue.Trim().Length == 0))
                                 {
                                     if ((field.updateable == false &&
                                          field.createable == false) ||
@@ -820,16 +822,25 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Get rid of the trailing OR
                 idWhere = idWhere.Substring(0, idWhere.Length - " OR ".Length);
 
-                // Create the list of object data type properties so we do the select correctly
-                objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+                //// Create the list of object data type properties so we do the select correctly
+                objectDataTypePropertiesToSelect = new List<ObjectDataTypePropertyAPI>();
 
-                // Now we use the properties to get the selection columns
-                foreach (PropertyAPI propertyAPI in propertyAPIs)
+                //// Now we use the properties to get the selection columns
+                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
                 {
-                    selectSoql += propertyAPI.developerName + ", ";
-                    objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = propertyAPI.developerName });
+                    // Go through each of the fields to check that it exists in the metadata
+                    foreach (Field field in describeSObjectResult.fields)
+                    {
+                        if (field.name.Equals(objectDataTypeProperty.developerName, StringComparison.InvariantCultureIgnoreCase) == true)
+                        {
+                            // The field in the object data exists, so we'll have validated the content value in the above algorithm
+                            selectSoql += field.name + ", ";
+                            objectDataTypePropertiesToSelect.Add(objectDataTypeProperty);
+                            break;
+                        }
+                    }
 
-                    if (propertyAPI.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
+                    if (objectDataTypeProperty.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                     {
                         includesId = true;
                     }
@@ -848,19 +859,19 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Dispatch the query and get the results.  We do this because salesforce may have done more
                 // than simply complete the id field.  Workflow rules and other assignment features may have manipulated the
                 // object values and all of this needs to be reflected in the result we send back to the user
-                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, selectSoql, includesId, objectDataTypeProperties);
+                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, selectSoql, includesId, objectDataTypePropertiesToSelect);
             }
 
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
 
             // Login to the service
-            sforceService = this.Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, false);
 
             // If the request has a search query, we need to alter the SOQL to SOSL
             if (listFilterAPI != null &&
@@ -898,7 +909,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, Boolean isModelingOperation)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
@@ -906,7 +917,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Boolean includesId = false;
 
             // Login to the service
-            sforceService = this.Login(authenticatedWho, authenticationUrl, username, password, securityToken);
+            sforceService = this.Login(authenticatedWho, configurationValues, false, isModelingOperation);
 
             soqlQuery = "";
 
@@ -941,7 +952,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI) + ")";
 
                 // Dispatch the search and get the results
-                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, listFilterAPI);
+                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, propertyAPIs, listFilterAPI);
             }
             else
             {
@@ -1061,23 +1072,43 @@ namespace ManyWho.Service.Salesforce.Singletons
                     objectAPI.developerName = objectName;
                     objectAPI.properties = new List<PropertyAPI>();
 
+                    if (queryObject.Any.Length > properties.Count)
+                    {
+                        throw new ArgumentNullException("ObjectData.Properties", "The list of properties being requested does not match the number of properties being returned by Salesforce.");
+                    }
+
                     for (int y = 0; y < queryObject.Any.Length; y++)
                     {
                         XmlElement element = queryObject.Any[y];
                         PropertyAPI propertyAPI = new PropertyAPI();
 
-                        propertyAPI.developerName = element.LocalName;
+                        // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
+                        // field names from a standard select which confuses the binding logic
+                        //propertyAPI.developerName = element.LocalName;
 
                         // This only works because the SOQL columns will have been generated from the ordered list of properties
                         // If the user has a final column of Id that's been added, we just keep the local name. The purpose of this
                         // is to preserve the deep name references that are difficult to resolve as they can be blank and have no
                         // child fields to do detection. This is much more explicit.
-                        if (properties.Count >= y)
-                        {
-                            propertyAPI.developerName = properties[y].developerName;
-                        }
+                        //if (properties.Count >= y)
+                        //{
+                        // Always use the name as defined by the binding properties as this will be consistent in all situations
+                        propertyAPI.developerName = properties[y].developerName;
+                        //}
 
-                        propertyAPI.contentValue = element.InnerText;
+                        if (propertyAPI.developerName.EndsWith(".name", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
+                            // additional XML
+                            if (element.LastChild != null)
+                            {
+                                propertyAPI.contentValue = element.LastChild.InnerText;
+                            }
+                        }
+                        else
+                        {
+                            propertyAPI.contentValue = element.InnerText;
+                        }
 
                         if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                         {
@@ -1134,7 +1165,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, ListFilterAPI listFilterAPI)
+        private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, ListFilterAPI listFilterAPI)
         {
             SearchResult searchResult = null;
             SearchRecord searchRecord = null;
@@ -1170,13 +1201,40 @@ namespace ManyWho.Service.Salesforce.Singletons
                         objectAPI.developerName = objectName;
                         objectAPI.properties = new List<PropertyAPI>();
 
+                        if (searchRecord.record.Any.Length > properties.Count)
+                        {
+                            throw new ArgumentNullException("ObjectData.Properties", "The list of properties being requested does not match the number of properties being returned by Salesforce.");
+                        }
+
                         for (int y = 0; y < searchRecord.record.Any.Length; y++)
                         {
                             XmlElement element = searchRecord.record.Any[y];
                             PropertyAPI propertyAPI = new PropertyAPI();
 
-                            propertyAPI.developerName = element.LocalName;
-                            propertyAPI.contentValue = element.InnerText;
+                            // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
+                            // field names from a standard select which confuses the binding logic
+                            //propertyAPI.developerName = element.LocalName;
+
+                            // This only works because the SOQL columns will have been generated from the ordered list of properties
+                            // If the user has a final column of Id that's been added, we just keep the local name. The purpose of this
+                            // is to preserve the deep name references that are difficult to resolve as they can be blank and have no
+                            // child fields to do detection. This is much more explicit.
+                            // Always use the name as defined by the binding properties as this will be consistent in all situations
+                            propertyAPI.developerName = properties[y].developerName;
+
+                            if (propertyAPI.developerName.EndsWith(".name", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
+                                // additional XML
+                                if (element.LastChild != null)
+                                {
+                                    propertyAPI.contentValue = element.LastChild.InnerText;
+                                }
+                            }
+                            else
+                            {
+                                propertyAPI.contentValue = element.InnerText;
+                            }
 
                             if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                             {
@@ -1441,7 +1499,82 @@ namespace ManyWho.Service.Salesforce.Singletons
             return soql;
         }
 
-        public SforceService Login(String sessionToken, String sessionUrl)
+        public SforceService Login(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, Boolean preferElevatedAccess, Boolean isModelingOperation)
+        {
+            SforceService sforceService = null;
+            String authenticationStrategy = null;
+            String authenticationUrl = null;
+            String securityToken = null;
+            String username = null;
+            String password = null;
+
+            if (authenticatedWho == null)
+            {
+                throw new ArgumentNullException("AuthenticatedWho", "The AuthenticatedWho object cannot be null.");
+            }
+
+            if (configurationValues == null ||
+                configurationValues.Count == 0)
+            {
+                throw new ArgumentNullException("ConfigurationValues", "The ConfigurationValues cannot be null or empty.");
+            }
+
+            // Get the authentication strategy out
+            authenticationStrategy = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY, configurationValues, false);
+
+            // If we don't have an authentication strategy, we use a standard configuration
+            if (String.IsNullOrWhiteSpace(authenticationStrategy) == true)
+            {
+                authenticationStrategy = SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD;
+            }
+
+            // This path should be used for all users when executing a workflow, unless this is a system operation that needs higher level
+            // credentials
+            if (isModelingOperation == true ||
+                authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_SUPER_USER, StringComparison.OrdinalIgnoreCase) == true ||
+                (preferElevatedAccess == true &&
+                 authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true))
+            {
+                // Grab the actual configuration values out
+                authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, configurationValues, true);
+                username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, configurationValues, true);
+                password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, configurationValues, true);
+                securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, configurationValues, false);
+
+                sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
+
+                if (sforceService == null)
+                {
+                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                }
+            }
+            else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
+                     authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
+                    authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0)
+                {
+                    // There's no point logging in, we can't as the user is using active user authentication and we don't have a token
+                }
+                else
+                {
+                    // We should log the user in using their session information that's been provided via a previous explicit login
+                    sforceService = this.LogUserInBasedOnSession(
+                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
+                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
+                    );
+
+                    if (sforceService == null)
+                    {
+                        throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                    }
+                }
+            }
+
+            return sforceService;
+        }
+
+        public SforceService LogUserInBasedOnSession(String sessionToken, String sessionUrl)
         {
             SforceService sforceService = null;
 
@@ -1454,35 +1587,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return sforceService;
         }
 
-        public SforceService Login(IAuthenticatedWho authenticatedWho, String authenticationUrl, String username, String password, String securityToken)
-        {
-            SforceService sforceService = null;
-
-            // Check to see if the calling user is a public user - if so, we login using the stored credentials or if the user is logged
-            // into a different directory than Salesforce (so is ostensibly a public user to SFDC).
-            if (authenticatedWho.ManyWhoUserId == ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_MANYWHO_USER_ID ||
-                authenticatedWho.Token.IndexOf("Salesforce:", StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                sforceService = this.Login(authenticationUrl, username, password, securityToken);
-            }
-            else if (String.IsNullOrWhiteSpace(authenticatedWho.Token) == false &&
-                     authenticatedWho.Token.IndexOf("||") > 0)
-            {
-                // We should log the user in using their session information
-                sforceService = this.Login(
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
-                );
-            }
-            else
-            {
-                throw new ArgumentNullException("Authentication", "Cannot login to Salesforce without the correct authentication information.");
-            }
-
-            return sforceService;
-        }
-
-        public SforceService Login(String authenticationUrl, String username, String password, String securityToken)
+        public SforceService LoginUsingCredentials(String authenticationUrl, String username, String password, String securityToken)
         {
             LoginResult loginResult = null;
             SforceService sforceService = null;
