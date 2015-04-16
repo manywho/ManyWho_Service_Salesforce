@@ -487,8 +487,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // E.g. https://c.cs80.visual.force.com/services/data/v27.0/chatter/files/069250000000iiDAAQ/content?versionNumber=1
                     String[] urlParts = chatterMessage.Attachment.DownloadUrl.Split('/');
 
-                    // Get the file identifier, and make sure it's pointing to the correct instance
-                    attachment.downloadUrl = chatterBaseUrl + "/" + urlParts[8];
+                    if (urlParts.Length >= 8)
+                    {
+                        // Get the file identifier, and make sure it's pointing to the correct instance
+                        attachment.downloadUrl = chatterBaseUrl + "/" + urlParts[8];
+                    }
                 }
 
                 message.attachments = new List<AttachmentAPI>();
