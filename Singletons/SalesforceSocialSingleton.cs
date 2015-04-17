@@ -483,11 +483,13 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // We need to scrub the download url as this url is the REST API that does not work through the browser
                 if (string.IsNullOrWhiteSpace(chatterMessage.Attachment.DownloadUrl) == false &&
                     chatterMessage.Attachment.DownloadUrl.IndexOf("servlet.shepherd", StringComparison.OrdinalIgnoreCase) < 0 &&
-                    chatterMessage.Attachment.DownloadUrl.IndexOf("https://c.cs80.visual.force.com/services/data/v27.0/chatter/files", StringComparison.OrdinalIgnoreCase) == 0)
+                    chatterMessage.Attachment.DownloadUrl.IndexOf("/services/data/v", StringComparison.OrdinalIgnoreCase) > 0 &&
+                    chatterMessage.Attachment.DownloadUrl.IndexOf("/chatter/files", StringComparison.OrdinalIgnoreCase) > 0)
                 {
                     // E.g. https://c.cs80.visual.force.com/services/data/v27.0/chatter/files/069250000000iiDAAQ/content?versionNumber=1
                     String[] urlParts = chatterMessage.Attachment.DownloadUrl.Split('/');
 
+                    // Check to make absolutely sure we have enough parts before adapting the url
                     if (urlParts.Length >= 8)
                     {
                         // Get the file identifier, and make sure it's pointing to the correct instance
