@@ -495,6 +495,10 @@ namespace ManyWho.Service.Salesforce.Singletons
                         // Get the file identifier, and make sure it's pointing to the correct instance
                         attachment.downloadUrl = chatterBaseUrl + "/" + urlParts[8];
                     }
+                    else
+                    {
+                        attachment.downloadUrl = "http://blahblah.com--" + urlParts.Length + "--" + chatterMessage.Attachment.DownloadUrl;
+                    }
                 }
 
                 message.attachments = new List<AttachmentAPI>();
