@@ -483,15 +483,25 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // We need to scrub the download url as this url is the REST API that does not work through the browser
                 if (string.IsNullOrWhiteSpace(chatterMessage.Attachment.DownloadUrl) == false &&
                     chatterMessage.Attachment.DownloadUrl.IndexOf("servlet.shepherd", StringComparison.OrdinalIgnoreCase) < 0 &&
-                    chatterMessage.Attachment.DownloadUrl.IndexOf("https://c.cs80.visual.force.com/services/data/v27.0/chatter/files", StringComparison.OrdinalIgnoreCase) == 0)
+                    chatterMessage.Attachment.DownloadUrl.IndexOf("/services/data/v", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                    chatterMessage.Attachment.DownloadUrl.IndexOf("/chatter/files", StringComparison.OrdinalIgnoreCase) > 0)
                 {
-                    // E.g. https://c.cs80.visual.force.com/services/data/v27.0/chatter/files/069250000000iiDAAQ/content?versionNumber=1
                     String[] urlParts = chatterMessage.Attachment.DownloadUrl.Split('/');
 
-                    if (urlParts.Length >= 8)
+                    // Check to make absolutely sure we have enough parts before adapting the url
+                    if (chatterMessage.Attachment.DownloadUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) == true &&
+                        urlParts.Length >= 8)
                     {
+                        // E.g. https://c.cs80.visual.force.com/services/data/v27.0/chatter/files/069250000000ixwAAA/content?versionNumber=1
                         // Get the file identifier, and make sure it's pointing to the correct instance
                         attachment.downloadUrl = chatterBaseUrl + "/" + urlParts[8];
+                    }
+                    else if (chatterMessage.Attachment.DownloadUrl.StartsWith("/services/data", StringComparison.OrdinalIgnoreCase) == true &&
+                             urlParts.Length >= 6)
+                    {
+                        // E.g. /services/data/v27.0/chatter/files/069250000000jBeAAI/content?versionNumber=1
+                        // We don't have the full url, so we need to adapt a smaller part
+                        attachment.downloadUrl = chatterBaseUrl + "/" + urlParts[6];
                     }
                 }
 
