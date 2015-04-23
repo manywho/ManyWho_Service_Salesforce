@@ -1915,7 +1915,7 @@ namespace ManyWho.Service.Salesforce
         /// <summary>
         /// This method allows the user to post a new message to the stream in chatter.
         /// </summary>
-        public MessageAPI PostNewMessage(IAuthenticatedWho authenticatedWho, String streamId, HttpContent httpContent)
+        public async Task<MessageAPI> PostNewMessage(IAuthenticatedWho authenticatedWho, String streamId, HttpContent httpContent)
         {
             WebException webException = null;
             MultipartFormDataStreamProvider multipartFormDataStreamProvider = null;
@@ -1964,7 +1964,7 @@ namespace ManyWho.Service.Salesforce
                     multipartFormDataStreamProvider = new MultipartFormDataStreamProvider(Path.GetTempPath());
 
                     // Read the content in the request into the stream provider
-                    multipartFormDataStreamProvider = httpContent.ReadAsMultipartAsync(multipartFormDataStreamProvider).Result;
+                    await httpContent.ReadAsMultipartAsync(multipartFormDataStreamProvider);
 
                     // Now we can create the multipart form we're going to post over to salesforce
                     multipartFormDataContent = new MultipartFormDataContent();
@@ -2125,23 +2125,15 @@ namespace ManyWho.Service.Salesforce
 
                         // Stop any retries - throw the error immediately
                         throw new ArgumentNullException("ChatterError", httpResponseMessage.ReasonPhrase);
-                        //if (webException != null)
-                        //{
-                        //    throw webException;
-                        //}
                     }
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
+                    // Send out a notification of the issue
+                    BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
+
                     // Simply rethrow the raw error
                     throw;
-                    // Make sure we handle the exception properly
-                    //webException = BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
-
-                    //if (webException != null)
-                    //{
-                    //    throw webException;
-                    //}
                 }
                 finally
                 {
