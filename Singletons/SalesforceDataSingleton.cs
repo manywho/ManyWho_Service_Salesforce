@@ -115,17 +115,26 @@ namespace ManyWho.Service.Salesforce.Singletons
 
         public List<TypeElementPropertyBindingAPI> DescribeFields(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String tableName)
         {
-            TypeElementPropertyBindingAPI typeElementFieldBinding = null;
-            List<TypeElementPropertyBindingAPI> typeElementFieldBindings = null;
-            SforceService sforceService = null;
             DescribeSObjectResult describeSObjectResult = null;
-            Field[] fields = null;
+            SforceService sforceService = null;
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
-            // Grab the object description and pull out the fields
+            // Grab the describe so we have it
             describeSObjectResult = sforceService.describeSObject(tableName);
+
+            // Execute the internal method
+            return this.DescribeFields(authenticatedWho, sforceService, describeSObjectResult, tableName);
+        }
+
+        private List<TypeElementPropertyBindingAPI> DescribeFields(IAuthenticatedWho authenticatedWho, SforceService sforceService, DescribeSObjectResult describeSObjectResult, String tableName)
+        {
+            TypeElementPropertyBindingAPI typeElementFieldBinding = null;
+            List<TypeElementPropertyBindingAPI> typeElementFieldBindings = null;
+            Field[] fields = null;
+
+            // Grab the object description and pull out the fields
             fields = describeSObjectResult.fields;
 
             if (fields != null &&
@@ -385,26 +394,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     throw new ArgumentNullException("BadRequest", errorMessage);
                 }
 
-                describeSObjectResult = sforceService.describeSObject(objectName);
-
-                if (describeSObjectResult == null)
-                {
-                    String errorMessage = "The object being referenced in the save does not exist! The name of the object in salesforce.com is: " + objectName;
-
-                    ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
-
-                    throw new ArgumentNullException("BadRequest", errorMessage);
-                }
-
-                if (describeSObjectResult.fields == null ||
-                    describeSObjectResult.fields.Length == 0)
-                {
-                    String errorMessage = "The object being referenced does not have any fields! The name of the object in salesforce.com is: " + objectName;
-
-                    ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
-
-                    throw new ArgumentNullException("BadRequest", errorMessage);
-                }
+                describeSObjectResult = this.GetDescribeResult(notifier, authenticatedWho, sforceService, objectName);
 
                 // Step 3: Now that we have the latest object information from salesforce.com, we can make sure the object coming in is correctly applied.
                 // We go through the fields in the describe call and then find the same field in the in-coming object data so we can see what do do with
@@ -909,7 +899,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, Boolean isModelingOperation)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, ListFilterAPI listFilterAPI, Boolean isModelingOperation)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
@@ -921,13 +911,16 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             soqlQuery = "";
 
+            // Clean the properties before using them for the select
+            objectDataTypeProperties = this.CleanObjectDataTypeProperties(null, authenticatedWho, sforceService, objectName, objectDataTypeProperties);
+
             // Create the columns for the query
-            foreach (ObjectDataTypePropertyAPI objectPropertyAPI in propertyAPIs)
+            foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
             {
-                soqlQuery += objectPropertyAPI.developerName + ", ";
+                soqlQuery += objectDataTypeProperty.developerName + ", ";
 
                 if (includesId == false &&
-                    objectPropertyAPI.developerName.ToLower() == "id")
+                    objectDataTypeProperty.developerName.ToLower() == "id")
                 {
                     includesId = true;
                 }
@@ -952,7 +945,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI) + ")";
 
                 // Dispatch the search and get the results
-                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, propertyAPIs, listFilterAPI);
+                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, listFilterAPI);
             }
             else
             {
@@ -961,7 +954,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI);
 
                 // Dispatch the query and get the results
-                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, propertyAPIs);
+                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties);
             }
 
             return objectAPIs;
@@ -1378,7 +1371,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                 if (listFilterAPI.id != null &&
                     listFilterAPI.id.Trim().Length > 0)
                 {
-                    soql += " Id = '" + listFilterAPI.id + "'";
+                    // Despite this being a little silly as we only have one filter, it makes the logic a little easier to manage on the string construction
+                    soql += " " + listFilterAPI.comparisonType + " Id = '" + listFilterAPI.id + "'";
                 }
                 else
                 {
@@ -1616,6 +1610,77 @@ namespace ManyWho.Service.Salesforce.Singletons
             sforceService.SessionHeaderValue.sessionId = loginResult.sessionId;
 
             return sforceService;
+        }
+
+        private List<ObjectDataTypePropertyAPI> CleanObjectDataTypeProperties(INotifier notifier, IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, List<ObjectDataTypePropertyAPI> objectDataTypeProperties)
+        {
+            List<TypeElementPropertyBindingAPI> typeElementPropertyBindings = null;
+            List<ObjectDataTypePropertyAPI> cleanObjectDataTypeProperties = null;
+            DescribeSObjectResult describeSObjectResult = null;
+
+            // Get the describe for the provided user and sforce service
+            describeSObjectResult = this.GetDescribeResult(notifier, authenticatedWho, sforceService, objectName);
+
+            if (describeSObjectResult == null)
+            {
+                throw new ArgumentNullException("DescribeSObjectResult", "The DescribeSObjectResult is null for: " + objectName);
+            }
+
+            // Get the type information for this user so we can reference that to ensure we're not looking up on a field that doesn't match
+            typeElementPropertyBindings = this.DescribeFields(authenticatedWho, sforceService, describeSObjectResult, objectName);
+
+            // Make sure we're actually getting some properties before doing anything more
+            if (objectDataTypeProperties != null &&
+                objectDataTypeProperties.Count > 0 &&
+                typeElementPropertyBindings != null &&
+                typeElementPropertyBindings.Count > 0)
+            {
+                cleanObjectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+
+                // First, go through the object data type properties one by one
+                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
+                {
+                    // Now we go through the bindings that are actually available for this user based on their credentials
+                    foreach (TypeElementPropertyBindingAPI typeElementPropertyBinding in typeElementPropertyBindings)
+                    {
+                        // If this property exists in the type information, then we add it to our list of cleaned properties
+                        if (objectDataTypeProperty.developerName.Equals(typeElementPropertyBinding.databaseFieldName, StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            cleanObjectDataTypeProperties.Add(objectDataTypeProperty);
+                        }
+                    }
+                }
+            }
+
+            return cleanObjectDataTypeProperties;
+        }
+
+        private DescribeSObjectResult GetDescribeResult(INotifier notifier, IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName)
+        {
+            DescribeSObjectResult describeSObjectResult = null;
+
+            describeSObjectResult = sforceService.describeSObject(objectName);
+
+            if (describeSObjectResult == null)
+            {
+                String errorMessage = "The object being referenced in the save does not exist! The name of the object in salesforce.com is: " + objectName;
+
+                ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+
+                throw new ArgumentNullException("BadRequest", errorMessage);
+            }
+
+            if (describeSObjectResult.fields == null ||
+                describeSObjectResult.fields.Length == 0)
+            {
+                String errorMessage = "The object being referenced does not have any fields! The name of the object in salesforce.com is: " + objectName;
+
+                ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+
+                throw new ArgumentNullException("BadRequest", errorMessage);
+            }
+
+            return describeSObjectResult;
         }
 
         // string	String values.
