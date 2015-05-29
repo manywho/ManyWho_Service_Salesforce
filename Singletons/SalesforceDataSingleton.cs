@@ -812,23 +812,14 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Get rid of the trailing OR
                 idWhere = idWhere.Substring(0, idWhere.Length - " OR ".Length);
 
-                //// Create the list of object data type properties so we do the select correctly
-                objectDataTypePropertiesToSelect = new List<ObjectDataTypePropertyAPI>();
+                // Clean the properties before using them for the select
+                objectDataTypePropertiesToSelect = this.CleanObjectDataTypeProperties(null, authenticatedWho, sforceService, objectName, objectDataTypeProperties);
 
-                //// Now we use the properties to get the selection columns
-                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
+                // Now we need to check if we have the Id column
+                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypePropertiesToSelect)
                 {
-                    // Go through each of the fields to check that it exists in the metadata
-                    foreach (Field field in describeSObjectResult.fields)
-                    {
-                        if (field.name.Equals(objectDataTypeProperty.developerName, StringComparison.InvariantCultureIgnoreCase) == true)
-                        {
-                            // The field in the object data exists, so we'll have validated the content value in the above algorithm
-                            selectSoql += field.name + ", ";
-                            objectDataTypePropertiesToSelect.Add(objectDataTypeProperty);
-                            break;
-                        }
-                    }
+                    // Add the field to the select soql
+                    selectSoql += objectDataTypeProperty.developerName + ", ";
 
                     if (objectDataTypeProperty.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                     {
