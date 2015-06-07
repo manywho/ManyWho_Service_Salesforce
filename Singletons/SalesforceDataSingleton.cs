@@ -153,8 +153,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                     typeElementFieldBindings.Add(typeElementFieldBinding);
 
                     // If this is an id lookup field, we want to get the name reference also
+                    // We exclude the Connection fields as though they are reference fields, they do not comply
+                    // with the standard for having a "name"
                     if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
-                        String.IsNullOrWhiteSpace(field.relationshipName) == false)
+                        String.IsNullOrWhiteSpace(field.relationshipName) == false &&
+                        field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
+                        field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false)
                     {
                         // Add the reference to the binding
                         typeElementFieldBinding = new TypeElementPropertyBindingAPI();
