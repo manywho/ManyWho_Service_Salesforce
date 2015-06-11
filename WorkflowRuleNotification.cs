@@ -155,7 +155,7 @@ namespace ManyWho.Service.Salesforce
             }
             else
             {
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification has not data to parse."); }
+                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification has no data to parse."); }
             }
         }
     }
