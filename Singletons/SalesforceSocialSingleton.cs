@@ -139,7 +139,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -251,7 +251,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 

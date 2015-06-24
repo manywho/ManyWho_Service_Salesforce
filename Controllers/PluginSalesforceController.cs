@@ -166,7 +166,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
 
             return response;
@@ -223,7 +223,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
 
             return response;
@@ -271,7 +271,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
 
             return response;
@@ -287,7 +287,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -301,7 +301,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -315,7 +315,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -329,7 +329,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -350,7 +350,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -364,7 +364,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -378,7 +378,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -392,7 +392,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -406,7 +406,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -420,7 +420,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -434,7 +434,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -448,7 +448,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -462,7 +462,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -476,7 +476,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -490,7 +490,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -504,7 +504,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -518,7 +518,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -532,7 +532,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -546,7 +546,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -560,7 +560,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -574,7 +574,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -588,7 +588,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -602,7 +602,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -616,7 +616,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -630,7 +630,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -644,7 +644,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -658,7 +658,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -672,7 +672,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -686,7 +686,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -700,7 +700,7 @@ namespace ManyWho.Flow.Web.Controllers
             }
             catch (Exception exception)
             {
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 

@@ -93,7 +93,7 @@ namespace ManyWho.Service.Salesforce
 
             if (soapBody != String.Empty)
             {
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Parsing notification SOAP: " + soapBody); }
+                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Parsing notification SOAP: " + soapBody); }
 
                 xtr = new XmlTextReader(new System.IO.StringReader(soapBody));
                 doc = new XmlDocument();
@@ -111,7 +111,7 @@ namespace ManyWho.Service.Salesforce
                                 if (xtr.Read())
                                 {
                                     this.SessionID = xtr.Value.Trim();
-                                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionId: " + this.SessionID); }
+                                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionId: " + this.SessionID); }
                                 }
                                 break;
                             //extract session url
@@ -119,7 +119,7 @@ namespace ManyWho.Service.Salesforce
                                 if (xtr.Read())
                                 {
                                     this.SessionURL = xtr.Value.Trim();
-                                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionURL: " + this.SessionURL); }
+                                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionURL: " + this.SessionURL); }
                                 }
                                 break;
                             //extract object's name
@@ -130,7 +130,7 @@ namespace ManyWho.Service.Salesforce
                                     if (sObjectName != null)
                                     {
                                         this.ObjectName = sObjectName.Split(new char[] { ':' })[1];
-                                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("ObjectName: " + this.ObjectName); }
+                                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("ObjectName: " + this.ObjectName); }
                                     }
                                 }
                                 break;
@@ -146,7 +146,7 @@ namespace ManyWho.Service.Salesforce
                                 if (xtr.Read())
                                 {
                                     this.ObjectIDs.Add(xtr.Value.Trim());
-                                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("ObjectId: " + xtr.Value.Trim()); }
+                                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("ObjectId: " + xtr.Value.Trim()); }
                                 }
                                 break;
                         }
@@ -155,7 +155,7 @@ namespace ManyWho.Service.Salesforce
             }
             else
             {
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification has no data to parse."); }
+                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification has no data to parse."); }
             }
         }
     }

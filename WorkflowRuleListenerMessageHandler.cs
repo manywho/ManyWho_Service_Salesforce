@@ -83,7 +83,7 @@ namespace ManyWho.Service.Salesforce
                 this.Execute(emailNotifier, tenantId, mode, receivedNotification);
 
                 // Send the debug log if the user is running in debug mode
-                if (ErrorUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, "Debug Log Entries"); }
+                if (SettingUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, "Debug Log Entries"); }
 
                 // Send a response back to SFDC
                 // Note: since we are not calling base class' SendAsync function, the request will return from here, and will not reach our POST function.
@@ -92,9 +92,9 @@ namespace ManyWho.Service.Salesforce
             catch (Exception exception)
             {
                 // Send the debug log if the user is running in debug mode
-                if (ErrorUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, ErrorUtils.GetExceptionMessage(exception)); }
+                if (SettingUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, BaseHttpUtils.GetExceptionMessage(exception)); }
 
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
@@ -112,17 +112,17 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
 
-            if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing listener notification."); }
+            if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing listener notification."); }
 
             // Go through each object identifier in the notification
             if (workflowRuleNotification.ObjectIDs != null &&
                 workflowRuleNotification.ObjectIDs.Count > 0)
             {
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Workflow event has object identifiers."); }
+                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Workflow event has object identifiers."); }
 
                 foreach (String objectId in workflowRuleNotification.ObjectIDs)
                 {
-                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Processing object identifier: " + objectId); }
+                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Processing object identifier: " + objectId); }
 
                     // Check to see if ManyWho has asked us to listen to any of them
                     salesforceListenerEntries = SalesforceListenerSingleton.GetInstance().GetListenerRequests(objectId);
@@ -131,7 +131,7 @@ namespace ManyWho.Service.Salesforce
                     if (salesforceListenerEntries != null &&
                         salesforceListenerEntries.Count > 0)
                     {
-                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Object has listener entries."); }
+                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Object has listener entries."); }
 
                         // If it has, send a listen notification back to the workflow engine - one by one at the moment (no bulk!)
                         foreach (KeyValuePair<String, SalesforceListenerEntry> pair in salesforceListenerEntries)
@@ -140,7 +140,7 @@ namespace ManyWho.Service.Salesforce
                             listenerServiceRequest = pair.Value.ListenerServiceRequest;
                             authenticatedWho = pair.Value.AuthenticatedWho;
 
-                            if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing listener entry."); }
+                            if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing listener entry."); }
 
                             // Create the service response
                             listenerServiceResponse = new ListenerServiceResponseAPI();
@@ -168,7 +168,7 @@ namespace ManyWho.Service.Salesforce
                             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, listenerServiceRequest.configurationValues, false);
                             authenticationStrategy = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY, listenerServiceRequest.configurationValues, false);
 
-                            if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Logging into salesforce using: " + username); }
+                            if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Logging into salesforce using: " + username); }
 
                             if (String.IsNullOrWhiteSpace(authenticationStrategy) == true ||
                                 authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
@@ -186,34 +186,34 @@ namespace ManyWho.Service.Salesforce
                                 throw new ArgumentNullException("ConfigurationValues", String.Format("The provided authentication strategy is not supported: '{0}'", authenticationStrategy));
                             }
 
-                            if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Getting full sObject for: " + objectId); }
+                            if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Getting full sObject for: " + objectId); }
 
                             // Load the latest object from salesforce so we have the data to send back
                             listenerServiceResponse.listeningEventValue.objectData = SalesforceDataSingleton.GetInstance().LoadSObjectByIdentifier(sforceService, workflowRuleNotification.ObjectName, objectId, true);
 
                             try
                             {
-                                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing event against ManyWho"); }
+                                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing event against ManyWho"); }
 
                                 // Dispatch a listen response to the engine as an event has occurred
                                 invokeType = RunSingleton.GetInstance().Event(notifier, authenticatedWho, tenantId, listenerServiceRequest.callbackUri, listenerServiceResponse);
                             }
                             catch (Exception exception)
                             {
-                                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Event execution failed with: " + ErrorUtils.GetExceptionMessage(exception)); }
+                                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Event execution failed with: " + BaseHttpUtils.GetExceptionMessage(exception)); }
 
                                 // Something went wrong - but we ignore it for now
                                 invokeType = ManyWhoConstants.INVOKE_TYPE_FORWARD;
                             }
 
-                            if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Service returned invoke type of: " + invokeType); }
+                            if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Service returned invoke type of: " + invokeType); }
 
                             // If the engine returns nothing, errors or returns an response other than a "WAIT", we delete the listener for now
                             // TODO: make this a bit more intelligent so we can handle things like retry
                             if (String.IsNullOrWhiteSpace(invokeType) == false &&
                                 invokeType.IndexOf(ManyWhoConstants.INVOKE_TYPE_WAIT, StringComparison.InvariantCultureIgnoreCase) < 0)
                             {
-                                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Removing entry from listeners for invoke type: " + invokeType); }
+                                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Removing entry from listeners for invoke type: " + invokeType); }
 
                                 SalesforceListenerSingleton.GetInstance().UnregisterListener(objectId, listenerServiceRequest);
                             }

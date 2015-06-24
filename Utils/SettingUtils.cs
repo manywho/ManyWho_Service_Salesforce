@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Configuration;
+using ManyWho.Flow.SDK;
 
 namespace ManyWho.Service.Salesforce.Utils
 {
@@ -14,6 +15,20 @@ namespace ManyWho.Service.Salesforce.Utils
         public const String APP_SETTING_DATABASE_USERNAME = "PluginManyWhoUtils.DatabaseUsername";
         public const String APP_SETTING_DATABASE_PASSWORD = "PluginManyWhoUtils.DatabasePassword";
         public const String APP_SETTING_IS_DEBUG = "PluginManyWhoUtils.Debug";
+
+        public static Boolean IsDebugging(String mode)
+        {
+            Boolean isDebugging = false;
+
+            if (string.IsNullOrWhiteSpace(mode) == false &&
+                (mode.Equals(ManyWhoConstants.MODE_DEBUG, StringComparison.OrdinalIgnoreCase) == true ||
+                 mode.Equals(ManyWhoConstants.MODE_DEBUG_STEPTHROUGH, StringComparison.OrdinalIgnoreCase) == true))
+            {
+                isDebugging = true;
+            }
+
+            return isDebugging;
+        }
 
         public static String GetStringSetting(String setting)
         {
