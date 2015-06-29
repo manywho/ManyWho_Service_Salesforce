@@ -64,9 +64,9 @@ namespace ManyWho.Service.Salesforce
                 }
 
                 // Get the segments from the call so we know which tenant we're executing against
-                tenantId = request.RequestUri.Segments[6].Replace("/", "");
-                flowId = request.RequestUri.Segments[7].Replace("/", "");
-                player = request.RequestUri.Segments[8];
+                tenantId = request.RequestUri.Segments[7].Replace("/", "");
+                flowId = request.RequestUri.Segments[8].Replace("/", "");
+                player = request.RequestUri.Segments[9];
 
                 // Check to make sure we've received valid guids
                 if (Guid.TryParse(tenantId, out tenantGuid) == false)
