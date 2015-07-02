@@ -158,8 +158,17 @@ namespace ManyWho.Service.Salesforce.Singletons
                     if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
                         String.IsNullOrWhiteSpace(field.relationshipName) == false &&
                         field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
-                        field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false)
+                        field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
+                        field.name.Equals("Case__r.Name", StringComparison.OrdinalIgnoreCase) == false)
                     {
+                        // Add an additional test here as the if statement will get a bit complicated including this also
+                        // Cases don't have a relationship name field annoyingly
+                        if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
+                            field.name.Equals("Parent.Name", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            continue;
+                        }
+
                         // Add the reference to the binding
                         typeElementFieldBinding = new TypeElementPropertyBindingAPI();
                         typeElementFieldBinding.databaseFieldName = field.relationshipName + ".Name";
