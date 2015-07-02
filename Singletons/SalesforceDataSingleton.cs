@@ -146,6 +146,10 @@ namespace ManyWho.Service.Salesforce.Singletons
                 {
                     Field field = fields[x];
 
+                    typeElementFieldBinding = new TypeElementPropertyBindingAPI();
+                    typeElementFieldBinding.databaseFieldName = field.name;
+                    typeElementFieldBinding.databaseContentType = field.type.ToString();
+
                     // If this is an id lookup field, we want to get the name reference also
                     // We exclude the Connection fields as though they are reference fields, they do not comply
                     // with the standard for having a "name"
