@@ -901,6 +901,7 @@ namespace ManyWho.Service.Salesforce.Singletons
         {
             AuthenticationUtilsResponse authenticationUtilsResponse = null;
             QueryResult queryResult = null;
+            Boolean executeQuery = true;
             String soql = null;
             String where = null;
 
@@ -912,6 +913,13 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
             else
             {
+                // Check to make sure we're not dealing with a public user as there's no point executing the query
+                if (String.IsNullOrWhiteSpace(thisUserId) == false &&
+                    thisUserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    executeQuery = false;
+                }
+
                 // Select from the group members to see if this user exists in the set
                 soql = "SELECT CollaborationGroupId FROM CollaborationGroupMember WHERE CollaborationGroupId = '" + referenceGroupId + "' AND MemberId = '" + thisUserId + "'";
             }
@@ -919,8 +927,12 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Create a new authentication utils response object to house the results
             authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
-            // Query salesforce to see if anything comes back
-            queryResult = sforceService.query(soql);
+            // Check to make sure we should bother executing the query
+            if (executeQuery == true)
+            {
+                // Query salesforce to see if anything comes back
+                queryResult = sforceService.query(soql);
+            }
 
             // Check to see if the query returned any results
             if (queryResult != null &&
