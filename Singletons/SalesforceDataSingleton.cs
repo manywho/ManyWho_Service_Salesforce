@@ -1049,6 +1049,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             ObjectAPI objectAPI = null;
             List<ObjectAPI> objectAPIs = null;
             Boolean isAggregate = false;
+            Int32 order = 0;
 
             // Make the query call and get the query results
             queryResult = sforceService.query(soqlQuery);
@@ -1080,6 +1081,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     objectAPI = new ObjectAPI();
                     objectAPI.developerName = objectName;
                     objectAPI.properties = new List<PropertyAPI>();
+                    objectAPI.order = order++;
 
                     if (queryObject.Any.Length > properties.Count)
                     {
@@ -1195,6 +1197,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             SearchRecord searchRecord = null;
             ObjectAPI objectAPI = null;
             List<ObjectAPI> objectAPIs = null;
+            Int32 order = 0;
 
             // Make the search call and get the search results
             searchResult = sforceService.search(soslQuery);
@@ -1224,6 +1227,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                         objectAPI = new ObjectAPI();
                         objectAPI.developerName = objectName;
                         objectAPI.properties = new List<PropertyAPI>();
+                        objectAPI.order = order++;
 
                         if (searchRecord.record.Any.Length > properties.Count)
                         {
