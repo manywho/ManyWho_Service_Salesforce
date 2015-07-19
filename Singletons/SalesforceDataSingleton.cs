@@ -882,21 +882,24 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
             else
             {
-                if (listFilterAPI.id != null &&
-                    listFilterAPI.id.Trim().Length == 0)
+                if (listFilterAPI != null)
                 {
-                    throw new ArgumentNullException("BadRequest", "ListFilter.Id is not yet supported for command operations.");
-                }
+                    if (listFilterAPI.id != null &&
+                        listFilterAPI.id.Trim().Length == 0)
+                    {
+                        throw new ArgumentNullException("BadRequest", "ListFilter.Id is not yet supported for command operations.");
+                    }
 
-                if (listFilterAPI.filterByProvidedObjects == true)
-                {
-                    throw new ArgumentNullException("BadRequest", "ListFilter.FilterByProvidedObjects is not yet supported for command operations.");
-                }
+                    if (listFilterAPI.filterByProvidedObjects == true)
+                    {
+                        throw new ArgumentNullException("BadRequest", "ListFilter.FilterByProvidedObjects is not yet supported for command operations.");
+                    }
 
-                if (listFilterAPI.where != null &&
-                    listFilterAPI.where.Count > 0)
-                {
-                    throw new ArgumentNullException("BadRequest", "ListFilter.Where is not yet supported for command operations.");
+                    if (listFilterAPI.where != null &&
+                        listFilterAPI.where.Count > 0)
+                    {
+                        throw new ArgumentNullException("BadRequest", "ListFilter.Where is not yet supported for command operations.");
+                    }
                 }
 
                 // Add the additional filtering to the command soql
