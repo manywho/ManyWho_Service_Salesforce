@@ -124,7 +124,7 @@ namespace ManyWho.Flow.Web.Controllers
                     authenticatedWho = emailVerification.AuthenticatedWho;
 
                     // Invoke the response on the manywho service
-                    invokeType = RunSingleton.GetInstance().Response(notifier, authenticatedWho, emailVerification.ServiceRequest.tenantId, emailVerification.ServiceRequest.callbackUri, serviceResponse);
+                    invokeType = RunSingleton.GetInstance().Response(notifier, null, emailVerification.ServiceRequest.tenantId, emailVerification.ServiceRequest.callbackUri, serviceResponse);
 
                     if (invokeType == null ||
                         invokeType.Trim().Length == 0)
