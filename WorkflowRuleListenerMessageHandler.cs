@@ -196,7 +196,7 @@ namespace ManyWho.Service.Salesforce
                                 if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing event against ManyWho"); }
 
                                 // Dispatch a listen response to the engine as an event has occurred
-                                invokeType = RunSingleton.GetInstance().Event(notifier, authenticatedWho, tenantId, listenerServiceRequest.callbackUri, listenerServiceResponse);
+                                invokeType = RunSingleton.GetInstance().Event(notifier, null, tenantId, listenerServiceRequest.callbackUri, listenerServiceResponse);
                             }
                             catch (Exception exception)
                             {
