@@ -14,7 +14,6 @@ namespace ManyWho.Service.Salesforce.Utils
         public const String APP_SETTING_DATABASE_NAME = "PluginManyWhoUtils.DatabaseName";
         public const String APP_SETTING_DATABASE_USERNAME = "PluginManyWhoUtils.DatabaseUsername";
         public const String APP_SETTING_DATABASE_PASSWORD = "PluginManyWhoUtils.DatabasePassword";
-        public const String APP_SETTING_IS_DEBUG = "PluginManyWhoUtils.Debug";
 
         public static Boolean IsDebugging(String mode)
         {
