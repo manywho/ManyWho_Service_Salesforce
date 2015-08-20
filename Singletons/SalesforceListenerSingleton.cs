@@ -1,35 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using Newtonsoft.Json;
 using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Run.Elements.Config;
+using ManyWho.Service.Salesforce.Utils;
 
 namespace ManyWho.Service.Salesforce.Singletons
 {
-    public class SalesforceListenerEntry
-    {
-        public ListenerServiceRequestAPI ListenerServiceRequest
-        {
-            get;
-            set;
-        }
-
-        public IAuthenticatedWho AuthenticatedWho
-        {
-            get;
-            set;
-        }
-    }
-
     public class SalesforceListenerSingleton
     {
-        private static Dictionary<String, Dictionary<String, SalesforceListenerEntry>> listenerRequests;
         private static SalesforceListenerSingleton salesforceListenerSingleton;
 
         private SalesforceListenerSingleton()
         {
-            listenerRequests = new Dictionary<String, Dictionary<String, SalesforceListenerEntry>>();
+
         }
 
         public static SalesforceListenerSingleton GetInstance()
@@ -42,24 +26,41 @@ namespace ManyWho.Service.Salesforce.Singletons
             return salesforceListenerSingleton;
         }
 
-        public Dictionary<String, SalesforceListenerEntry> GetListenerRequests(String objectId)
+        public Dictionary<String, ListenerServiceRequestAPI> GetListenerRequests(String tenantId, String objectId)
         {
-            Dictionary<String, SalesforceListenerEntry> salesforceListenerEntries = null;
+            Dictionary<String, ListenerServiceRequestAPI> salesforceListenerEntries = null;
+            String json = null;
+
+            if (String.IsNullOrWhiteSpace(tenantId) == true)
+            {
+                throw new ArgumentNullException("TenantId", "The TenantId cannot be null or blank.");
+            }
 
             if (String.IsNullOrWhiteSpace(objectId) == true)
             {
                 throw new ArgumentNullException("ObjectId", "The ObjectId cannot be null or blank.");
             }
 
-            // Try to get the listener requests out for this object
-            listenerRequests.TryGetValue(objectId.ToLower(), out salesforceListenerEntries);
+            // Get the stored JSON for the listener requests
+            json = StorageUtils.GetStoredJson((tenantId + objectId).ToLower());
+
+            if (string.IsNullOrWhiteSpace(json) == false)
+            {
+                // Convert the json back to actual objects
+                salesforceListenerEntries = JsonConvert.DeserializeObject<Dictionary<String, ListenerServiceRequestAPI>>(json);
+            }
 
             return salesforceListenerEntries;
         }
 
-        public void UnregisterListener(String objectId, ListenerServiceRequestAPI listenerServiceRequest)
+        public void UnregisterListener(String tenantId, String objectId, ListenerServiceRequestAPI listenerServiceRequest)
         {
-            Dictionary<String, SalesforceListenerEntry> salesforceListenerEntries = null;
+            Dictionary<String, ListenerServiceRequestAPI> salesforceListenerEntries = null;
+
+            if (String.IsNullOrWhiteSpace(tenantId) == true)
+            {
+                throw new ArgumentNullException("TenantId", "The TenantId cannot be null or blank.");
+            }
 
             if (String.IsNullOrWhiteSpace(objectId) == true)
             {
@@ -77,7 +78,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             // Try to get the listener requests out for this object
-            listenerRequests.TryGetValue(objectId.ToLower(), out salesforceListenerEntries);
+            salesforceListenerEntries = this.GetListenerRequests(tenantId, objectId);
 
             // Check to make sure we found some listener service requests for this record
             if (salesforceListenerEntries != null)
@@ -92,15 +93,15 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // If the listener service requests are now emptry, we remove the parent as well
                 if (salesforceListenerEntries.Count == 0)
                 {
-                    listenerRequests.Remove(objectId.ToLower());
+                    StorageUtils.RemoveStoredJson((tenantId + objectId).ToLower());
                 }
             }
         }
 
         public void RegisterListener(IAuthenticatedWho authenticatedWho, ListenerServiceRequestAPI listenerServiceRequest)
         {
-            Dictionary<String, SalesforceListenerEntry> salesforceListenerEntries = null;
-            SalesforceListenerEntry salesforceListenerEntry = null;
+            Dictionary<String, ListenerServiceRequestAPI> salesforceListenerEntries = null;
+            String objectId = null;
             Guid externalGuid = Guid.Empty;
 
             if (authenticatedWho == null)
@@ -145,23 +146,24 @@ namespace ManyWho.Service.Salesforce.Singletons
                 throw new ArgumentNullException("ListenerServiceRequest.ValueForListening.ObjectData", "The Salesforce Service cannot listen to an object that has not been first saved or loaded from Salesforce.");
             }
 
-            // Get the listener service requests out of the data store
-            if (listenerRequests.TryGetValue(listenerServiceRequest.valueForListening.objectData[0].externalId.ToLower(), out salesforceListenerEntries) == false)
+            // Assign the object id from the external id
+            objectId = listenerServiceRequest.valueForListening.objectData[0].externalId;
+
+            // Try to get the listener requests out for this object
+            salesforceListenerEntries = this.GetListenerRequests(listenerServiceRequest.tenantId, objectId);
+
+            // Check to make sure we have something, or create a new list
+            if (salesforceListenerEntries == null)
             {
                 // This is the first time we're registering a listener for this object, so we create a new map
-                salesforceListenerEntries = new Dictionary<String, SalesforceListenerEntry>();
+                salesforceListenerEntries = new Dictionary<String, ListenerServiceRequestAPI>();
             }
 
-            // Create the entry
-            salesforceListenerEntry = new SalesforceListenerEntry();
-            salesforceListenerEntry.AuthenticatedWho = authenticatedWho;
-            salesforceListenerEntry.ListenerServiceRequest = listenerServiceRequest;
-
             // Now we have our list of listeners, we add this one based on the token
-            salesforceListenerEntries[listenerServiceRequest.token.ToLower()] = salesforceListenerEntry;
+            salesforceListenerEntries[listenerServiceRequest.token.ToLower()] = listenerServiceRequest;
 
             // And we put the updated map, back into the data store
-            listenerRequests[listenerServiceRequest.valueForListening.objectData[0].externalId.ToLower()] = salesforceListenerEntries;
+            StorageUtils.SetStoredJson((listenerServiceRequest.tenantId + objectId).ToLower(), JsonConvert.SerializeObject(salesforceListenerEntries));
         }
     }
 }

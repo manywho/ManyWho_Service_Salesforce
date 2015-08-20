@@ -100,10 +100,9 @@ namespace ManyWho.Service.Salesforce
 
         private void Execute(INotifier notifier, String tenantId, String mode, WorkflowRuleNotification workflowRuleNotification)
         {
-            Dictionary<String, SalesforceListenerEntry> salesforceListenerEntries = null;
+            Dictionary<String, ListenerServiceRequestAPI> salesforceListenerEntries = null;
             ListenerServiceResponseAPI listenerServiceResponse = null;
             ListenerServiceRequestAPI listenerServiceRequest = null;
-            IAuthenticatedWho authenticatedWho = null;
             SforceService sforceService = null;
             String authenticationStrategy = null;
             String authenticationUrl = null;
@@ -125,7 +124,7 @@ namespace ManyWho.Service.Salesforce
                     if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Processing object identifier: " + objectId); }
 
                     // Check to see if ManyWho has asked us to listen to any of them
-                    salesforceListenerEntries = SalesforceListenerSingleton.GetInstance().GetListenerRequests(objectId);
+                    salesforceListenerEntries = SalesforceListenerSingleton.GetInstance().GetListenerRequests(tenantId, objectId);
 
                     // Check to see if we're actually listening
                     if (salesforceListenerEntries != null &&
@@ -134,11 +133,10 @@ namespace ManyWho.Service.Salesforce
                         if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Object has listener entries."); }
 
                         // If it has, send a listen notification back to the workflow engine - one by one at the moment (no bulk!)
-                        foreach (KeyValuePair<String, SalesforceListenerEntry> pair in salesforceListenerEntries)
+                        foreach (KeyValuePair<String, ListenerServiceRequestAPI> pair in salesforceListenerEntries)
                         {
                             // Get the listener request out
-                            listenerServiceRequest = pair.Value.ListenerServiceRequest;
-                            authenticatedWho = pair.Value.AuthenticatedWho;
+                            listenerServiceRequest = pair.Value;
 
                             if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing listener entry."); }
 
@@ -215,7 +213,7 @@ namespace ManyWho.Service.Salesforce
                             {
                                 if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Removing entry from listeners for invoke type: " + invokeType); }
 
-                                SalesforceListenerSingleton.GetInstance().UnregisterListener(objectId, listenerServiceRequest);
+                                SalesforceListenerSingleton.GetInstance().UnregisterListener(tenantId, objectId, listenerServiceRequest);
                             }
                         }
                     }

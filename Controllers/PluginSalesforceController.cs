@@ -1,27 +1,14 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Net;
 using System.Web;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using ManyWho.Flow.SDK;
 using ManyWho.Flow.SDK.Utils;
-using ManyWho.Flow.SDK.Draw.Flow;
-using ManyWho.Flow.SDK.Draw.Content;
-using ManyWho.Flow.SDK.Draw.Elements;
-using ManyWho.Flow.SDK.Draw.Elements.UI;
-using ManyWho.Flow.SDK.Draw.Elements.Map;
 using ManyWho.Flow.SDK.Draw.Elements.Type;
-using ManyWho.Flow.SDK.Draw.Elements.Value;
-using ManyWho.Flow.SDK.Run;
-using ManyWho.Flow.SDK.Run.State;
-using ManyWho.Flow.SDK.Run.Elements.UI;
 using ManyWho.Flow.SDK.Run.Elements.Map;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Flow.SDK.Run.Elements.Config;
@@ -30,10 +17,7 @@ using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Social;
 using ManyWho.Service.Salesforce;
 using ManyWho.Service.Salesforce.Utils;
-using ManyWho.Service.Salesforce.Models.Rest.Enums;
-using ManyWho.Service.Salesforce.Models.Rest;
 using ManyWho.Service.Salesforce.Models.Canvas;
-using ManyWho.Service.ManyWho.Utils.Singletons;
 
 /*!
 
@@ -69,11 +53,10 @@ namespace ManyWho.Flow.Web.Controllers
         [ActionName("TaskEmailOutcomeResponse")]
         public HttpResponseMessage TaskEmailOutcomeResponse(String token, String selectedOutcomeId, String redirectUri = null)
         {
-            IAuthenticatedWho authenticatedWho = null;
             INotifier notifier = null;
             HttpResponseMessage response = null;
             ServiceResponseAPI serviceResponse = null;
-            EmailVerification emailVerification = null;
+            ServiceRequestAPI serviceRequest = null;
             String invokeType = null;
             String responseContent = null;
 
@@ -90,66 +73,44 @@ namespace ManyWho.Flow.Web.Controllers
                 }
 
                 // Get the email verification for this tracking code
-                emailVerification = ManyWhoUtilsSingleton.GetInstance().RetrieveTaskRequest(Guid.Parse(token));
+                serviceRequest = JsonConvert.DeserializeObject<ServiceRequestAPI>(StorageUtils.GetStoredJson(token.ToLower()));
 
-                if (emailVerification == null)
+                if (serviceRequest == null)
                 {
-                    throw new ArgumentNullException("EmailVerification", "The EmailVerification could not be found for this request.");
+                    throw new ArgumentNullException("ServiceRequest", "The request has already been processed.");
                 }
 
-                // If the email verification is completed, we simply return as response OK to sendgrid - basically, we ignore the email
-                if (emailVerification.IsCompleted == false)
+                // Create the notifier
+                notifier = EmailNotifier.GetInstance(serviceRequest.tenantId, null, null, "TaskEmailOutcomeResponse");
+
+                // Create the service response to send back to ManyWho based on this outcome click
+                serviceResponse = new ServiceResponseAPI();
+                serviceResponse.invokeType = ManyWhoConstants.INVOKE_TYPE_FORWARD;
+                serviceResponse.tenantId = serviceRequest.tenantId;
+                serviceResponse.token = serviceRequest.token;
+                serviceResponse.selectedOutcomeId = selectedOutcomeId;
+
+                // Invoke the response on the manywho service
+                invokeType = RunSingleton.GetInstance().Response(notifier, null, serviceRequest.tenantId, serviceRequest.callbackUri, serviceResponse);
+
+                if (invokeType == null ||
+                    invokeType.Trim().Length == 0)
                 {
-                    if (emailVerification.ServiceRequest == null)
-                    {
-                        throw new ArgumentNullException("ServiceRequest", "The ServiceRequest object is null in the task persistence.");
-                    }
+                    throw new ArgumentNullException("ServiceRequest", "The invokeType coming back from ManyWho cannot be null or blank.");
+                }
 
-                    if (emailVerification.AuthenticatedWho == null)
-                    {
-                        throw new ArgumentNullException("AuthenticatedWho", "The AuthenticatedWho object is null in the task persistence.");
-                    }
-
-                    // Create the notifier
-                    notifier = EmailNotifier.GetInstance(emailVerification.ServiceRequest.tenantId, emailVerification.AuthenticatedWho, null, "TaskEmailOutcomeResponse");
-
-                    // Create the service response to send back to ManyWho based on this outcome click
-                    serviceResponse = new ServiceResponseAPI();
-                    serviceResponse.invokeType = ManyWhoConstants.INVOKE_TYPE_FORWARD;
-                    serviceResponse.tenantId = emailVerification.ServiceRequest.tenantId;
-                    serviceResponse.token = emailVerification.ServiceRequest.token;
-                    serviceResponse.selectedOutcomeId = selectedOutcomeId;
-
-                    // Get the authenticated who from the verification
-                    authenticatedWho = emailVerification.AuthenticatedWho;
-
-                    // Invoke the response on the manywho service
-                    invokeType = RunSingleton.GetInstance().Response(notifier, null, emailVerification.ServiceRequest.tenantId, emailVerification.ServiceRequest.callbackUri, serviceResponse);
-
-                    if (invokeType == null ||
-                        invokeType.Trim().Length == 0)
-                    {
-                        throw new ArgumentNullException("ServiceRequest", "The invokeType coming back from ManyWho cannot be null or blank.");
-                    }
-
-                    if (invokeType.IndexOf(ManyWhoConstants.INVOKE_TYPE_SUCCESS, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                    {
-                        // The system has accepted our task email response so the token is now dead - we should mark it as completed in our db
-                        ManyWhoUtilsSingleton.GetInstance().MarkTaskCompleted(Guid.Parse(emailVerification.ServiceRequest.tenantId), Guid.Parse(token));
-                    }
-                    else
-                    {
-                        // The system has not accepted our task email response, so we should simply keep waiting and responding to emails with this task token
-                    }
-
-                    // Tell the user the outcome selection was successful
-                    responseContent = "Your request has been successfully completed. Please close this window.";
+                if (invokeType.IndexOf(ManyWhoConstants.INVOKE_TYPE_SUCCESS, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                {
+                    // The system has accepted our task email response so the token is now dead - we remove it from storage
+                    StorageUtils.RemoveStoredJson(token.ToLower());
                 }
                 else
                 {
-                    // Tell the caller that we got the email response - though that does not mean that we accepted this response as finishing the workflow
-                    responseContent = "This request has already been processed. Please close this window.";
+                    // The system has not accepted our task email response, so we should simply keep waiting and responding to emails with this task token
                 }
+
+                // Tell the user the outcome selection was successful
+                responseContent = "Your request has been successfully completed. Please close this window.";
 
                 if (String.IsNullOrWhiteSpace(redirectUri) == false)
                 {
