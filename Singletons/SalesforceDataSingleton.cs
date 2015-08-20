@@ -1604,33 +1604,28 @@ namespace ManyWho.Service.Salesforce.Singletons
                 securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, configurationValues, false);
 
                 sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
-
-                if (sforceService == null)
-                {
-                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
-                }
             }
             else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
                      authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
             {
-                if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
-                    authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0)
+                if (string.IsNullOrWhiteSpace(authenticatedWho.Token) == true ||
+                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.OrdinalIgnoreCase) == true ||
+                    (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
+                     authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0))
                 {
-                    // There's no point logging in, we can't as the user is using active user authentication and we don't have a token
+                    throw new ArgumentNullException("SalesforceService", "The authentication token is null, empty, or incorrectly configured. If you are running using a PUBLIC authentication context, make sure you set your " + SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY + " configuration value to 'SuperUser'.");
                 }
-                else
-                {
-                    // We should log the user in using their session information that's been provided via a previous explicit login
-                    sforceService = this.LogUserInBasedOnSession(
-                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
-                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
-                    );
 
-                    if (sforceService == null)
-                    {
-                        throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
-                    }
-                }
+                // We should log the user in using their session information that's been provided via a previous explicit login
+                sforceService = this.LogUserInBasedOnSession(
+                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
+                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
+                );
+            }
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
             }
 
             return sforceService;
