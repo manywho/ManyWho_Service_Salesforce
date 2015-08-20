@@ -164,7 +164,9 @@ namespace ManyWho.Service.Salesforce.Singletons
                         // Add an additional test here as the if statement will get a bit complicated including this also
                         // Cases don't have a relationship name field annoyingly
                         if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
-                            field.name.Equals("Parent.Name", StringComparison.OrdinalIgnoreCase) == true)
+                            (field.name.Equals("Parent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.name.Equals("QuestionId", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.name.Equals("CommunityId", StringComparison.OrdinalIgnoreCase) == true))
                         {
                             continue;
                         }
