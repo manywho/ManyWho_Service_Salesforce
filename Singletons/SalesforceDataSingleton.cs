@@ -152,25 +152,9 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     typeElementFieldBindings.Add(typeElementFieldBinding);
 
-                    // If this is an id lookup field, we want to get the name reference also
-                    // We exclude the Connection fields as though they are reference fields, they do not comply
-                    // with the standard for having a "name"
-                    if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
-                        String.IsNullOrWhiteSpace(field.relationshipName) == false &&
-                        field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
-                        field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
-                        field.name.Equals("Case__r.Name", StringComparison.OrdinalIgnoreCase) == false)
+                    // Check to see if this field reference should be added
+                    if (this.AddReferenceField(tableName, field) == true)
                     {
-                        // Add an additional test here as the if statement will get a bit complicated including this also
-                        // Cases don't have a relationship name field annoyingly
-                        if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
-                            (field.name.Equals("ParentId", StringComparison.OrdinalIgnoreCase) == true ||
-                             field.name.Equals("QuestionId", StringComparison.OrdinalIgnoreCase) == true ||
-                             field.name.Equals("CommunityId", StringComparison.OrdinalIgnoreCase) == true))
-                        {
-                            continue;
-                        }
-
                         // Add the reference to the binding
                         typeElementFieldBinding = new TypeElementPropertyBindingAPI();
                         typeElementFieldBinding.databaseFieldName = field.relationshipName + ".Name";
@@ -182,6 +166,37 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             return typeElementFieldBindings;
+        }
+
+        private Boolean AddReferenceField(String tableName, Field field)
+        {
+            Boolean addReferenceField = false;
+
+            // If this is an id lookup field, we want to get the name reference also
+            // We exclude the Connection fields as though they are reference fields, they do not comply
+            // with the standard for having a "name"
+            if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
+                String.IsNullOrWhiteSpace(field.relationshipName) == false &&
+                field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
+                field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
+                field.name.Equals("Case__r.Name", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                // Add an additional test here as the if statement will get a bit complicated including this also
+                // Cases don't have a relationship name field annoyingly
+                if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
+                    (field.name.Equals("ParentId", StringComparison.OrdinalIgnoreCase) == true ||
+                     field.name.Equals("QuestionId", StringComparison.OrdinalIgnoreCase) == true ||
+                     field.name.Equals("CommunityId", StringComparison.OrdinalIgnoreCase) == true))
+                {
+                    // Do nothing, we don't want to reference this field
+                }
+                else
+                {
+                    addReferenceField = true;
+                }
+            }
+
+            return addReferenceField;
         }
 
         public List<TypeElementRequestAPI> GetTypeElements(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
@@ -332,9 +347,8 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                                         typeElement.properties.Add(typeElementEntry);
 
-                                        // If this is a reference field, then we want to get the reference name field also
-                                        if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
-                                            String.IsNullOrWhiteSpace(field.relationshipName) == false)
+                                        // Check to see if this field reference should be added
+                                        if (this.AddReferenceField(describeSObjectResult.name, field) == true)
                                         {
                                             // Add the reference to the binding
                                             typeElementFieldBinding = new TypeElementPropertyBindingAPI();
