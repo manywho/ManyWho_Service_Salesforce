@@ -217,9 +217,11 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.template.config</DependentUpon>
     </None>
+    <None Include="Database\schema.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Database\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">

@@ -51,7 +51,7 @@ namespace ManyWho.Service.Salesforce.Utils
             {
                 postgresDatabase.CreateCommand();
                 postgresDatabase.AddDbParameter("Id", PostgresDatabase.DBTYPE_STRING, 255, false, key);
-                postgresDatabase.AddDbParameter("Id", PostgresDatabase.DBTYPE_JSON, -1, true, json);
+                postgresDatabase.AddDbParameter("Json", PostgresDatabase.DBTYPE_JSON, -1, true, json);
 
                 if (string.IsNullOrWhiteSpace(GetStoredJson(key)) == true)
                 {
