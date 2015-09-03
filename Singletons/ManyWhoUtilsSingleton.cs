@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Net.Mail;
+using ManyWho.Flow.SDK;
 using ManyWho.Flow.SDK.Utils;
 using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Run;
@@ -202,7 +203,10 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 {
                     foreach (OutcomeAvailableAPI outcome in outcomes)
                     {
-                        textBody += outcome.label + "(Click here: " + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + ")" + Environment.NewLine;
+                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false)
+                        {
+                            textBody += outcome.label + "(Click here: " + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + ")" + Environment.NewLine;
+                        }
                     }
                 }
 
@@ -237,7 +241,10 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
 
                     foreach (OutcomeAvailableAPI outcome in outcomes)
                     {
-                        fullHtmlBody += "<a href=\"" + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + "\" class=\"btn btn-primary\">" + outcome.label + "</a>&nbsp;";
+                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false)
+                        {
+                            fullHtmlBody += "<a href=\"" + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + "\" class=\"btn btn-primary\">" + outcome.label + "</a>&nbsp;";
+                        }
                     }
 
                     fullHtmlBody += "</div>";

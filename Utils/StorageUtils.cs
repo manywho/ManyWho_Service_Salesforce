@@ -39,7 +39,7 @@ namespace ManyWho.Service.Salesforce.Utils
                 postgresDatabase.CreateCommand();
                 postgresDatabase.AddDbParameter("Id", PostgresDatabase.DBTYPE_STRING, 255, false, key);
 
-                postgresDatabase.ExecuteCommand(string.Format("DELETE FROM StoredJson WHERE Id = {0}Id LIMIT 1", postgresDatabase.ParameterPrefix));
+                postgresDatabase.ExecuteCommand(string.Format("DELETE FROM StoredJson WHERE Id = {0}Id", postgresDatabase.ParameterPrefix));
 
                 postgresDatabase.Commit();
             }

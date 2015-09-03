@@ -53,6 +53,7 @@ namespace ManyWho.Flow.Web.Controllers
         [ActionName("TaskEmailOutcomeResponse")]
         public HttpResponseMessage TaskEmailOutcomeResponse(String token, String selectedOutcomeId, String redirectUri = null)
         {
+            IAuthenticatedWho authenticatedWho = null;
             INotifier notifier = null;
             HttpResponseMessage response = null;
             ServiceResponseAPI serviceResponse = null;
@@ -80,8 +81,12 @@ namespace ManyWho.Flow.Web.Controllers
                     throw new ArgumentNullException("ServiceRequest", "The request has already been processed.");
                 }
 
+                // Get the notifier email
+                authenticatedWho = new AuthenticatedWho();
+                authenticatedWho.Email = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
+
                 // Create the notifier
-                notifier = EmailNotifier.GetInstance(serviceRequest.tenantId, null, null, "TaskEmailOutcomeResponse");
+                notifier = EmailNotifier.GetInstance(serviceRequest.tenantId, authenticatedWho, null, "TaskEmailOutcomeResponse");
 
                 // Create the service response to send back to ManyWho based on this outcome click
                 serviceResponse = new ServiceResponseAPI();
