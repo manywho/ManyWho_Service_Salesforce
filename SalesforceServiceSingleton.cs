@@ -1436,6 +1436,7 @@ namespace ManyWho.Service.Salesforce
             manywhoObject.properties = new List<PropertyAPI>();
             manywhoObject.properties.Add(new PropertyAPI() { developerName = "Name", contentValue = "ManyWho Flow Collaboration" });
             manywhoObject.properties.Add(new PropertyAPI() { developerName = "Id", contentValue = "" });
+            manywhoObject.properties.Add(new PropertyAPI() { developerName = "JoinUri", contentValue = socialServiceRequestAPI.joinPlayerUri });
 
             // Add the object to the list of objects to save
             manywhoObjects = new List<ObjectAPI>();
@@ -1445,6 +1446,7 @@ namespace ManyWho.Service.Salesforce
             objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
             objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
             objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Id" });
+            objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "JoinUri__c" });
 
             // Save the manywho object to salesforce
             manywhoObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, socialServiceRequestAPI.configurationValues, objectDataTypeProperties, manywhoObjects);
