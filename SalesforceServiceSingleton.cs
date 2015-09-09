@@ -1436,7 +1436,7 @@ namespace ManyWho.Service.Salesforce
             manywhoObject.properties = new List<PropertyAPI>();
             manywhoObject.properties.Add(new PropertyAPI() { developerName = "Name", contentValue = "ManyWho Flow Collaboration" });
             manywhoObject.properties.Add(new PropertyAPI() { developerName = "Id", contentValue = "" });
-            manywhoObject.properties.Add(new PropertyAPI() { developerName = "JoinUri", contentValue = socialServiceRequestAPI.joinPlayerUri });
+            manywhoObject.properties.Add(new PropertyAPI() { developerName = "JoinUri__c", contentValue = socialServiceRequestAPI.joinPlayerUri });
 
             // Add the object to the list of objects to save
             manywhoObjects = new List<ObjectAPI>();
