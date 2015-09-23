@@ -353,6 +353,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // requesting access
                     objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
 
+                    if (objectAPI == null)
+                    {
+                        throw new ArgumentNullException("User", string.Format("A user could not be found for the provided identifier. You may be logged into the incorrect Salesforce Org for which the Flow has been configured. The user identifier provided is: '{0}'", authenticatedWho.UserId));
+                    }
+
                     // Set the status of this user to not authorized, but we do want to return their details
                     foreach (PropertyAPI property in objectAPI.properties)
                     {
