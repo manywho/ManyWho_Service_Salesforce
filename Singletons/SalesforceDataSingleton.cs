@@ -678,21 +678,28 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     // Parse the content value to find out if it's a valid date time
                                     DateTime.TryParse(referencedPropertyAPI.contentValue, out datetimeValue);
 
-                                    if ("date".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                    if (datetimeValue == DateTime.MinValue)
                                     {
-                                        referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("yyyy-MM-dd");
+                                        referencedPropertyAPI.contentValue = null;
                                     }
-                                    else if ("datetime".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                    else
                                     {
-                                        referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("s");
-                                    }
-                                    else if ("time".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
-                                    {
-                                        String errorMessage = "The salesforce.com plugin does not currently support \"time\" field types.";
+                                        if ("date".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                        {
+                                            referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("yyyy-MM-dd");
+                                        }
+                                        else if ("datetime".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                        {
+                                            referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("s");
+                                        }
+                                        else if ("time".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                        {
+                                            String errorMessage = "The salesforce.com plugin does not currently support \"time\" field types.";
 
-                                        ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+                                            ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
 
-                                        throw new ArgumentNullException("BadRequest", errorMessage);
+                                            throw new ArgumentNullException("BadRequest", errorMessage);
+                                        }
                                     }
                                 }
                                 else if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_NUMBER, StringComparison.InvariantCultureIgnoreCase) == true)
