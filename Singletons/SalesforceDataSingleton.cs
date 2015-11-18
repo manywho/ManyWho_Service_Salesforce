@@ -179,7 +179,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                 String.IsNullOrWhiteSpace(field.relationshipName) == false &&
                 field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
                 field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
-                field.name.Equals("Case__r.Name", StringComparison.OrdinalIgnoreCase) == false)
+                field.relationshipName.Equals("Case__r", StringComparison.OrdinalIgnoreCase) == false &&
+                field.name.Equals("Case__c", StringComparison.OrdinalIgnoreCase) == false)
             {
                 // Add an additional test here as the if statement will get a bit complicated including this also
                 // Cases don't have a relationship name field annoyingly
@@ -515,19 +516,34 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 }
                             }
 
+                            // Grab the content type for the field - the content type as it should be from ManyWho
+                            contentType = TranslateToManyWhoContentType(field.type.ToString());
+
                             // If the property does not have a value, we exclude it from the update. We assume that the user will be providing a value
                             // if they want to perform a save. The driver therefore does not currently support "nulling" or "blanking" field values. This will
                             // help prevent any data loss issues and blanking values feels like an edge case that's more likely to cause problems than solve them!
-                            if (referencedPropertyAPI != null &&
-                                (referencedPropertyAPI.contentValue == null ||
-                                 referencedPropertyAPI.contentValue.Trim().Length == 0))
+                            if (referencedPropertyAPI != null)
                             {
-                                propertiesToRemove.Add(referencedPropertyAPI);
-                                continue;
-                            }
+                                if (referencedPropertyAPI.contentValue == null ||
+                                    referencedPropertyAPI.contentValue.Trim().Length == 0)
+                                {
+                                    propertiesToRemove.Add(referencedPropertyAPI);
+                                    continue;
+                                }
+                                else if (contentType != null &&
+                                         contentType.Equals(ManyWhoConstants.CONTENT_TYPE_DATETIME) == true)
+                                {
+                                    DateTime dateTimeCheck;
 
-                            // Grab the content type for the field - the content type as it should be from ManyWho
-                            contentType = TranslateToManyWhoContentType(field.type.ToString());
+                                    if (DateTime.TryParse(referencedPropertyAPI.contentValue, out dateTimeCheck) == true &&
+                                        dateTimeCheck == DateTime.MinValue)
+                                    {
+                                        // Don't insert min dates as salesforce will throw an error
+                                        propertiesToRemove.Add(referencedPropertyAPI);
+                                        continue;
+                                    }
+                                }
+                            }
 
                             // If the field is not creatable and updateable, we remove it from the save. Normally we should not have fields of this kind
                             // in the type - however - as this stuff was implemented post salesforce service creation by a number of tenants, we need to check
