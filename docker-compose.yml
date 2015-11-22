@@ -1,4 +1,4 @@
-﻿service:
+service:
   image: manywho/service-salesforce:$IMAGE_TAG
   environment:
     - BasePathServer=$BASEPATH_SERVER
