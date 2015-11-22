@@ -1,4 +1,5 @@
-﻿using ManyWho.Service.Salesforce.Filters;
+﻿using System;
+using ManyWho.Service.Salesforce.Filters;
 using ManyWho.Service.Salesforce.Middleware;
 using ManyWho.Service.Salesforce.Utils;
 using Microsoft.AspNet.Builder;
@@ -11,13 +12,12 @@ namespace ManyWho.Service.Salesforce
 {
     public class Startup
     {
-        public static string[] Arguments { get; set; }
         public static IConfiguration Configuration { get; set; }
 
         public Startup(IHostingEnvironment env)
         {
             Configuration = new ConfigurationBuilder()
-                .AddCommandLine(Arguments)
+                .AddCommandLine(Environment.GetCommandLineArgs())
                 .AddIniFile($"config.{env.EnvironmentName.ToLower()}.ini")
                 .Build();   
         }
@@ -312,11 +312,6 @@ namespace ManyWho.Service.Salesforce
             });
         }
 
-        public static void Main(string[] args)
-        {
-            Arguments = args;
-
-            WebApplication.Run<Startup>(args);
-        }
+        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 }
