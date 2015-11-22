@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManyWho.Service.Salesforce", "ManyWho.Service.Salesforce.csproj", "{AA99A76A-B258-49A4-8607-35595627D720}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A37CC20B-3B8F-4A47-A2F6-154C2DC7BC4F}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ManyWho.Service.Salesforce", "src\ManyWho.Service.Salesforce\ManyWho.Service.Salesforce.xproj", "{908FB4FD-82A6-485F-BC80-117565274D4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +13,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AA99A76A-B258-49A4-8607-35595627D720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA99A76A-B258-49A4-8607-35595627D720}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA99A76A-B258-49A4-8607-35595627D720}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA99A76A-B258-49A4-8607-35595627D720}.Release|Any CPU.Build.0 = Release|Any CPU
+		{908FB4FD-82A6-485F-BC80-117565274D4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{908FB4FD-82A6-485F-BC80-117565274D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{908FB4FD-82A6-485F-BC80-117565274D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{908FB4FD-82A6-485F-BC80-117565274D4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{908FB4FD-82A6-485F-BC80-117565274D4E} = {A37CC20B-3B8F-4A47-A2F6-154C2DC7BC4F}
 	EndGlobalSection
 EndGlobal
