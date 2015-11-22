@@ -1,0 +1,13 @@
+﻿service:
+  image: manywho/service-salesforce:$IMAGE_TAG
+  environment:
+    - BasePathServer=$BASEPATH_SERVER
+    - BasePathCdn=$BASEPATH_CDN
+    - EmailFrom=$EMAIL_FROM
+    - EmailUsername=$EMAIL_USERNAME
+    - EmailPassword=$EMAIL_PASSWORD
+    - EmailSmtp=$EMAIL_SMTP
+    - DatabaseHost=$DATABASE_HOST
+    - DatabaseName=$DATABASE_NAME
+    - DatabaseUsername=$DATABASE_USERNAME
+    - DatabasePassword=$DATABASE_PASSWORD
