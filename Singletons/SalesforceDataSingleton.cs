@@ -153,8 +153,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                     typeElementFieldBindings.Add(typeElementFieldBinding);
 
                     // If this is an id lookup field, we want to get the name reference also
+                    // We exclude the Connection fields as though they are reference fields, they do not comply
+                    // with the standard for having a "name"
                     if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
-                        String.IsNullOrWhiteSpace(field.relationshipName) == false)
+                        String.IsNullOrWhiteSpace(field.relationshipName) == false &&
+                        field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
+                        field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false)
                     {
                         // Add the reference to the binding
                         typeElementFieldBinding = new TypeElementPropertyBindingAPI();
@@ -358,7 +362,9 @@ namespace ManyWho.Service.Salesforce.Singletons
 
         public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, List<ObjectAPI> objectAPIs)
         {
+            CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties = null;
             List<ObjectDataTypePropertyAPI> objectDataTypePropertiesToSelect = null;
+            Dictionary<String, Boolean> currencyFields = null;
             DescribeSObjectResult describeSObjectResult = null;
             Field[] fields = null;
             String selectSoql = null;
@@ -812,23 +818,18 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Get rid of the trailing OR
                 idWhere = idWhere.Substring(0, idWhere.Length - " OR ".Length);
 
-                //// Create the list of object data type properties so we do the select correctly
-                objectDataTypePropertiesToSelect = new List<ObjectDataTypePropertyAPI>();
+                // Get the cleaned response out that includes currency information
+                cleanedObjectDataTypeProperties = this.CleanObjectDataTypeProperties(null, authenticatedWho, sforceService, objectName, objectDataTypeProperties);
 
-                //// Now we use the properties to get the selection columns
-                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
+                // Clean the properties before using them for the select
+                objectDataTypePropertiesToSelect = cleanedObjectDataTypeProperties.ObjectDataTypeProperties;
+                currencyFields = cleanedObjectDataTypeProperties.CurrencyFields;
+
+                // Now we need to check if we have the Id column
+                foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypePropertiesToSelect)
                 {
-                    // Go through each of the fields to check that it exists in the metadata
-                    foreach (Field field in describeSObjectResult.fields)
-                    {
-                        if (field.name.Equals(objectDataTypeProperty.developerName, StringComparison.InvariantCultureIgnoreCase) == true)
-                        {
-                            // The field in the object data exists, so we'll have validated the content value in the above algorithm
-                            selectSoql += field.name + ", ";
-                            objectDataTypePropertiesToSelect.Add(objectDataTypeProperty);
-                            break;
-                        }
-                    }
+                    // Add the field to the select soql
+                    selectSoql += objectDataTypeProperty.developerName + ", ";
 
                     if (objectDataTypeProperty.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                     {
@@ -849,13 +850,13 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Dispatch the query and get the results.  We do this because salesforce may have done more
                 // than simply complete the id field.  Workflow rules and other assignment features may have manipulated the
                 // object values and all of this needs to be reflected in the result we send back to the user
-                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, selectSoql, includesId, objectDataTypePropertiesToSelect);
+                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, selectSoql, includesId, objectDataTypePropertiesToSelect, currencyFields);
             }
 
             return objectAPIs;
         }
 
-        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery)
+        public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery, Dictionary<String, Boolean> currencyFields)
         {
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
@@ -893,7 +894,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI);
 
                 // Dispatch the query and get the results
-                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, true, propertyAPIs);
+                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, true, propertyAPIs, currencyFields);
             }
 
             return objectAPIs;
@@ -901,6 +902,8 @@ namespace ManyWho.Service.Salesforce.Singletons
 
         public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, ListFilterAPI listFilterAPI, Boolean isModelingOperation)
         {
+            CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties = null;
+            Dictionary<String, Boolean> currencyFields = null;
             List<ObjectAPI> objectAPIs = null;
             SforceService sforceService = null;
             String soqlQuery = null;
@@ -911,8 +914,12 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             soqlQuery = "";
 
+            // Get the cleaned properties and currency info
+            cleanedObjectDataTypeProperties = this.CleanObjectDataTypeProperties(null, authenticatedWho, sforceService, objectName, objectDataTypeProperties);
+
             // Clean the properties before using them for the select
-            objectDataTypeProperties = this.CleanObjectDataTypeProperties(null, authenticatedWho, sforceService, objectName, objectDataTypeProperties);
+            objectDataTypeProperties = cleanedObjectDataTypeProperties.ObjectDataTypeProperties;
+            currencyFields = cleanedObjectDataTypeProperties.CurrencyFields;
 
             // Create the columns for the query
             foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
@@ -945,7 +952,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI) + ")";
 
                 // Dispatch the search and get the results
-                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, listFilterAPI);
+                objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, listFilterAPI, currencyFields);
             }
             else
             {
@@ -954,7 +961,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 soqlQuery += this.ConstructQuery(listFilterAPI);
 
                 // Dispatch the query and get the results
-                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties);
+                objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, currencyFields);
             }
 
             return objectAPIs;
@@ -988,7 +995,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             soql = "SELECT " + soql + " FROM " + objectName + " WHERE Id = '" + objectId + "'";
 
             // Execute the query on the remote system
-            objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soql, true, properties);
+            objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soql, true, properties, null);
 
             // Now we have the object APIs, we need to translate to the labels, not the db fields as this call is for services
             if (translateToLabels == true)
@@ -1026,7 +1033,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        private List<ObjectAPI> CreateObjectAPIsFromQuerySObjects(SforceService sforceService, String objectName, String soqlQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties)
+        private List<ObjectAPI> CreateObjectAPIsFromQuerySObjects(SforceService sforceService, String objectName, String soqlQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, Dictionary<String, Boolean> currencyFields)
         {
             QueryResult queryResult = null;
             sObject queryObject = null;
@@ -1103,6 +1110,21 @@ namespace ManyWho.Service.Salesforce.Singletons
                             propertyAPI.contentValue = element.InnerText;
                         }
 
+                        // Check to see if this is a currency field, if so, we need to change the formatting slightly
+                        if (currencyFields != null &&
+                            String.IsNullOrWhiteSpace(propertyAPI.contentValue) == false &&
+                            currencyFields.ContainsKey(propertyAPI.developerName) == true)
+                        {
+                            Double currencyValue = Double.MinValue;
+                            // This is a currency field, so we need to improve the formatting so it's a proper number
+
+                            // If the value parses OK, we convert it over, otherwise we leave it alone
+                            if (Double.TryParse(propertyAPI.contentValue, out currencyValue) == true)
+                            {
+                                propertyAPI.contentValue = currencyValue.ToString("0.##");
+                            }
+                        }
+
                         if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
                         {
                             objectAPI.externalId = propertyAPI.contentValue;
@@ -1158,7 +1180,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, ListFilterAPI listFilterAPI)
+        private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, ListFilterAPI listFilterAPI, Dictionary<String, Boolean> currencyFields)
         {
             SearchResult searchResult = null;
             SearchRecord searchRecord = null;
@@ -1227,6 +1249,20 @@ namespace ManyWho.Service.Salesforce.Singletons
                             else
                             {
                                 propertyAPI.contentValue = element.InnerText;
+                            }
+
+                            // Check to see if this is a currency field, if so, we need to change the formatting slightly
+                            if (currencyFields != null &&
+                                currencyFields.ContainsKey(propertyAPI.developerName) == true)
+                            {
+                                Double currencyValue = Double.MinValue;
+                                // This is a currency field, so we need to improve the formatting so it's a proper number
+
+                                // If the value parses OK, we convert it over, otherwise we leave it alone
+                                if (Double.TryParse(propertyAPI.contentValue, out currencyValue) == true)
+                                {
+                                    propertyAPI.contentValue = currencyValue.ToString();
+                                }
                             }
 
                             if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
@@ -1612,8 +1648,10 @@ namespace ManyWho.Service.Salesforce.Singletons
             return sforceService;
         }
 
-        private List<ObjectDataTypePropertyAPI> CleanObjectDataTypeProperties(INotifier notifier, IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, List<ObjectDataTypePropertyAPI> objectDataTypeProperties)
+        private CleanedObjectDataTypeProperties CleanObjectDataTypeProperties(INotifier notifier, IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, List<ObjectDataTypePropertyAPI> objectDataTypeProperties)
         {
+            CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties = null;
+            Dictionary<String, Boolean> currencyFields = null;
             List<TypeElementPropertyBindingAPI> typeElementPropertyBindings = null;
             List<ObjectDataTypePropertyAPI> cleanObjectDataTypeProperties = null;
             DescribeSObjectResult describeSObjectResult = null;
@@ -1636,6 +1674,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                 typeElementPropertyBindings.Count > 0)
             {
                 cleanObjectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
+                currencyFields = new Dictionary<String, Boolean>();
+                cleanedObjectDataTypeProperties = new CleanedObjectDataTypeProperties();
 
                 // First, go through the object data type properties one by one
                 foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
@@ -1647,12 +1687,25 @@ namespace ManyWho.Service.Salesforce.Singletons
                         if (objectDataTypeProperty.developerName.Equals(typeElementPropertyBinding.databaseFieldName, StringComparison.OrdinalIgnoreCase) == true)
                         {
                             cleanObjectDataTypeProperties.Add(objectDataTypeProperty);
+
+                            // Now add the entry to our currency fields if this is one. For currency fields, we need to change the formatting
+                            // as Salesforce sends them back with an "E" when using large numbers
+                            if (typeElementPropertyBinding.databaseContentType != null &&
+                                typeElementPropertyBinding.databaseContentType.Equals("currency", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                // This is a currency field, so we add it to our table of currencies
+                                currencyFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                            }
                         }
                     }
                 }
             }
 
-            return cleanObjectDataTypeProperties;
+            // Fill up the response object so we can properly return the data to manywho
+            cleanedObjectDataTypeProperties.ObjectDataTypeProperties = cleanObjectDataTypeProperties;
+            cleanedObjectDataTypeProperties.CurrencyFields = currencyFields;
+
+            return cleanedObjectDataTypeProperties;
         }
 
         private DescribeSObjectResult GetDescribeResult(INotifier notifier, IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName)
@@ -1750,6 +1803,21 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             return contentType;
+        }
+    }
+
+    public class CleanedObjectDataTypeProperties
+    {
+        public List<ObjectDataTypePropertyAPI> ObjectDataTypeProperties
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> CurrencyFields
+        {
+            get;
+            set;
         }
     }
 }

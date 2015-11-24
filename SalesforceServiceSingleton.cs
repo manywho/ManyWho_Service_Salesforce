@@ -836,7 +836,7 @@ namespace ManyWho.Service.Salesforce
                 }
 
                 // Execute the soql command
-                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter, soql);
+                objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, objectDataType.developerName, objectDataType.properties, objectDataRequestAPI.listFilter, soql, null);
             }
             else
             {
