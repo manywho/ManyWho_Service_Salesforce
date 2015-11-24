@@ -2,15 +2,13 @@
 using System.IO;
 using System.Linq;
 using System.Xml;
-using System.Web;
-using System.Web.Http;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Formatting;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ManyWho.Flow.SDK;
 using ManyWho.Flow.SDK.Translate;
@@ -18,21 +16,15 @@ using ManyWho.Flow.SDK.Utils;
 using ManyWho.Flow.SDK.Social;
 using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Describe;
-using ManyWho.Flow.SDK.Draw.Elements.UI;
 using ManyWho.Flow.SDK.Draw.Elements.Type;
-using ManyWho.Flow.SDK.Draw.Elements.Config;
-using ManyWho.Flow.SDK.Draw.Elements.Group;
-using ManyWho.Flow.SDK.Run.Elements.UI;
 using ManyWho.Flow.SDK.Run.Elements.Map;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Flow.SDK.Run;
 using ManyWho.Flow.SDK.Run.State;
-using ManyWho.Service.Salesforce.Models.Rest.Enums;
 using ManyWho.Service.Salesforce.Models.Rest;
 using ManyWho.Service.Salesforce.Utils;
 using ManyWho.Service.Salesforce.Singletons;
-using ManyWho.Flow.Web.Controllers;
 using ManyWho.Service.ManyWho.Utils.Singletons;
 
 /*!
@@ -473,7 +465,7 @@ namespace ManyWho.Service.Salesforce
                 if (ManyWhoUtilsSingleton.GetInstance().SendEmail(notifier, authenticatedWho, serviceRequest, false) == true)
                 {
                     // Store this email task request so we have it for any replies from the user - getting back the unique identifier for the task
-                    ManyWhoUtilsSingleton.GetInstance().StoreTaskRequest(authenticatedWho, serviceRequest);
+                    StorageUtils.SetStoredJson(serviceRequest.token.ToLower(), JsonConvert.SerializeObject(serviceRequest));
 
                     // We need to wait as this is a task email
                     serviceResponse.invokeType = ManyWhoConstants.INVOKE_TYPE_WAIT;
@@ -1444,6 +1436,7 @@ namespace ManyWho.Service.Salesforce
             manywhoObject.properties = new List<PropertyAPI>();
             manywhoObject.properties.Add(new PropertyAPI() { developerName = "Name", contentValue = "ManyWho Flow Collaboration" });
             manywhoObject.properties.Add(new PropertyAPI() { developerName = "Id", contentValue = "" });
+            manywhoObject.properties.Add(new PropertyAPI() { developerName = "JoinUri__c", contentValue = socialServiceRequestAPI.joinPlayerUri });
 
             // Add the object to the list of objects to save
             manywhoObjects = new List<ObjectAPI>();
@@ -1453,6 +1446,7 @@ namespace ManyWho.Service.Salesforce
             objectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
             objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
             objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "Id" });
+            objectDataTypeProperties.Add(new ObjectDataTypePropertyAPI() { developerName = "JoinUri__c" });
 
             // Save the manywho object to salesforce
             manywhoObjects = SalesforceDataSingleton.GetInstance().Save(notifier, authenticatedWho, socialServiceRequestAPI.configurationValues, objectDataTypeProperties, manywhoObjects);
@@ -1592,7 +1586,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -1751,7 +1745,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -1905,7 +1899,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -2138,7 +2132,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -2231,7 +2225,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -2373,7 +2367,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -2524,7 +2518,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -2617,7 +2611,7 @@ namespace ManyWho.Service.Salesforce
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 

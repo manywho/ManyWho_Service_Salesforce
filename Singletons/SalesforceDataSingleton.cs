@@ -152,13 +152,8 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     typeElementFieldBindings.Add(typeElementFieldBinding);
 
-                    // If this is an id lookup field, we want to get the name reference also
-                    // We exclude the Connection fields as though they are reference fields, they do not comply
-                    // with the standard for having a "name"
-                    if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
-                        String.IsNullOrWhiteSpace(field.relationshipName) == false &&
-                        field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
-                        field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false)
+                    // Check to see if this field reference should be added
+                    if (this.AddReferenceField(tableName, field) == true)
                     {
                         // Add the reference to the binding
                         typeElementFieldBinding = new TypeElementPropertyBindingAPI();
@@ -171,6 +166,38 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             return typeElementFieldBindings;
+        }
+
+        private Boolean AddReferenceField(String tableName, Field field)
+        {
+            Boolean addReferenceField = false;
+
+            // If this is an id lookup field, we want to get the name reference also
+            // We exclude the Connection fields as though they are reference fields, they do not comply
+            // with the standard for having a "name"
+            if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
+                String.IsNullOrWhiteSpace(field.relationshipName) == false &&
+                field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
+                field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
+                field.relationshipName.Equals("Case__r", StringComparison.OrdinalIgnoreCase) == false &&
+                field.name.Equals("Case__c", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                // Add an additional test here as the if statement will get a bit complicated including this also
+                // Cases don't have a relationship name field annoyingly
+                if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
+                    (field.name.Equals("ParentId", StringComparison.OrdinalIgnoreCase) == true ||
+                     field.name.Equals("QuestionId", StringComparison.OrdinalIgnoreCase) == true ||
+                     field.name.Equals("CommunityId", StringComparison.OrdinalIgnoreCase) == true))
+                {
+                    // Do nothing, we don't want to reference this field
+                }
+                else
+                {
+                    addReferenceField = true;
+                }
+            }
+
+            return addReferenceField;
         }
 
         public List<TypeElementRequestAPI> GetTypeElements(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
@@ -321,9 +348,8 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                                         typeElement.properties.Add(typeElementEntry);
 
-                                        // If this is a reference field, then we want to get the reference name field also
-                                        if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
-                                            String.IsNullOrWhiteSpace(field.relationshipName) == false)
+                                        // Check to see if this field reference should be added
+                                        if (this.AddReferenceField(describeSObjectResult.name, field) == true)
                                         {
                                             // Add the reference to the binding
                                             typeElementFieldBinding = new TypeElementPropertyBindingAPI();
@@ -490,19 +516,34 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 }
                             }
 
+                            // Grab the content type for the field - the content type as it should be from ManyWho
+                            contentType = TranslateToManyWhoContentType(field.type.ToString());
+
                             // If the property does not have a value, we exclude it from the update. We assume that the user will be providing a value
                             // if they want to perform a save. The driver therefore does not currently support "nulling" or "blanking" field values. This will
                             // help prevent any data loss issues and blanking values feels like an edge case that's more likely to cause problems than solve them!
-                            if (referencedPropertyAPI != null &&
-                                (referencedPropertyAPI.contentValue == null ||
-                                 referencedPropertyAPI.contentValue.Trim().Length == 0))
+                            if (referencedPropertyAPI != null)
                             {
-                                propertiesToRemove.Add(referencedPropertyAPI);
-                                continue;
-                            }
+                                if (referencedPropertyAPI.contentValue == null ||
+                                    referencedPropertyAPI.contentValue.Trim().Length == 0)
+                                {
+                                    propertiesToRemove.Add(referencedPropertyAPI);
+                                    continue;
+                                }
+                                else if (contentType != null &&
+                                         contentType.Equals(ManyWhoConstants.CONTENT_TYPE_DATETIME) == true)
+                                {
+                                    DateTime dateTimeCheck;
 
-                            // Grab the content type for the field - the content type as it should be from ManyWho
-                            contentType = TranslateToManyWhoContentType(field.type.ToString());
+                                    if (DateTime.TryParse(referencedPropertyAPI.contentValue, out dateTimeCheck) == true &&
+                                        dateTimeCheck == DateTime.MinValue)
+                                    {
+                                        // Don't insert min dates as salesforce will throw an error
+                                        propertiesToRemove.Add(referencedPropertyAPI);
+                                        continue;
+                                    }
+                                }
+                            }
 
                             // If the field is not creatable and updateable, we remove it from the save. Normally we should not have fields of this kind
                             // in the type - however - as this stuff was implemented post salesforce service creation by a number of tenants, we need to check
@@ -653,21 +694,28 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     // Parse the content value to find out if it's a valid date time
                                     DateTime.TryParse(referencedPropertyAPI.contentValue, out datetimeValue);
 
-                                    if ("date".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                    if (datetimeValue == DateTime.MinValue)
                                     {
-                                        referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("yyyy-MM-dd");
+                                        referencedPropertyAPI.contentValue = null;
                                     }
-                                    else if ("datetime".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                    else
                                     {
-                                        referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("s");
-                                    }
-                                    else if ("time".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
-                                    {
-                                        String errorMessage = "The salesforce.com plugin does not currently support \"time\" field types.";
+                                        if ("date".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                        {
+                                            referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("yyyy-MM-dd");
+                                        }
+                                        else if ("datetime".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                        {
+                                            referencedPropertyAPI.contentValue = datetimeValue.ToUniversalTime().ToString("s");
+                                        }
+                                        else if ("time".Equals(fieldDataType, StringComparison.InvariantCultureIgnoreCase) == true)
+                                        {
+                                            String errorMessage = "The salesforce.com plugin does not currently support \"time\" field types.";
 
-                                        ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+                                            ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
 
-                                        throw new ArgumentNullException("BadRequest", errorMessage);
+                                            throw new ArgumentNullException("BadRequest", errorMessage);
+                                        }
                                     }
                                 }
                                 else if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_NUMBER, StringComparison.InvariantCultureIgnoreCase) == true)
@@ -873,21 +921,24 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
             else
             {
-                if (listFilterAPI.id != null &&
-                    listFilterAPI.id.Trim().Length == 0)
+                if (listFilterAPI != null)
                 {
-                    throw new ArgumentNullException("BadRequest", "ListFilter.Id is not yet supported for command operations.");
-                }
+                    if (listFilterAPI.id != null &&
+                        listFilterAPI.id.Trim().Length == 0)
+                    {
+                        throw new ArgumentNullException("BadRequest", "ListFilter.Id is not yet supported for command operations.");
+                    }
 
-                if (listFilterAPI.filterByProvidedObjects == true)
-                {
-                    throw new ArgumentNullException("BadRequest", "ListFilter.FilterByProvidedObjects is not yet supported for command operations.");
-                }
+                    if (listFilterAPI.filterByProvidedObjects == true)
+                    {
+                        throw new ArgumentNullException("BadRequest", "ListFilter.FilterByProvidedObjects is not yet supported for command operations.");
+                    }
 
-                if (listFilterAPI.where != null &&
-                    listFilterAPI.where.Count > 0)
-                {
-                    throw new ArgumentNullException("BadRequest", "ListFilter.Where is not yet supported for command operations.");
+                    if (listFilterAPI.where != null &&
+                        listFilterAPI.where.Count > 0)
+                    {
+                        throw new ArgumentNullException("BadRequest", "ListFilter.Where is not yet supported for command operations.");
+                    }
                 }
 
                 // Add the additional filtering to the command soql
@@ -1040,6 +1091,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             ObjectAPI objectAPI = null;
             List<ObjectAPI> objectAPIs = null;
             Boolean isAggregate = false;
+            Int32 order = 0;
 
             // Make the query call and get the query results
             queryResult = sforceService.query(soqlQuery);
@@ -1071,6 +1123,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     objectAPI = new ObjectAPI();
                     objectAPI.developerName = objectName;
                     objectAPI.properties = new List<PropertyAPI>();
+                    objectAPI.order = order++;
 
                     if (queryObject.Any.Length > properties.Count)
                     {
@@ -1186,6 +1239,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             SearchRecord searchRecord = null;
             ObjectAPI objectAPI = null;
             List<ObjectAPI> objectAPIs = null;
+            Int32 order = 0;
 
             // Make the search call and get the search results
             searchResult = sforceService.search(soslQuery);
@@ -1215,6 +1269,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                         objectAPI = new ObjectAPI();
                         objectAPI.developerName = objectName;
                         objectAPI.properties = new List<PropertyAPI>();
+                        objectAPI.order = order++;
 
                         if (searchRecord.record.Any.Length > properties.Count)
                         {
@@ -1572,33 +1627,28 @@ namespace ManyWho.Service.Salesforce.Singletons
                 securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, configurationValues, false);
 
                 sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
-
-                if (sforceService == null)
-                {
-                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
-                }
             }
             else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
                      authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
             {
-                if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
-                    authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0)
+                if (string.IsNullOrWhiteSpace(authenticatedWho.Token) == true ||
+                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.OrdinalIgnoreCase) == true ||
+                    (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
+                     authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0))
                 {
-                    // There's no point logging in, we can't as the user is using active user authentication and we don't have a token
+                    throw new ArgumentNullException("SalesforceService", "The authentication token is null, empty, or incorrectly configured. If you are running using a PUBLIC authentication context, make sure you set your " + SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY + " configuration value to 'SuperUser'.");
                 }
-                else
-                {
-                    // We should log the user in using their session information that's been provided via a previous explicit login
-                    sforceService = this.LogUserInBasedOnSession(
-                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
-                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
-                    );
 
-                    if (sforceService == null)
-                    {
-                        throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
-                    }
-                }
+                // We should log the user in using their session information that's been provided via a previous explicit login
+                sforceService = this.LogUserInBasedOnSession(
+                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
+                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
+                );
+            }
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
             }
 
             return sforceService;

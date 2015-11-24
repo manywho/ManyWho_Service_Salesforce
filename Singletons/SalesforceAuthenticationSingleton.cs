@@ -353,6 +353,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // requesting access
                     objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
 
+                    if (objectAPI == null)
+                    {
+                        throw new ArgumentNullException("User", string.Format("A user could not be found for the provided identifier. You may be logged into the incorrect Salesforce Org for which the Flow has been configured. The user identifier provided is: '{0}'", authenticatedWho.UserId));
+                    }
+
                     // Set the status of this user to not authorized, but we do want to return their details
                     foreach (PropertyAPI property in objectAPI.properties)
                     {
@@ -740,7 +745,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -826,7 +831,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 finally
                 {
                     // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
+                    BaseHttpUtils.CleanUpHttp(httpClient, null, httpResponseMessage);
                 }
             }
 
@@ -901,6 +906,7 @@ namespace ManyWho.Service.Salesforce.Singletons
         {
             AuthenticationUtilsResponse authenticationUtilsResponse = null;
             QueryResult queryResult = null;
+            Boolean executeQuery = true;
             String soql = null;
             String where = null;
 
@@ -912,6 +918,13 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
             else
             {
+                // Check to make sure we're not dealing with a public user as there's no point executing the query
+                if (String.IsNullOrWhiteSpace(thisUserId) == false &&
+                    thisUserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    executeQuery = false;
+                }
+
                 // Select from the group members to see if this user exists in the set
                 soql = "SELECT CollaborationGroupId FROM CollaborationGroupMember WHERE CollaborationGroupId = '" + referenceGroupId + "' AND MemberId = '" + thisUserId + "'";
             }
@@ -919,8 +932,12 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Create a new authentication utils response object to house the results
             authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
-            // Query salesforce to see if anything comes back
-            queryResult = sforceService.query(soql);
+            // Check to make sure we should bother executing the query
+            if (executeQuery == true)
+            {
+                // Query salesforce to see if anything comes back
+                queryResult = sforceService.query(soql);
+            }
 
             // Check to see if the query returned any results
             if (queryResult != null &&

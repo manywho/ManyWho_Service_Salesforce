@@ -100,7 +100,7 @@ namespace ManyWho.Service.Salesforce
                 this.Execute(emailNotifier, tenantId, flowId, player, mode, receivedNotification);
 
                 // Send the debug log if the user is running in debug mode
-                if (ErrorUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, "Debug Log Entries"); }
+                if (SettingUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, "Debug Log Entries"); }
 
                 //Send a response back to SFDC
                 //Note: since we are not calling base class' SendAsync function, the request will return from here, and will not reach our POST function.
@@ -109,34 +109,34 @@ namespace ManyWho.Service.Salesforce
             catch (Exception exception)
             {
                 // Send the debug log if the user is running in debug mode
-                if (ErrorUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, ErrorUtils.GetExceptionMessage(exception)); }
+                if (SettingUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, BaseHttpUtils.GetExceptionMessage(exception)); }
 
-                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, ErrorUtils.GetExceptionMessage(exception));
+                throw BaseHttpUtils.GetWebException(HttpStatusCode.BadRequest, BaseHttpUtils.GetExceptionMessage(exception));
             }
         }
 
         public void Execute(INotifier notifier, String tenantId, String flowId, String player, String mode, WorkflowRuleNotification workflowRuleNotification)
         {
-            IAuthenticatedWho authenticatedWho = null;
             FlowResponseAPI flowResponse = null;
             EngineInvokeRequestAPI engineInvokeRequest = null;
             EngineInvokeResponseAPI engineInvokeResponse = null;
             EngineInitializationRequestAPI engineInitializationRequest = null;
             EngineInitializationResponseAPI engineInitializationResponse = null;
             AuthenticationCredentialsAPI authenticationCredentials = null;
+            String authenticationToken = null;
 
-            if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing notification."); }
+            if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing notification."); }
 
             // Check to see if we have object identifiers to process
             if (workflowRuleNotification.ObjectIDs != null &&
                 workflowRuleNotification.ObjectIDs.Count > 0)
             {
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification has object identifiers."); }
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry(String.Format("Loading flow for tenant ({0}) and identifier ({1}).", tenantId, flowId)); }
+                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification has object identifiers."); }
+                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry(String.Format("Loading flow for tenant ({0}) and identifier ({1}).", tenantId, flowId)); }
 
                 // Now we have the data from the message, we can execute the workflow
                 // Load the flow by the unique identifier
-                flowResponse = RunSingleton.GetInstance().LoadFlowById(notifier, authenticatedWho, tenantId, flowId);
+                flowResponse = RunSingleton.GetInstance().LoadFlowById(notifier, authenticationToken, tenantId, flowId);
 
                 // Check to make sure we have a flow response
                 if (flowResponse == null)
@@ -146,7 +146,7 @@ namespace ManyWho.Service.Salesforce
 
                 foreach (String objectID in workflowRuleNotification.ObjectIDs)
                 {
-                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Sending initialization request to ManyWho."); }
+                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Sending initialization request to ManyWho."); }
 
                     // Create an engine initialization request to kick off the flow
                     engineInitializationRequest = new EngineInitializationRequestAPI();
@@ -160,18 +160,18 @@ namespace ManyWho.Service.Salesforce
                     engineInitializationRequest.inputs.Add(new EngineValueAPI() { developerName = "SalesforceNotificationRecordId", contentValue = objectID, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
                     engineInitializationRequest.inputs.Add(new EngineValueAPI() { developerName = "SalesforceNotificationObjectName", contentValue = workflowRuleNotification.ObjectName, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
 
-                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("SalesforceNotificationRecordId: " + objectID); }
-                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("SalesforceNotificationObjectName: " + workflowRuleNotification.ObjectName); }
+                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("SalesforceNotificationRecordId: " + objectID); }
+                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("SalesforceNotificationObjectName: " + workflowRuleNotification.ObjectName); }
 
                     // Initialize the engine with the bare basics
-                    engineInitializationResponse = RunSingleton.GetInstance().Initialize(notifier, authenticatedWho, tenantId, engineInitializationRequest);
+                    engineInitializationResponse = RunSingleton.GetInstance().Initialize(notifier, authenticationToken, tenantId, engineInitializationRequest);
 
                     // Check to see if the workflow is authorized to execute - if not, we need to login using the session
                     if (engineInitializationResponse.statusCode.Equals(ManyWhoConstants.AUTHORIZATION_STATUS_NOT_AUTHORIZED, StringComparison.OrdinalIgnoreCase) == true)
                     {
-                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Event not authorized, attempting a login using session info."); }
-                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionId: " + workflowRuleNotification.SessionID); }
-                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionURL: " + workflowRuleNotification.SessionURL); }
+                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Event not authorized, attempting a login using session info."); }
+                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionId: " + workflowRuleNotification.SessionID); }
+                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("SessionURL: " + workflowRuleNotification.SessionURL); }
 
                         // Create the authentication credentials for the service
                         authenticationCredentials = new AuthenticationCredentialsAPI();
@@ -179,18 +179,18 @@ namespace ManyWho.Service.Salesforce
                         authenticationCredentials.sessionToken = workflowRuleNotification.SessionID;
                         authenticationCredentials.sessionUrl = workflowRuleNotification.SessionURL;
 
-                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Logging into service again using session info."); }
+                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Logging into service again using session info."); }
 
                         // Login to the system
-                        authenticatedWho = this.Login(notifier, tenantId, engineInitializationResponse.stateId, authenticationCredentials);
+                        authenticationToken = RunSingleton.GetInstance().Login(notifier, tenantId, engineInitializationResponse.stateId, authenticationCredentials);
 
                         // Apply the state back
                         engineInitializationRequest.stateId = engineInitializationResponse.stateId;
 
-                        if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Initializing engine again for state identifier: " + engineInitializationResponse.stateId); }
+                        if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Initializing engine again for state identifier: " + engineInitializationResponse.stateId); }
 
                         // Initialize the engine again - re-using the state identifier
-                        engineInitializationResponse = RunSingleton.GetInstance().Initialize(notifier, authenticatedWho, tenantId, engineInitializationRequest);
+                        engineInitializationResponse = RunSingleton.GetInstance().Initialize(notifier, authenticationToken, tenantId, engineInitializationRequest);
                     }
 
                     // Now create the fist engine invoke request so we can get the content of the first ivr
@@ -203,13 +203,13 @@ namespace ManyWho.Service.Salesforce
                     engineInvokeRequest.stateToken = engineInitializationResponse.stateToken;
                     engineInvokeRequest.mode = mode;
 
-                    if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Sending invoke request to ManyWho."); }
+                    if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Sending invoke request to ManyWho."); }
 
                     // Invoke the engine with the first request
-                    engineInvokeResponse = RunSingleton.GetInstance().Execute(notifier, authenticatedWho, tenantId, engineInvokeRequest);
+                    engineInvokeResponse = RunSingleton.GetInstance().Execute(notifier, authenticationToken, tenantId, engineInvokeRequest);
 
                     // If we're running in step through mode, we notify the author with the join identifier so they can debug the workflow
-                    if (ErrorUtils.IsDebugging(engineInvokeRequest.mode) == true &&
+                    if (SettingUtils.IsDebugging(engineInvokeRequest.mode) == true &&
                         engineInvokeRequest.mode.Equals(ManyWhoConstants.MODE_DEBUG_STEPTHROUGH, StringComparison.OrdinalIgnoreCase) == true)
                     {
                         notifier.AddLogEntry("Flow is waiting to be joined in order to be debugged.");
@@ -219,80 +219,8 @@ namespace ManyWho.Service.Salesforce
             }
             else
             {
-                if (ErrorUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification does not have object identifiers."); }
+                if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Notification does not have object identifiers."); }
             }
-        }
-
-        public IAuthenticatedWho Login(INotifier notifier, String tenantId, String stateId, AuthenticationCredentialsAPI authenticationCredentials)
-        {
-            WebException webException = null;
-            String endpointUrl = null;
-            HttpClient httpClient = null;
-            HttpContent httpContent = null;
-            HttpResponseMessage httpResponseMessage = null;
-            IAuthenticatedWho authenticatedWho = null;
-            String authenticationToken = null;
-
-            // We enclose the request in a for loop to handle http errors
-            for (int i = 0; i < HttpUtils.MAXIMUM_RETRIES; i++)
-            {
-                try
-                {
-                    // Create the http client to handle our request
-                    httpClient = HttpUtils.CreateHttpClient(authenticatedWho, tenantId, null);
-
-                    // Use the JSON formatter to create the content of the request body
-                    httpContent = new StringContent(JsonConvert.SerializeObject(authenticationCredentials));
-                    httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                    // Construct the URL for the engine initialization request
-                    endpointUrl = "https://flow.manywho.com/api/run/1/authentication/" + stateId;
-
-                    // Post the engine initialization request over to ManyWho
-                    httpResponseMessage = httpClient.PostAsync(endpointUrl, httpContent).Result;
-
-                    // Check the status of the response and respond appropriately
-                    if (httpResponseMessage.IsSuccessStatusCode)
-                    {
-                        // Get the engine initialization response object from the response message
-                        authenticationToken = httpResponseMessage.Content.ReadAsStringAsync().Result;
-                        authenticationToken = authenticationToken.Substring(1, authenticationToken.Length - 2);
-
-                        // Get the authenticated who from the token
-                        authenticatedWho = AuthenticationUtils.Deserialize(Uri.UnescapeDataString(authenticationToken));
-
-                        // We successfully executed the request, we can break out of the retry loop
-                        break;
-                    }
-                    else
-                    {
-                        // Make sure we handle the lack of success properly
-                        webException = BaseHttpUtils.HandleUnsuccessfulHttpResponseMessage(notifier, authenticatedWho, i, httpResponseMessage, endpointUrl);
-
-                        if (webException != null)
-                        {
-                            throw webException;
-                        }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    // Make sure we handle the exception properly
-                    webException = BaseHttpUtils.HandleHttpException(notifier, authenticatedWho, i, exception, endpointUrl);
-
-                    if (webException != null)
-                    {
-                        throw webException;
-                    }
-                }
-                finally
-                {
-                    // Clean up the objects from the request
-                    HttpUtils.CleanUpHttp(httpClient, httpContent, httpResponseMessage);
-                }
-            }
-
-            return authenticatedWho;
         }
     }
 }

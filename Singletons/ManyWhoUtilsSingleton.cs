@@ -1,28 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Web;
 using System.Net;
-using System.Data;
-using System.Data.SqlClient;
 using System.Net.Mime;
 using System.Net.Mail;
-using System.Net.Http;
-using System.Web.Http;
-using System.Configuration;
-using Newtonsoft.Json;
 using ManyWho.Flow.SDK;
 using ManyWho.Flow.SDK.Utils;
 using ManyWho.Flow.SDK.Security;
-using ManyWho.Flow.SDK.Describe;
-using ManyWho.Flow.SDK.Translate;
 using ManyWho.Flow.SDK.Run;
-using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Map;
-using ManyWho.Service.ManyWho.Utils.Utils;
 using ManyWho.Service.Salesforce;
 using ManyWho.Service.Salesforce.Singletons;
 using ManyWho.Service.Salesforce.Utils;
@@ -217,7 +203,10 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 {
                     foreach (OutcomeAvailableAPI outcome in outcomes)
                     {
-                        textBody += outcome.label + "(Click here: " + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + ")" + Environment.NewLine;
+                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false)
+                        {
+                            textBody += outcome.label + "(Click here: " + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + ")" + Environment.NewLine;
+                        }
                     }
                 }
 
@@ -252,7 +241,10 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
 
                     foreach (OutcomeAvailableAPI outcome in outcomes)
                     {
-                        fullHtmlBody += "<a href=\"" + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + "\" class=\"btn btn-primary\">" + outcome.label + "</a>&nbsp;";
+                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false)
+                        {
+                            fullHtmlBody += "<a href=\"" + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + "\" class=\"btn btn-primary\">" + outcome.label + "</a>&nbsp;";
+                        }
                     }
 
                     fullHtmlBody += "</div>";
@@ -272,281 +264,6 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
             smtpClient.EnableSsl = true;
             smtpClient.Credentials = credentials;
             smtpClient.Send(mailMsg);
-        }
-
-        public Guid StoreTaskRequest(IAuthenticatedWho authenticatedWho, ServiceRequestAPI serviceRequest)
-        {
-            SqlConnection sqlConnection = null;
-            SqlTransaction sqlTransaction = null;
-            SqlCommand sqlCommand = null;
-            SqlParameter authorizationParameter = null;
-            SqlParameter taskTokenParameter = null;
-            SqlParameter serviceRequestParameter = null;
-            SqlParameter isCompletedParameter = null;
-            SqlParameter manywhoTenantIdParameter = null;
-
-            try
-            {
-                sqlConnection = DatabaseUtils.SqlConnection();
-                sqlConnection.Open();
-
-                sqlTransaction = sqlConnection.BeginTransaction();
-
-                // Create the new sql command
-                sqlCommand = new SqlCommand();
-                sqlCommand.Connection = sqlConnection;
-                sqlCommand.Transaction = sqlTransaction;
-
-                // Create the parameters
-                authorizationParameter = new SqlParameter("@AuthorizationHeader", SqlDbType.NText);
-                serviceRequestParameter = new SqlParameter("@ServiceRequestAPI", SqlDbType.NText);
-                isCompletedParameter = new SqlParameter("@IsCompleted", SqlDbType.Bit);
-                taskTokenParameter = new SqlParameter("@ServiceRequestAPI_Token", SqlDbType.UniqueIdentifier);
-                manywhoTenantIdParameter = new SqlParameter("@ManyWhoTenant_Id", SqlDbType.UniqueIdentifier);
-
-                // Apply the values to the parameters
-                authorizationParameter.Value = AuthenticationUtils.Serialize(authenticatedWho);
-                serviceRequestParameter.Value = JsonConvert.SerializeObject(serviceRequest);
-                isCompletedParameter.Value = false;
-                taskTokenParameter.Value = Guid.Parse(serviceRequest.token);
-                manywhoTenantIdParameter.Value = Guid.Parse(serviceRequest.tenantId);
-
-                // Add the parameters to the command
-                sqlCommand.Parameters.Add(authorizationParameter);
-                sqlCommand.Parameters.Add(taskTokenParameter);
-                sqlCommand.Parameters.Add(serviceRequestParameter);
-                sqlCommand.Parameters.Add(isCompletedParameter);
-                sqlCommand.Parameters.Add(manywhoTenantIdParameter);
-
-                // Create the sql command and execute
-                sqlCommand.CommandText = "INSERT INTO EmailTasks2 (ServiceRequestAPI_Token, ManyWhoTenant_Id, AuthorizationHeader, ServiceRequestAPI, IsCompleted) VALUES (@ServiceRequestAPI_Token, @ManyWhoTenant_Id, @AuthorizationHeader, @ServiceRequestAPI, @IsCompleted)";
-                sqlCommand.ExecuteNonQuery();
-
-                sqlTransaction.Commit();
-            }
-            catch (Exception)
-            {
-                if (sqlTransaction != null &&
-                    sqlTransaction.Connection != null)
-                {
-                    sqlTransaction.Rollback();
-                }
-
-                throw;
-            }
-            finally
-            {
-                if (sqlTransaction != null)
-                {
-                    sqlTransaction.Dispose();
-                    sqlTransaction = null;
-                }
-
-                if (sqlConnection != null)
-                {
-                    // Make sure it is absolutely dead
-                    sqlConnection.Dispose();
-                    sqlConnection = null;
-                }
-            }
-
-            return Guid.Parse(serviceRequest.token);
-        }
-
-        public Guid MarkTaskCompleted(Guid tenantId, Guid taskToken)
-        {
-            SqlConnection sqlConnection = null;
-            SqlTransaction sqlTransaction = null;
-            SqlCommand sqlCommand = null;
-            SqlParameter taskTokenParameter = null;
-            SqlParameter isCompletedParameter = null;
-            SqlParameter manywhoTenantIdParameter = null;
-
-            try
-            {
-                sqlConnection = DatabaseUtils.SqlConnection();
-                sqlConnection.Open();
-
-                sqlTransaction = sqlConnection.BeginTransaction();
-
-                // Create the new sql command
-                sqlCommand = new SqlCommand();
-                sqlCommand.Connection = sqlConnection;
-                sqlCommand.Transaction = sqlTransaction;
-
-                // Create the parameters
-                taskTokenParameter = new SqlParameter("@ServiceRequestAPI_Token", SqlDbType.UniqueIdentifier);
-                isCompletedParameter = new SqlParameter("@IsCompleted", SqlDbType.Bit);
-                manywhoTenantIdParameter = new SqlParameter("@ManyWhoTenant_Id", SqlDbType.UniqueIdentifier);
-
-                // Create the new task token
-                taskToken = Guid.NewGuid();
-
-                // Apply the values to the parameters
-                taskTokenParameter.Value = taskToken;
-                isCompletedParameter.Value = true;
-                manywhoTenantIdParameter.Value = tenantId;
-
-                // Add the parameters to the command
-                sqlCommand.Parameters.Add(taskTokenParameter);
-                sqlCommand.Parameters.Add(isCompletedParameter);
-                sqlCommand.Parameters.Add(manywhoTenantIdParameter);
-
-                // Create the sql command and execute
-                sqlCommand.CommandText = "UPDATE EmailTasks2 SET IsCompleted = @IsCompleted WHERE ServiceRequestAPI_Token = @ServiceRequestAPI_Token AND ManyWhoTenant_Id = @ManyWhoTenant_Id";
-                sqlCommand.ExecuteNonQuery();
-
-                sqlTransaction.Commit();
-            }
-            catch (Exception)
-            {
-                if (sqlTransaction != null &&
-                    sqlTransaction.Connection != null)
-                {
-                    sqlTransaction.Rollback();
-                }
-
-                throw;
-            }
-            finally
-            {
-                if (sqlTransaction != null)
-                {
-                    sqlTransaction.Dispose();
-                    sqlTransaction = null;
-                }
-
-                if (sqlConnection != null)
-                {
-                    // Make sure it is absolutely dead
-                    sqlConnection.Dispose();
-                    sqlConnection = null;
-                }
-            }
-
-            return taskToken;
-        }
-
-        public EmailVerification RetrieveTaskRequest(Guid taskToken)
-        {
-            EmailVerification emailVerification = null;
-            SqlConnection sqlConnection = null;
-            SqlTransaction sqlTransaction = null;
-            SqlDataReader dataReader = null;
-            SqlCommand sqlCommand = null;
-            SqlParameter taskTokenParameter = null;
-
-            try
-            {
-                sqlConnection = DatabaseUtils.SqlConnection();
-                sqlConnection.Open();
-
-                sqlTransaction = sqlConnection.BeginTransaction();
-
-                // Create the new sql command
-                sqlCommand = new SqlCommand();
-                sqlCommand.Connection = sqlConnection;
-                sqlCommand.Transaction = sqlTransaction;
-
-                taskTokenParameter = new SqlParameter("@ServiceRequestAPI_Token", SqlDbType.UniqueIdentifier);
-                taskTokenParameter.Value = taskToken;
-
-                sqlCommand.Parameters.Add(taskTokenParameter);
-                sqlCommand.CommandText = "SELECT AuthorizationHeader, ServiceRequestAPI, IsCompleted FROM EmailTasks2 WHERE ServiceRequestAPI_Token = @ServiceRequestAPI_Token";
-
-                try
-                {
-                    dataReader = sqlCommand.ExecuteReader();
-
-                    if (dataReader.HasRows == true)
-                    {
-                        int recordCount = 0;
-
-                        while (dataReader.Read() == true)
-                        {
-                            // Throw an error if the results are not returning a unique result
-                            if (recordCount > 0)
-                            {
-                                throw new Exception("Database contains more than one verification for token: " + taskToken);
-                            }
-
-                            emailVerification = new EmailVerification();
-                            emailVerification.AuthenticatedWho = AuthenticationUtils.Deserialize(dataReader.GetString(0));
-                            emailVerification.ServiceRequest = JsonConvert.DeserializeObject<ServiceRequestAPI>(dataReader.GetString(1));
-                            emailVerification.IsCompleted = dataReader.GetBoolean(2);
-
-                            recordCount++;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    if (dataReader != null &&
-                        dataReader.IsClosed == false)
-                    {
-                        dataReader.Close();
-                    }
-                }
-
-                sqlTransaction.Commit();
-            }
-            catch (Exception)
-            {
-                if (sqlTransaction != null &&
-                    sqlTransaction.Connection != null)
-                {
-                    sqlTransaction.Rollback();
-                }
-
-                throw;
-            }
-            finally
-            {
-                if (sqlTransaction != null)
-                {
-                    sqlTransaction.Dispose();
-                    sqlTransaction = null;
-                }
-
-                if (sqlConnection != null)
-                {
-                    // Make sure it is absolutely dead
-                    sqlConnection.Dispose();
-                    sqlConnection = null;
-                }
-            }
-
-            return emailVerification;
-        }
-    }
-
-    public class EmailVerification
-    {
-        public EmailVerification()
-        {
-
-        }
-
-        public IAuthenticatedWho AuthenticatedWho
-        {
-            get;
-            set;
-        }
-
-        public ServiceRequestAPI ServiceRequest
-        {
-            get;
-            set;
-        }
-
-        public Boolean IsCompleted
-        {
-            get;
-            set;
         }
     }
 }

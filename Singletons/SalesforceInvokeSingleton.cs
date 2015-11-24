@@ -73,7 +73,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
             username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
             password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
-            securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, true);
+            securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
             chatterBaseUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CHATTER_BASE_URL, serviceRequest.configurationValues, true);
             adminEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
 
@@ -209,7 +209,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
             username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
             password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
-            securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, true);
+            securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
 
             if (serviceRequest.authorization != null)
@@ -321,7 +321,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
             username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
             password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
-            securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, true);
+            securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
 
             if (serviceRequest.authorization != null)

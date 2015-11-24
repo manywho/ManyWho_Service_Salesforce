@@ -84,15 +84,15 @@ namespace ManyWho.Service.Salesforce.Utils
             if (iteration >= (MAXIMUM_RETRIES - 1))
             {
                 // The the alert email the fault
-                ErrorUtils.SendAlert(notifier, authenticatedWho, "Fault", "The system has attempted multiple retries (" + MAXIMUM_RETRIES + ") with no luck on: " + endpointUrl + ". The error message we're getting back is: " + ErrorUtils.GetExceptionMessage(exception));
+                ErrorUtils.SendAlert(notifier, authenticatedWho, "Fault", "The system has attempted multiple retries (" + MAXIMUM_RETRIES + ") with no luck on: " + endpointUrl + ". The error message we're getting back is: " + GetExceptionMessage(exception));
 
                 // Throw the fault up to the caller
-                webException = new WebException(ErrorUtils.GetExceptionMessage(exception));
+                webException = new WebException(GetExceptionMessage(exception));
             }
             else
             {
                 // Alert the admin that a retry has happened
-                ErrorUtils.SendAlert(notifier, authenticatedWho, "Warning", "The system is attempting a retry (" + iteration + ") on: " + endpointUrl + ". The error message we're getting back is: " + ErrorUtils.GetExceptionMessage(exception));
+                ErrorUtils.SendAlert(notifier, authenticatedWho, "Warning", "The system is attempting a retry (" + iteration + ") on: " + endpointUrl + ". The error message we're getting back is: " + GetExceptionMessage(exception));
             }
 
             return webException;
@@ -133,27 +133,6 @@ namespace ManyWho.Service.Salesforce.Utils
             httpClient.Timeout = TimeSpan.FromSeconds(timeOut);
 
             return httpClient;
-        }
-
-        public static void CleanUpHttp(HttpClient httpClient, HttpContent httpContent, HttpResponseMessage httpResponseMessage)
-        {
-            if (httpClient != null)
-            {
-                httpClient.Dispose();
-                httpClient = null;
-            }
-
-            if (httpContent != null)
-            {
-                httpContent.Dispose();
-                httpContent = null;
-            }
-
-            if (httpResponseMessage != null)
-            {
-                httpResponseMessage.Dispose();
-                httpResponseMessage = null;
-            }
         }
 
         public static HttpResponseException GetWebException(HttpStatusCode statusCode, String reasonPhrase)
@@ -210,6 +189,145 @@ namespace ManyWho.Service.Salesforce.Utils
             }
 
             return email;
+        }
+
+                public static void CleanUpHttp(HttpClient httpClient, HttpContent httpContent, HttpResponseMessage httpResponseMessage)
+        {
+            if (httpClient != null)
+            {
+                httpClient.Dispose();
+                httpClient = null;
+            }
+
+            if (httpContent != null)
+            {
+                httpContent.Dispose();
+                httpContent = null;
+            }
+
+            if (httpResponseMessage != null)
+            {
+                httpResponseMessage.Dispose();
+                httpResponseMessage = null;
+            }
+        }
+        public static HttpResponseException GetWebException(HttpStatusCode statusCode, Exception exception)
+        {
+            // Aggregate the exception and return as a single reason phrase
+            return GetWebException(statusCode, AggregateAndWriteErrorMessage(exception, "", false));
+        }
+
+        public static String GetExceptionMessage(Exception exception)
+        {
+            return AggregateAndWriteErrorMessage(exception, "", false);
+        }
+
+        public static String GetExceptionMessage(Exception exception, Boolean includeStackTrace)
+        {
+            return AggregateAndWriteErrorMessage(exception, "", includeStackTrace);
+        }
+
+        private static String AggregateAndWriteErrorMessage(Exception exception, String message, Boolean includeTrace)
+        {
+            if (exception != null)
+            {
+                if (exception is AggregateException)
+                {
+                    message = AggregateAndWriteAggregateErrorMessage((AggregateException)exception, message, includeTrace);
+                }
+                else if (exception is WebException)
+                {
+                    message = AggregateAndWriteHttpResponseErrorMessage((WebException)exception, message);
+                }
+                else
+                {
+                    message = AggregateAndWriteExceptionErrorMessage(exception, message, includeTrace);
+                }
+            }
+
+            return message;
+        }
+
+        private static String AggregateAndWriteAggregateErrorMessage(Exception exception, String message, Boolean includeTrace)
+        {
+            if (exception is AggregateException)
+            {
+                AggregateException aex = (AggregateException)exception;
+
+                message += "The exception is an aggregate of the following exceptions:" + Environment.NewLine + Environment.NewLine;
+
+                if (aex.InnerExceptions != null &&
+                    aex.InnerExceptions.Any())
+                {
+                    foreach (Exception innerException in aex.InnerExceptions)
+                    {
+                        if (innerException is AggregateException)
+                        {
+                            message = AggregateAndWriteAggregateErrorMessage((AggregateException)innerException, message, includeTrace);
+                        }
+                        else if (innerException is WebException)
+                        {
+                            message = AggregateAndWriteHttpResponseErrorMessage((WebException)innerException, message);
+                        }
+                        else
+                        {
+                            message = AggregateAndWriteErrorMessage(innerException, message, includeTrace);
+                        }
+                    }
+                }
+            }
+
+            return message;
+        }
+
+        private static String AggregateAndWriteHttpResponseErrorMessage(WebException exception, String message)
+        {
+            WebResponse webResponse = null;
+            String statusDescription = null;
+
+            if (exception != null)
+            {
+                if (exception.Response != null)
+                {
+                    webResponse = exception.Response;
+
+                    if (webResponse is HttpWebResponse)
+                    {
+                        statusDescription = ((HttpWebResponse)webResponse).StatusDescription;
+
+                        // Grab the message from the 
+                        if (statusDescription != null &&
+                            statusDescription.Trim().Length > 0)
+                        {
+                            message += "HttpResponseException:" + Environment.NewLine;
+                            message += statusDescription + Environment.NewLine + Environment.NewLine;
+                        }
+                    }
+                }
+                else
+                {
+                    message += exception.Message;
+                }
+            }
+
+            return message;
+        }
+
+        private static String AggregateAndWriteExceptionErrorMessage(Exception exception, String message, Boolean includeTrace)
+        {
+            if (exception != null)
+            {
+                message += "Exception:" + Environment.NewLine;
+                message += exception.Message + Environment.NewLine + Environment.NewLine;
+
+                if (includeTrace == true)
+                {
+                    message += "Stack Trace:" + Environment.NewLine;
+                    message += exception.StackTrace + Environment.NewLine + Environment.NewLine;
+                }
+            }
+
+            return message;
         }
     }
 }
