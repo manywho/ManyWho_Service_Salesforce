@@ -48,11 +48,15 @@ namespace ManyWho.Service.Salesforce
             String player = null;
             String mode = null;
             String email = null;
+            String reportingMode = null;
 
             try
             {
                 // Get the mode from the request uri
                 mode = BaseHttpUtils.GetModeFromQuery(request.RequestUri);
+
+                // Get the reporting mode from the request uri
+                reportingMode = BaseHttpUtils.GetReportingModeFromQuery(request.RequestUri);
 
                 // Get any provided notification email
                 email = BaseHttpUtils.GetEmailFromQuery(request.RequestUri);
@@ -97,7 +101,7 @@ namespace ManyWho.Service.Salesforce
                 receivedNotification.ExtractData(emailNotifier, request.Content.ReadAsStringAsync().Result, mode);
 
                 // Execute the notifications against ManyWho
-                this.Execute(emailNotifier, tenantId, flowId, player, mode, receivedNotification);
+                this.Execute(emailNotifier, tenantId, flowId, player, mode, reportingMode, receivedNotification);
 
                 // Send the debug log if the user is running in debug mode
                 if (SettingUtils.IsDebugging(mode)) { ErrorUtils.SendAlert(emailNotifier, null, ErrorUtils.ALERT_TYPE_WARNING, "Debug Log Entries"); }
@@ -115,7 +119,7 @@ namespace ManyWho.Service.Salesforce
             }
         }
 
-        public void Execute(INotifier notifier, String tenantId, String flowId, String player, String mode, WorkflowRuleNotification workflowRuleNotification)
+        public void Execute(INotifier notifier, String tenantId, String flowId, String player, String mode, String reportingMode, WorkflowRuleNotification workflowRuleNotification)
         {
             FlowResponseAPI flowResponse = null;
             EngineInvokeRequestAPI engineInvokeRequest = null;
@@ -154,6 +158,7 @@ namespace ManyWho.Service.Salesforce
                     engineInitializationRequest.flowId.id = flowResponse.id.id;
                     engineInitializationRequest.flowId.versionId = flowResponse.id.versionId;
                     engineInitializationRequest.mode = mode;
+                    engineInitializationRequest.reportingMode = reportingMode;
 
                     // Initialize the workflow with the values provided
                     engineInitializationRequest.inputs = new List<EngineValueAPI>();
