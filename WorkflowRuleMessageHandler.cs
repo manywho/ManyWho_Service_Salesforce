@@ -100,6 +100,10 @@ namespace ManyWho.Service.Salesforce
                 receivedNotification = new WorkflowRuleNotification();
                 receivedNotification.ExtractData(emailNotifier, request.Content.ReadAsStringAsync().Result, mode);
 
+                if (SettingUtils.IsDebugging(mode)) { emailNotifier.AddLogEntry("Mode: " + mode); }
+                if (SettingUtils.IsDebugging(mode)) { emailNotifier.AddLogEntry("Email: " + email); }
+                if (SettingUtils.IsDebugging(mode)) { emailNotifier.AddLogEntry("Reporting Mode: " + reportingMode); }
+
                 // Execute the notifications against ManyWho
                 this.Execute(emailNotifier, tenantId, flowId, player, mode, reportingMode, receivedNotification);
 
