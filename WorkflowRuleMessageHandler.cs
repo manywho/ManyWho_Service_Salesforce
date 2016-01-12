@@ -164,6 +164,13 @@ namespace ManyWho.Service.Salesforce
                     engineInitializationRequest.mode = mode;
                     engineInitializationRequest.reportingMode = reportingMode;
 
+                    // If we're not using the default player, change the urls
+                    if (player != "default")
+                    {
+                        engineInitializationRequest.joinPlayerUrl = "https://flow.manywho.com/" + tenantId + "/play/" + player;
+                        engineInitializationRequest.playerUrl = "https://flow.manywho.com/" + tenantId + "/play/" + player;
+                    }
+
                     // Initialize the workflow with the values provided
                     engineInitializationRequest.inputs = new List<EngineValueAPI>();
                     engineInitializationRequest.inputs.Add(new EngineValueAPI() { developerName = "SalesforceNotificationRecordId", contentValue = objectID, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
