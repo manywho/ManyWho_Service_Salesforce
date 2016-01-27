@@ -12,6 +12,7 @@ using ManyWho.Flow.SDK.Run.Elements.Map;
 using ManyWho.Service.Salesforce;
 using ManyWho.Service.Salesforce.Singletons;
 using ManyWho.Service.Salesforce.Utils;
+using ManyWho.Service.Salesforce.Salesforce;
 
 namespace ManyWho.Service.ManyWho.Utils.Singletons
 {

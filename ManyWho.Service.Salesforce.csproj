@@ -79,6 +79,7 @@
       <HintPath>packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -179,8 +180,12 @@
     <Compile Include="Models\Rest\ChatterUserPhotoInfo.cs" />
     <Compile Include="Models\Rest\Enums\ChatterMessageSegmentType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="SalesforceServiceSingleton.cs" />
-    <Compile Include="Salesforce\SforceService.cs" />
     <Compile Include="Singletons\ManyWhoUtilsSingleton.cs" />
     <Compile Include="Singletons\SalesforceCacheManagerSingleton.cs" />
     <Compile Include="Singletons\SalesforceListenerSingleton.cs" />
@@ -199,6 +204,11 @@
     <Compile Include="Utils\SalesforceHttpUtils.cs" />
     <Compile Include="Utils\SettingUtils.cs" />
     <Compile Include="Utils\StorageUtils.cs" />
+    <Compile Include="Web References\Salesforce\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="WorkflowRuleListenerMessageHandler.cs" />
     <Compile Include="WorkflowRuleMessageHandler.cs" />
     <Compile Include="WorkflowRuleNotification.cs" />
@@ -209,6 +219,156 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="Web References\Salesforce\DeleteResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeAppMenuItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeApprovalLayout.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeAvailableQuickActionResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeCompactLayout.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeCompactLayoutsResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeDataCategoryGroupResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeDataCategoryGroupStructureResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeFlexiPageResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeGlobalResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeGlobalTheme.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeLayoutResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeNounResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribePathAssistant.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeQuickActionResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeSearchLayoutResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeSearchScopeOrderResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeSObjectResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeSoftphoneLayoutResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeSoqlListView.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeTab.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeTabSetResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeThemeItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\EmptyRecycleBinResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\ExecuteListViewResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\GetDeletedResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\GetServerTimestampResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\GetUpdatedResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\GetUserInfoResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\InvalidateSessionsResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\KnowledgeSettings.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\LeadConvertResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\LoginResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\MergeResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\PerformQuickActionResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\ProcessResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\QueryResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\QuickActionTemplateResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <None Include="Web References\Salesforce\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="Web References\Salesforce\RenderEmailTemplateResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\ResetPasswordResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\SaveResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\SearchResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\SendEmailResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\SetPasswordResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\sObject.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\UndeleteResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\UpsertResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <None Include="Web References\Salesforce\wsdl.wsdl" />
     <None Include="Web.template.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.template.config</DependentUpon>
@@ -221,12 +381,30 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Database\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="C:\Users\stevewood\Desktop\wsdl.jsp.xml">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\Salesforce\</RelPath>
+      <UpdateFromURL>C:\Users\stevewood\Desktop\wsdl.jsp.xml</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>ManyWho_Service_Salesforce_Salesforce_SforceService</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
