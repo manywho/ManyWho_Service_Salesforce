@@ -943,7 +943,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 }
 
                 // Add the additional filtering to the command soql
-                soqlQuery += this.ConstructQuery(listFilterAPI);
+                soqlQuery += this.ConstructQuery(listFilterAPI, null);
 
                 // Dispatch the query and get the results
                 objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, true, propertyAPIs, currencyFields);
@@ -1001,7 +1001,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                 // Construct the sosl query - we don't need the columns
                 soqlQuery = "FIND {" + listFilterAPI.search + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
-                soqlQuery += this.ConstructQuery(listFilterAPI) + ")";
+                soqlQuery += this.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties) + ")";
 
                 // Dispatch the search and get the results
                 objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, listFilterAPI, currencyFields);
@@ -1010,7 +1010,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 2) + " ";
                 soqlQuery += "FROM " + objectName;
-                soqlQuery += this.ConstructQuery(listFilterAPI);
+                soqlQuery += this.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties);
 
                 // Dispatch the query and get the results
                 objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, currencyFields);
@@ -1445,7 +1445,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return saveObject;
         }
 
-        private String ConstructQuery(ListFilterAPI listFilterAPI)
+        private String ConstructQuery(ListFilterAPI listFilterAPI, CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties)
         {
             String soql = "";
 
@@ -1525,14 +1525,46 @@ namespace ManyWho.Service.Salesforce.Singletons
                             }
                             else
                             {
-                                // TODO: Need to look at the object schema rather than making this assumption
-                                if (String.IsNullOrWhiteSpace(listFilterWhereAPI.value) == false &&
-                                    (listFilterWhereAPI.value.Equals("true", StringComparison.OrdinalIgnoreCase) == true ||
-                                     listFilterWhereAPI.value.Equals("false", StringComparison.OrdinalIgnoreCase) == true))
+                                Boolean valueAssigned = false;
+
+                                if (cleanedObjectDataTypeProperties != null)
                                 {
-                                    soql += " " + listFilterWhereAPI.value.ToLower() + "";
+                                    Boolean isDataType = false;
+
+                                    if (cleanedObjectDataTypeProperties.BooleanFields != null &&
+                                        cleanedObjectDataTypeProperties.BooleanFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        Boolean booleanValue = false;
+                                        Boolean.TryParse(listFilterWhereAPI.value, out booleanValue);
+
+                                        soql += " " + booleanValue.ToString().ToLower() + "";
+
+                                        valueAssigned = true;
+                                    }
+                                    else if (cleanedObjectDataTypeProperties.DateTimeFields != null &&
+                                             cleanedObjectDataTypeProperties.DateTimeFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        DateTime dateTimeValue;
+                                        DateTime.TryParse(listFilterWhereAPI.value, out dateTimeValue);
+
+                                        soql += " " + dateTimeValue.ToString("yyyy-MM-ddThh:mm:ssZ") + "";
+
+                                        valueAssigned = true;
+                                    }
+                                    else if (cleanedObjectDataTypeProperties.DateFields != null &&
+                                             cleanedObjectDataTypeProperties.DateFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        DateTime dateTimeValue;
+                                        DateTime.TryParse(listFilterWhereAPI.value, out dateTimeValue);
+
+                                        soql += " " + dateTimeValue.ToString("yyyy-MM-dd") + "";
+
+                                        valueAssigned = true;
+                                    }
                                 }
-                                else
+
+                                // If the value has not been assigned based on type information, we assign it as a string query
+                                if (valueAssigned == false)
                                 {
                                     soql += " '" + listFilterWhereAPI.value + "'";
                                 }
@@ -1703,6 +1735,9 @@ namespace ManyWho.Service.Salesforce.Singletons
         {
             CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties = null;
             Dictionary<String, Boolean> currencyFields = null;
+            Dictionary<String, Boolean> dateTimeFields = null;
+            Dictionary<String, Boolean> dateFields = null;
+            Dictionary<String, Boolean> booleanFields = null;
             List<TypeElementPropertyBindingAPI> typeElementPropertyBindings = null;
             List<ObjectDataTypePropertyAPI> cleanObjectDataTypeProperties = null;
             DescribeSObjectResult describeSObjectResult = null;
@@ -1725,8 +1760,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                 typeElementPropertyBindings.Count > 0)
             {
                 cleanObjectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
-                currencyFields = new Dictionary<String, Boolean>();
                 cleanedObjectDataTypeProperties = new CleanedObjectDataTypeProperties();
+                currencyFields = new Dictionary<String, Boolean>();
+                dateTimeFields = new Dictionary<String, Boolean>();
+                booleanFields = new Dictionary<String, Boolean>();
+                dateFields = new Dictionary<String, Boolean>();
 
                 // First, go through the object data type properties one by one
                 foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
@@ -1740,12 +1778,30 @@ namespace ManyWho.Service.Salesforce.Singletons
                             cleanObjectDataTypeProperties.Add(objectDataTypeProperty);
 
                             // Now add the entry to our currency fields if this is one. For currency fields, we need to change the formatting
-                            // as Salesforce sends them back with an "E" when using large numbers
-                            if (typeElementPropertyBinding.databaseContentType != null &&
-                                typeElementPropertyBinding.databaseContentType.Equals("currency", StringComparison.OrdinalIgnoreCase) == true)
+                            // as Salesforce sends them back with an "E" when using large numbers. We also check for other data types as this can
+                            // affect how we perform SOQL queries
+                            if (typeElementPropertyBinding.databaseContentType != null)
                             {
-                                // This is a currency field, so we add it to our table of currencies
-                                currencyFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                if (typeElementPropertyBinding.databaseContentType.Equals("currency", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a currency field, so we add it to our table of currencies
+                                    currencyFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("datetime", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a date/time field, so we add it to our table of date times
+                                    dateTimeFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("date", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a date field, so we add it to our table of dates
+                                    dateFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("boolean", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a boolean field, so we add it to our table of booleans
+                                    booleanFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
                             }
                         }
                     }
@@ -1755,6 +1811,9 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Fill up the response object so we can properly return the data to manywho
             cleanedObjectDataTypeProperties.ObjectDataTypeProperties = cleanObjectDataTypeProperties;
             cleanedObjectDataTypeProperties.CurrencyFields = currencyFields;
+            cleanedObjectDataTypeProperties.BooleanFields = booleanFields;
+            cleanedObjectDataTypeProperties.DateTimeFields = dateTimeFields;
+            cleanedObjectDataTypeProperties.DateFields = dateFields;
 
             return cleanedObjectDataTypeProperties;
         }
@@ -1866,6 +1925,24 @@ namespace ManyWho.Service.Salesforce.Singletons
         }
 
         public Dictionary<String, Boolean> CurrencyFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> DateTimeFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> DateFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> BooleanFields
         {
             get;
             set;
