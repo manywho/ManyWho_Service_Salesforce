@@ -81,6 +81,11 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
 
@@ -121,6 +126,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             // Grab the describe so we have it
             describeSObjectResult = sforceService.describeSObject(tableName);
@@ -218,6 +228,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
@@ -410,7 +425,12 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 // Step 1: Login to the service so we can do a bunch of things
                 sforceService = this.Login(authenticatedWho, configurationValues, false, false);
-                
+
+                if (sforceService == null)
+                {
+                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                }
+
                 // Step 2: in the save is to get the latest information about the object from salesforce
                 // TODO: this should definitely be cached and operate under a rolling nightly refresh
 
@@ -913,6 +933,11 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, false);
 
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
             // If the request has a search query, we need to alter the SOQL to SOSL
             if (listFilterAPI != null &&
                 listFilterAPI.search != null &&
@@ -963,6 +988,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, isModelingOperation);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             soqlQuery = "";
 
@@ -1665,23 +1695,26 @@ namespace ManyWho.Service.Salesforce.Singletons
                      authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
             {
                 if (string.IsNullOrWhiteSpace(authenticatedWho.Token) == true ||
-                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.OrdinalIgnoreCase) == true ||
-                    (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
-                     authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0))
+                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    throw new ArgumentNullException("SalesforceService", "The authentication token is null, empty, or incorrectly configured. If you are running using a PUBLIC authentication context, make sure you set your " + SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY + " configuration value to 'SuperUser'.");
+                    if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
+                        authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0)
+                    {
+                        // Do nothing, we don't have their active session information to perform a login
+                    }
+                    else
+                    {
+                        throw new ArgumentNullException("SalesforceService", "The authentication token is null, empty, or incorrectly configured. If you are running using a PUBLIC authentication context, make sure you set your " + SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY + " configuration value to 'SuperUser'.");
+                    }
                 }
-
-                // We should log the user in using their session information that's been provided via a previous explicit login
-                sforceService = this.LogUserInBasedOnSession(
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
-                );
-            }
-
-            if (sforceService == null)
-            {
-                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                else
+                {
+                    // We should log the user in using their session information that's been provided via a previous explicit login
+                    sforceService = this.LogUserInBasedOnSession(
+                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
+                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
+                    );
+                }
             }
 
             return sforceService;

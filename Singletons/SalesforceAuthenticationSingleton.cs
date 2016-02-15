@@ -93,6 +93,11 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Login to the service
             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, configurationValues, true, false);
 
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
             if (authorization.groups != null &&
                 authorization.groups.Count > 0)
             {

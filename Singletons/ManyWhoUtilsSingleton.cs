@@ -116,6 +116,11 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 // We need to get the users from salesforce
                 sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
 
+                if (sforceService == null)
+                {
+                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                }
+
                 // Get the to emails from Salesforce
                 toEmails = SalesforceAuthenticationSingleton.GetInstance().GetGroupMemberEmails(notifier, sforceService, serviceRequest, serviceRequest.authorization.groups[0].authenticationId);
 

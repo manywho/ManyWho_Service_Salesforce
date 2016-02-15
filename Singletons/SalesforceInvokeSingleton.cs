@@ -98,6 +98,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                             // Login as the API user
                             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
 
+                            if (sforceService == null)
+                            {
+                                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                            }
+
                             // Get the session id out as we'll use that for the oauth login
                             groupAuthenticationToken = sforceService.SessionHeaderValue.sessionId;
                         }

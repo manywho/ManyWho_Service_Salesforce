@@ -680,6 +680,11 @@ namespace ManyWho.Service.Salesforce
             // We need to get the users from salesforce
             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceNotificationRequestAPI.configurationValues, true, false);
 
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
             if (serviceNotificationRequestAPI.notificationMessages != null &&
                 serviceNotificationRequestAPI.notificationMessages.Count > 0)
             {
@@ -2813,6 +2818,11 @@ namespace ManyWho.Service.Salesforce
 
             // Login to the salesforce service
             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, fileDataRequest.configurationValues, false, false);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             // Now we have the file data request, we grab out the data that needs to be uploaded to the service
             if (multipartFormDataStreamProvider.FileData != null &&
