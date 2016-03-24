@@ -189,22 +189,194 @@ namespace ManyWho.Service.Salesforce.Singletons
             if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
                 String.IsNullOrWhiteSpace(field.relationshipName) == false &&
                 field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
-                field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
-                field.relationshipName.Equals("Case__r", StringComparison.OrdinalIgnoreCase) == false &&
-                field.name.Equals("Case__c", StringComparison.OrdinalIgnoreCase) == false)
+                field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false)
             {
-                // Add an additional test here as the if statement will get a bit complicated including this also
-                // Cases don't have a relationship name field annoyingly
-                if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
-                    (field.name.Equals("ParentId", StringComparison.OrdinalIgnoreCase) == true ||
-                     field.name.Equals("QuestionId", StringComparison.OrdinalIgnoreCase) == true ||
-                     field.name.Equals("CommunityId", StringComparison.OrdinalIgnoreCase) == true))
+                // Add additional reference testing for tables that do not have name properties
+                if (field.referenceTo != null &&
+                    field.referenceTo.Length > 0)
                 {
-                    // Do nothing, we don't want to reference this field
-                }
-                else
-                {
-                    addReferenceField = true;
+                    for (int i = 0; i < field.referenceTo.Length; i++)
+                    {
+                        if (String.IsNullOrWhiteSpace(field.referenceTo[i]) == false &&
+                            (field.referenceTo[i].EndsWith("__c", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Account", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountTerritoryAssignmentRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountTerritorySharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AdditionalNumber", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AgentWork", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexClass", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexComponent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexPage", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexTrigger", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AppMenuItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Asset", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AssetOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AssetTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AssignmentRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Attachment", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BackgroundOperation", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BrandTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BusinessHours", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BusinessProcess", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CallCenter", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Campaign", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CampaignMember", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CampaignOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CampaignTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseTeamRole", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseTeamTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ChatterAnswersReputationLevel", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CollaborationGroup", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Community", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ConnectedApplication", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Contact", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContactCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContactOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContactTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentDistribution", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentFolder", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentHubItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentWorkspace", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContractTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CronJobDetail", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DandBCompany", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DashboardComponent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DashboardTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudCompany", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudDandBCompany", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudOwnedEntity", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudPurchaseUsage", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Division", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Document", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DocumentTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DuplicateRecordItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DuplicateRecordSet", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EmailTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Entitlement", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EntitlementContact", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EntitlementTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EnvironmentHubMember", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EventTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("FiscalYearSettings", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("FlowInterview", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Folder", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Goal", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("GoalLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("GoogleDoc", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Group", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("HashtagDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Holiday", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("IdeaReputationLevel", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("KnowledgeArticleViewStat", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Lead", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LeadCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LeadOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LeadTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ListView", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveAgentSession", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveAgentSessionOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscript", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscriptEvent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscriptOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscriptSkill", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatVisitor", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MacroInstruction", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MailmergeTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Metric", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MetricDataLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MilestoneType", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Name", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Network", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("NetworkActivityAudit", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("NoteTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Opportunity", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityLineItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityTeamMember", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Order", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OrderOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Organization", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("PermissionSet", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Pricebook2", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("PricebookEntry", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProcessDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProcessNode", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Product2", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Profile", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProfileSkill", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProfileSkillEndorsement", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProfileSkillUser", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("PushTopic", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuestionSubscription", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuickText", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuickTextOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Quote", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuoteDocument", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("RecentlyViewed", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("RecordType", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Reply", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ReplyReportAbuse", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Report", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ReportTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Scontrol", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SelfServiceUser", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ServiceContract", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ServiceContractOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Site", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SlaProcess", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SolutionTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SOSSession", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SOSSessionActivity", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SOSSessionOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("StaticResource", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("StreamingChannel", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("TagDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("TaskTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Territory", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Territory2", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Territory2Model", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Topic", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("TopicLocalization—Beta", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("User", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserAppMenuItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserLicense", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserMembershipSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProfile", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvAccount", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvAccountStaging", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvMockTarget", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvisioningLog", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvisioningRequest", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvisioningRequestOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserRole", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserServicePresence", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserTerritory2Association", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WebLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkBadgeDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkCoaching", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedback", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackQuestion", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackQuestionSet", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackQuestionShare", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackRequest", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkGoal", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkGoalHistory", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkGoalLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkPerformanceCycle", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkRewardFund", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkRewardFundType", StringComparison.OrdinalIgnoreCase) == true))
+                        {
+                            // This reference field does have a name property
+                            addReferenceField = true;
+                            break;
+                        }
+                    }
                 }
             }
 
