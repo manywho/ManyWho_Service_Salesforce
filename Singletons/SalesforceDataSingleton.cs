@@ -20,6 +20,7 @@ using ManyWho.Flow.SDK.Run;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Service.Salesforce.Utils;
+using ManyWho.Service.Salesforce.Salesforce;
 
 /*!
 
@@ -80,6 +81,11 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
 
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
 
@@ -120,6 +126,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             // Grab the describe so we have it
             describeSObjectResult = sforceService.describeSObject(tableName);
@@ -178,22 +189,194 @@ namespace ManyWho.Service.Salesforce.Singletons
             if (field.type.ToString().Equals("reference", StringComparison.OrdinalIgnoreCase) == true &&
                 String.IsNullOrWhiteSpace(field.relationshipName) == false &&
                 field.relationshipName.Equals("ConnectionReceived", StringComparison.OrdinalIgnoreCase) == false &&
-                field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false &&
-                field.relationshipName.Equals("Case__r", StringComparison.OrdinalIgnoreCase) == false &&
-                field.name.Equals("Case__c", StringComparison.OrdinalIgnoreCase) == false)
+                field.relationshipName.Equals("ConnectionSent", StringComparison.OrdinalIgnoreCase) == false)
             {
-                // Add an additional test here as the if statement will get a bit complicated including this also
-                // Cases don't have a relationship name field annoyingly
-                if (tableName.Equals("Case", StringComparison.OrdinalIgnoreCase) == true &&
-                    (field.name.Equals("ParentId", StringComparison.OrdinalIgnoreCase) == true ||
-                     field.name.Equals("QuestionId", StringComparison.OrdinalIgnoreCase) == true ||
-                     field.name.Equals("CommunityId", StringComparison.OrdinalIgnoreCase) == true))
+                // Add additional reference testing for tables that do not have name properties
+                if (field.referenceTo != null &&
+                    field.referenceTo.Length > 0)
                 {
-                    // Do nothing, we don't want to reference this field
-                }
-                else
-                {
-                    addReferenceField = true;
+                    for (int i = 0; i < field.referenceTo.Length; i++)
+                    {
+                        if (String.IsNullOrWhiteSpace(field.referenceTo[i]) == false &&
+                            (field.referenceTo[i].EndsWith("__c", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Account", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountTerritoryAssignmentRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountTerritorySharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AdditionalNumber", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AgentWork", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexClass", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexComponent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexPage", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ApexTrigger", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AppMenuItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Asset", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AssetOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AssetTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AssignmentRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Attachment", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BackgroundOperation", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BrandTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BusinessHours", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("BusinessProcess", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CallCenter", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Campaign", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CampaignMember", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CampaignOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CampaignTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseTeamRole", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CaseTeamTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ChatterAnswersReputationLevel", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CollaborationGroup", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Community", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ConnectedApplication", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Contact", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContactCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContactOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContactTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentDistribution", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentFolder", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentHubItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContentWorkspace", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ContractTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("CronJobDetail", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DandBCompany", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DashboardComponent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DashboardTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudCompany", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudDandBCompany", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudOwnedEntity", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DatacloudPurchaseUsage", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Division", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Document", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DocumentTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DuplicateRecordItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("DuplicateRecordSet", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EmailTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Entitlement", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EntitlementContact", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EntitlementTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EnvironmentHubMember", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("EventTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("FiscalYearSettings", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("FlowInterview", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Folder", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Goal", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("GoalLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("GoogleDoc", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Group", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("HashtagDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Holiday", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("IdeaReputationLevel", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("KnowledgeArticleViewStat", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Lead", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LeadCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LeadOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LeadTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ListView", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveAgentSession", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveAgentSessionOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscript", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscriptEvent", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscriptOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatTranscriptSkill", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("LiveChatVisitor", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MacroInstruction", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MailmergeTemplate", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Metric", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MetricDataLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("MilestoneType", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Name", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Network", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("NetworkActivityAudit", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("NoteTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Opportunity", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityLineItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OpportunityTeamMember", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Order", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("OrderOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Organization", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("PermissionSet", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Pricebook2", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("PricebookEntry", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProcessDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProcessNode", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Product2", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Profile", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProfileSkill", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProfileSkillEndorsement", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ProfileSkillUser", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("PushTopic", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuestionSubscription", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuickText", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuickTextOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Quote", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("QuoteDocument", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("RecentlyViewed", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("RecordType", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Reply", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ReplyReportAbuse", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Report", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ReportTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Scontrol", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SelfServiceUser", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ServiceContract", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("ServiceContractOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Site", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SlaProcess", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SolutionTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SOSSession", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SOSSessionActivity", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("SOSSessionOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("StaticResource", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("StreamingChannel", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("TagDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("TaskTag", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Territory", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Territory2", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Territory2Model", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("Topic", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("TopicLocalization—Beta", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("User", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserAppMenuItem", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserLicense", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserMembershipSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProfile", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvAccount", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvAccountStaging", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvMockTarget", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvisioningLog", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvisioningRequest", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserProvisioningRequestOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserRole", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserServicePresence", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("UserTerritory2Association", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WebLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkBadgeDefinition", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkCoaching", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedback", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackQuestion", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackQuestionSet", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackQuestionShare", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkFeedbackRequest", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkGoal", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkGoalHistory", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkGoalLink", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkPerformanceCycle", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkRewardFund", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("WorkRewardFundType", StringComparison.OrdinalIgnoreCase) == true))
+                        {
+                            // This reference field does have a name property
+                            addReferenceField = true;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -217,6 +400,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, true);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             // Get all the objects available in the org
             describeGlobalResult = sforceService.describeGlobal();
@@ -409,7 +597,12 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 // Step 1: Login to the service so we can do a bunch of things
                 sforceService = this.Login(authenticatedWho, configurationValues, false, false);
-                
+
+                if (sforceService == null)
+                {
+                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                }
+
                 // Step 2: in the save is to get the latest information about the object from salesforce
                 // TODO: this should definitely be cached and operate under a rolling nightly refresh
 
@@ -912,6 +1105,11 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, false);
 
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
             // If the request has a search query, we need to alter the SOQL to SOSL
             if (listFilterAPI != null &&
                 listFilterAPI.search != null &&
@@ -942,7 +1140,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 }
 
                 // Add the additional filtering to the command soql
-                soqlQuery += this.ConstructQuery(listFilterAPI);
+                soqlQuery += this.ConstructQuery(listFilterAPI, null);
 
                 // Dispatch the query and get the results
                 objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, true, propertyAPIs, currencyFields);
@@ -962,6 +1160,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = this.Login(authenticatedWho, configurationValues, false, isModelingOperation);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             soqlQuery = "";
 
@@ -1000,7 +1203,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                 // Construct the sosl query - we don't need the columns
                 soqlQuery = "FIND {" + listFilterAPI.search + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
-                soqlQuery += this.ConstructQuery(listFilterAPI) + ")";
+                soqlQuery += this.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties) + ")";
 
                 // Dispatch the search and get the results
                 objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, listFilterAPI, currencyFields);
@@ -1009,7 +1212,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 2) + " ";
                 soqlQuery += "FROM " + objectName;
-                soqlQuery += this.ConstructQuery(listFilterAPI);
+                soqlQuery += this.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties);
 
                 // Dispatch the query and get the results
                 objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, currencyFields);
@@ -1444,7 +1647,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             return saveObject;
         }
 
-        private String ConstructQuery(ListFilterAPI listFilterAPI)
+        private String ConstructQuery(ListFilterAPI listFilterAPI, CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties)
         {
             String soql = "";
 
@@ -1524,14 +1727,46 @@ namespace ManyWho.Service.Salesforce.Singletons
                             }
                             else
                             {
-                                // TODO: Need to look at the object schema rather than making this assumption
-                                if (String.IsNullOrWhiteSpace(listFilterWhereAPI.value) == false &&
-                                    (listFilterWhereAPI.value.Equals("true", StringComparison.OrdinalIgnoreCase) == true ||
-                                     listFilterWhereAPI.value.Equals("false", StringComparison.OrdinalIgnoreCase) == true))
+                                Boolean valueAssigned = false;
+
+                                if (cleanedObjectDataTypeProperties != null)
                                 {
-                                    soql += " " + listFilterWhereAPI.value.ToLower() + "";
+                                    Boolean isDataType = false;
+
+                                    if (cleanedObjectDataTypeProperties.BooleanFields != null &&
+                                        cleanedObjectDataTypeProperties.BooleanFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        Boolean booleanValue = false;
+                                        Boolean.TryParse(listFilterWhereAPI.value, out booleanValue);
+
+                                        soql += " " + booleanValue.ToString().ToLower() + "";
+
+                                        valueAssigned = true;
+                                    }
+                                    else if (cleanedObjectDataTypeProperties.DateTimeFields != null &&
+                                             cleanedObjectDataTypeProperties.DateTimeFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        DateTime dateTimeValue;
+                                        DateTime.TryParse(listFilterWhereAPI.value, out dateTimeValue);
+
+                                        soql += " " + dateTimeValue.ToString("yyyy-MM-ddThh:mm:ssZ") + "";
+
+                                        valueAssigned = true;
+                                    }
+                                    else if (cleanedObjectDataTypeProperties.DateFields != null &&
+                                             cleanedObjectDataTypeProperties.DateFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        DateTime dateTimeValue;
+                                        DateTime.TryParse(listFilterWhereAPI.value, out dateTimeValue);
+
+                                        soql += " " + dateTimeValue.ToString("yyyy-MM-dd") + "";
+
+                                        valueAssigned = true;
+                                    }
                                 }
-                                else
+
+                                // If the value has not been assigned based on type information, we assign it as a string query
+                                if (valueAssigned == false)
                                 {
                                     soql += " '" + listFilterWhereAPI.value + "'";
                                 }
@@ -1632,23 +1867,26 @@ namespace ManyWho.Service.Salesforce.Singletons
                      authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
             {
                 if (string.IsNullOrWhiteSpace(authenticatedWho.Token) == true ||
-                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.OrdinalIgnoreCase) == true ||
-                    (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
-                     authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0))
+                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    throw new ArgumentNullException("SalesforceService", "The authentication token is null, empty, or incorrectly configured. If you are running using a PUBLIC authentication context, make sure you set your " + SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY + " configuration value to 'SuperUser'.");
+                    if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true &&
+                        authenticatedWho.Token.IndexOf(SalesforceHttpUtils.TOKEN_PREFIX) < 0)
+                    {
+                        // Do nothing, we don't have their active session information to perform a login
+                    }
+                    else
+                    {
+                        throw new ArgumentNullException("SalesforceService", "The authentication token is null, empty, or incorrectly configured. If you are running using a PUBLIC authentication context, make sure you set your " + SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY + " configuration value to 'SuperUser'.");
+                    }
                 }
-
-                // We should log the user in using their session information that's been provided via a previous explicit login
-                sforceService = this.LogUserInBasedOnSession(
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
-                    SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
-                );
-            }
-
-            if (sforceService == null)
-            {
-                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                else
+                {
+                    // We should log the user in using their session information that's been provided via a previous explicit login
+                    sforceService = this.LogUserInBasedOnSession(
+                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
+                        SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
+                    );
+                }
             }
 
             return sforceService;
@@ -1682,7 +1920,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             // Log the user into the main authentication endpoint
-            sforceService.Url = authenticationUrl + "/services/Soap/u/26.0";
+            sforceService.Url = authenticationUrl + "/services/Soap/u/35.0";
             loginResult = sforceService.login(username, password + securityToken);
 
             if (loginResult.passwordExpired)
@@ -1702,6 +1940,9 @@ namespace ManyWho.Service.Salesforce.Singletons
         {
             CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties = null;
             Dictionary<String, Boolean> currencyFields = null;
+            Dictionary<String, Boolean> dateTimeFields = null;
+            Dictionary<String, Boolean> dateFields = null;
+            Dictionary<String, Boolean> booleanFields = null;
             List<TypeElementPropertyBindingAPI> typeElementPropertyBindings = null;
             List<ObjectDataTypePropertyAPI> cleanObjectDataTypeProperties = null;
             DescribeSObjectResult describeSObjectResult = null;
@@ -1724,8 +1965,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                 typeElementPropertyBindings.Count > 0)
             {
                 cleanObjectDataTypeProperties = new List<ObjectDataTypePropertyAPI>();
-                currencyFields = new Dictionary<String, Boolean>();
                 cleanedObjectDataTypeProperties = new CleanedObjectDataTypeProperties();
+                currencyFields = new Dictionary<String, Boolean>();
+                dateTimeFields = new Dictionary<String, Boolean>();
+                booleanFields = new Dictionary<String, Boolean>();
+                dateFields = new Dictionary<String, Boolean>();
 
                 // First, go through the object data type properties one by one
                 foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
@@ -1739,12 +1983,30 @@ namespace ManyWho.Service.Salesforce.Singletons
                             cleanObjectDataTypeProperties.Add(objectDataTypeProperty);
 
                             // Now add the entry to our currency fields if this is one. For currency fields, we need to change the formatting
-                            // as Salesforce sends them back with an "E" when using large numbers
-                            if (typeElementPropertyBinding.databaseContentType != null &&
-                                typeElementPropertyBinding.databaseContentType.Equals("currency", StringComparison.OrdinalIgnoreCase) == true)
+                            // as Salesforce sends them back with an "E" when using large numbers. We also check for other data types as this can
+                            // affect how we perform SOQL queries
+                            if (typeElementPropertyBinding.databaseContentType != null)
                             {
-                                // This is a currency field, so we add it to our table of currencies
-                                currencyFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                if (typeElementPropertyBinding.databaseContentType.Equals("currency", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a currency field, so we add it to our table of currencies
+                                    currencyFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("datetime", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a date/time field, so we add it to our table of date times
+                                    dateTimeFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("date", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a date field, so we add it to our table of dates
+                                    dateFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("boolean", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a boolean field, so we add it to our table of booleans
+                                    booleanFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
                             }
                         }
                     }
@@ -1754,6 +2016,9 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Fill up the response object so we can properly return the data to manywho
             cleanedObjectDataTypeProperties.ObjectDataTypeProperties = cleanObjectDataTypeProperties;
             cleanedObjectDataTypeProperties.CurrencyFields = currencyFields;
+            cleanedObjectDataTypeProperties.BooleanFields = booleanFields;
+            cleanedObjectDataTypeProperties.DateTimeFields = dateTimeFields;
+            cleanedObjectDataTypeProperties.DateFields = dateFields;
 
             return cleanedObjectDataTypeProperties;
         }
@@ -1865,6 +2130,24 @@ namespace ManyWho.Service.Salesforce.Singletons
         }
 
         public Dictionary<String, Boolean> CurrencyFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> DateTimeFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> DateFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> BooleanFields
         {
             get;
             set;

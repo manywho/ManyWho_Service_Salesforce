@@ -12,6 +12,7 @@ using ManyWho.Flow.SDK.Run.Elements.Map;
 using ManyWho.Service.Salesforce;
 using ManyWho.Service.Salesforce.Singletons;
 using ManyWho.Service.Salesforce.Utils;
+using ManyWho.Service.Salesforce.Salesforce;
 
 namespace ManyWho.Service.ManyWho.Utils.Singletons
 {
@@ -115,6 +116,11 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 // We need to get the users from salesforce
                 sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceRequest.configurationValues, true, false);
 
+                if (sforceService == null)
+                {
+                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                }
+
                 // Get the to emails from Salesforce
                 toEmails = SalesforceAuthenticationSingleton.GetInstance().GetGroupMemberEmails(notifier, sforceService, serviceRequest, serviceRequest.authorization.groups[0].authenticationId);
 
@@ -203,7 +209,8 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 {
                     foreach (OutcomeAvailableAPI outcome in outcomes)
                     {
-                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false)
+                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false &&
+                            string.IsNullOrWhiteSpace(outcome.label) == false)
                         {
                             textBody += outcome.label + "(Click here: " + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + ")" + Environment.NewLine;
                         }
@@ -219,13 +226,14 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                 fullHtmlBody = "";
                 fullHtmlBody += "<html>";
                 fullHtmlBody += "<head>";
-                fullHtmlBody += "<link type=\"text/css\" href=\"http://cdn.manywho.com/extensions/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\" />";
-                fullHtmlBody += "<link type=\"text/css\" href=\"http://cdn.manywho.com/extensions/bootstrap/css/bootstrap-responsive.css\" rel=\"stylesheet\" />";
+                fullHtmlBody += "<script type=\"text/javascript\" src=\"https://assets.manywho.com/js/vendor/bootstrap-3.3.6.min.js\"></script>";
+                fullHtmlBody += "<link rel=\"stylesheet\" href=\"https://assets.manywho.com/css/mw-bootstrap.ae817fbf.css\">";
+                fullHtmlBody += "<link rel=\"stylesheet\" href=\"https://assets.manywho.com/css/themes/mw-sf1.css\">";
                 fullHtmlBody += "</head>";
-                fullHtmlBody += "<body>";
+                fullHtmlBody += "<body class=\"mw-bs\">";
                 fullHtmlBody += "<div class=\"container-fluid\">";
-                fullHtmlBody += "<div class=\"row-fluid\">";
-                fullHtmlBody += "<div class=\"span12\">";
+                fullHtmlBody += "<div class=\"row\">";
+                fullHtmlBody += "<div class=\"col-md-12\">";
                 fullHtmlBody += htmlBody;
                 fullHtmlBody += "</div>";
                 fullHtmlBody += "</div>";
@@ -236,12 +244,13 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
                     // The user has outcomes that should be used for actions - sort them before doing anything else
                     outcomes.Sort();
 
-                    fullHtmlBody += "<div class=\"row-fluid\">";
-                    fullHtmlBody += "<div class=\"span12\">";
+                    fullHtmlBody += "<div class=\"row\">";
+                    fullHtmlBody += "<div class=\"col-md-12\">";
 
                     foreach (OutcomeAvailableAPI outcome in outcomes)
                     {
-                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false)
+                        if (outcome.id.Equals(ManyWhoConstants.FAULT_GUID.ToString(), StringComparison.OrdinalIgnoreCase) == false &&
+                            string.IsNullOrWhiteSpace(outcome.label) == false)
                         {
                             fullHtmlBody += "<a href=\"" + SettingUtils.GetStringSetting("Salesforce.ServerBasePath") + "/api/email/outcomeresponse?token=" + token + "&selectedOutcomeId=" + outcome.id + "&redirectUri=" + Uri.EscapeUriString(redirectUri) + "\" class=\"btn btn-primary\">" + outcome.label + "</a>&nbsp;";
                         }

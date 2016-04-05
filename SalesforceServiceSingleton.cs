@@ -26,6 +26,7 @@ using ManyWho.Service.Salesforce.Models.Rest;
 using ManyWho.Service.Salesforce.Utils;
 using ManyWho.Service.Salesforce.Singletons;
 using ManyWho.Service.ManyWho.Utils.Singletons;
+using ManyWho.Service.Salesforce.Salesforce;
 
 /*!
 
@@ -678,6 +679,11 @@ namespace ManyWho.Service.Salesforce
 
             // We need to get the users from salesforce
             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, serviceNotificationRequestAPI.configurationValues, true, false);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             if (serviceNotificationRequestAPI.notificationMessages != null &&
                 serviceNotificationRequestAPI.notificationMessages.Count > 0)
@@ -1332,7 +1338,7 @@ namespace ManyWho.Service.Salesforce
                         authenticatedUser.lastName = (String)jsonObject["last_name"];
                         authenticatedUser.status = ManyWhoConstants.AUTHENTICATED_USER_STATUS_AUTHENTICATED;
                         authenticatedUser.statusMessage = null;
-                        authenticatedUser.token = this.CreateSalesforceAuthenticationToken(serviceToken, chatterBaseUrl + "/services/Soap/u/26.0");
+                        authenticatedUser.token = this.CreateSalesforceAuthenticationToken(serviceToken, chatterBaseUrl + "/services/Soap/u/35.0");
 
                         // Check to make sure we're sending back a valid user as names can be empty
                         if (String.IsNullOrWhiteSpace(authenticatedUser.firstName) == true)
@@ -2812,6 +2818,11 @@ namespace ManyWho.Service.Salesforce
 
             // Login to the salesforce service
             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, fileDataRequest.configurationValues, false, false);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             // Now we have the file data request, we grab out the data that needs to be uploaded to the service
             if (multipartFormDataStreamProvider.FileData != null &&

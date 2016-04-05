@@ -172,6 +172,30 @@ namespace ManyWho.Service.Salesforce.Utils
             return mode;
         }
 
+        public static String GetReportingModeFromQuery(Uri uri)
+        {
+            String reportingMode = null;
+
+            // Check to see if the caller passed in the mode
+            if (uri.Query != null)
+            {
+                if (uri.Query.IndexOf(ManyWhoConstants.REPORT_PATH_AND_VALUES, StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    reportingMode = ManyWhoConstants.REPORT_PATH_AND_VALUES;
+                }
+                else if (uri.Query.IndexOf(ManyWhoConstants.REPORT_PATH, StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    reportingMode = ManyWhoConstants.REPORT_PATH;
+                }
+                else if (uri.Query.IndexOf(ManyWhoConstants.REPORT_VALUES, StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    reportingMode = ManyWhoConstants.REPORT_VALUES;
+                }
+            }
+
+            return reportingMode;
+        }
+
         public static String GetEmailFromQuery(Uri uri)
         {
             NameValueCollection nameValueCollection = null;

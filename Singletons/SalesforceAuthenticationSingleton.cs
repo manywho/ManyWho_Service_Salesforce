@@ -16,6 +16,7 @@ using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Service.Salesforce.Utils;
 using ManyWho.Service.Salesforce.Models.Rest;
+using ManyWho.Service.Salesforce.Salesforce;
 
 /*!
 
@@ -91,6 +92,11 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Login to the service
             sforceService = SalesforceDataSingleton.GetInstance().Login(authenticatedWho, configurationValues, true, false);
+
+            if (sforceService == null)
+            {
+                throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
 
             if (authorization.groups != null &&
                 authorization.groups.Count > 0)
