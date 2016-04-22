@@ -1763,6 +1763,26 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                                         valueAssigned = true;
                                     }
+                                    else if (cleanedObjectDataTypeProperties.NumberFields != null &&
+                                             cleanedObjectDataTypeProperties.NumberFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        Double doubleValue;
+                                        Double.TryParse(listFilterWhereAPI.value, out doubleValue);
+
+                                        soql += " " + doubleValue.ToString() + "";
+
+                                        valueAssigned = true;
+                                    }
+                                    else if (cleanedObjectDataTypeProperties.CurrencyFields != null &&
+                                             cleanedObjectDataTypeProperties.CurrencyFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
+                                    {
+                                        Double doubleValue;
+                                        Double.TryParse(listFilterWhereAPI.value, out doubleValue);
+
+                                        soql += " " + doubleValue.ToString() + "";
+
+                                        valueAssigned = true;
+                                    }
                                 }
 
                                 // If the value has not been assigned based on type information, we assign it as a string query
@@ -1943,6 +1963,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             Dictionary<String, Boolean> dateTimeFields = null;
             Dictionary<String, Boolean> dateFields = null;
             Dictionary<String, Boolean> booleanFields = null;
+            Dictionary<String, Boolean> numberFields = null;
             List<TypeElementPropertyBindingAPI> typeElementPropertyBindings = null;
             List<ObjectDataTypePropertyAPI> cleanObjectDataTypeProperties = null;
             DescribeSObjectResult describeSObjectResult = null;
@@ -1970,6 +1991,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 dateTimeFields = new Dictionary<String, Boolean>();
                 booleanFields = new Dictionary<String, Boolean>();
                 dateFields = new Dictionary<String, Boolean>();
+                numberFields = new Dictionary<String, Boolean>();
 
                 // First, go through the object data type properties one by one
                 foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
@@ -2007,6 +2029,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     // This is a boolean field, so we add it to our table of booleans
                                     booleanFields.Add(typeElementPropertyBinding.databaseFieldName, true);
                                 }
+                                else if (typeElementPropertyBinding.databaseContentType.Equals("double", StringComparison.OrdinalIgnoreCase) == true ||
+                                         typeElementPropertyBinding.databaseContentType.Equals("percent", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // This is a numeric field other than currency
+                                    numberFields.Add(typeElementPropertyBinding.databaseFieldName, true);
+                                }
                             }
                         }
                     }
@@ -2019,6 +2047,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             cleanedObjectDataTypeProperties.BooleanFields = booleanFields;
             cleanedObjectDataTypeProperties.DateTimeFields = dateTimeFields;
             cleanedObjectDataTypeProperties.DateFields = dateFields;
+            cleanedObjectDataTypeProperties.NumberFields = numberFields;
 
             return cleanedObjectDataTypeProperties;
         }
@@ -2148,6 +2177,12 @@ namespace ManyWho.Service.Salesforce.Singletons
         }
 
         public Dictionary<String, Boolean> BooleanFields
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<String, Boolean> NumberFields
         {
             get;
             set;
