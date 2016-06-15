@@ -64,6 +64,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             String authenticationUrl = null;
             String username = null;
             String password = null;
+            String refreshToken = null;
             String securityToken = null;
             String chatterBaseUrl = null;
             String adminEmail = null;
@@ -72,8 +73,9 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Grab the configuration values from the service request
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
-            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
-            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
+            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, false);
+            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_REFRESH_TOKEN, serviceRequest.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
             chatterBaseUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CHATTER_BASE_URL, serviceRequest.configurationValues, true);
             adminEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
@@ -202,6 +204,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             String authenticationUrl = null;
             String username = null;
             String password = null;
+            String refreshToken = null;
             String securityToken = null;
             String adminEmail = null;
             String when = null;
@@ -213,8 +216,9 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Grab the configuration values from the service request
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
-            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
-            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
+            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, false);
+            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_REFRESH_TOKEN, serviceRequest.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
 
@@ -315,6 +319,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             String authenticationUrl = null;
             String username = null;
             String password = null;
+            String refreshToken = null;
             String securityToken = null;
             String adminEmail = null;
             String when = null;
@@ -325,8 +330,9 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // Grab the configuration values from the service request
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
-            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
-            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
+            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, false);
+            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_REFRESH_TOKEN, serviceRequest.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_ADMIN_EMAIL, serviceRequest.configurationValues, true);
 

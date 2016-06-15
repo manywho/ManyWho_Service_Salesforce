@@ -108,6 +108,7 @@ namespace ManyWho.Service.Salesforce
             String authenticationStrategy = null;
             String authenticationUrl = null;
             String securityToken = null;
+            String refreshToken = null;
             String invokeType = null;
             String username = null;
             String password = null;
@@ -162,8 +163,9 @@ namespace ManyWho.Service.Salesforce
                             // Get the configuration values out that are needed to check the voting status
                             // TODO: we should smart cache the login info and connection
                             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, listenerServiceRequest.configurationValues, true);
-                            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, listenerServiceRequest.configurationValues, true);
-                            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, listenerServiceRequest.configurationValues, true);
+                            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, listenerServiceRequest.configurationValues, false);
+                            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, listenerServiceRequest.configurationValues, false);
+                            refreshToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_REFRESH_TOKEN, listenerServiceRequest.configurationValues, false);
                             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, listenerServiceRequest.configurationValues, false);
                             authenticationStrategy = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_STRATEGY, listenerServiceRequest.configurationValues, false);
 

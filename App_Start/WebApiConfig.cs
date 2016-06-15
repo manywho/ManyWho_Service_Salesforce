@@ -36,6 +36,29 @@ namespace ManyWho.Service.Salesforce
                 }
             );
 
+            // OAuth2 install routes
+            config.Routes.MapHttpRoute(
+                name: "PluginSalesforceStartOAuth2Install",
+                constraints: new { httpMethod = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Get) },
+                routeTemplate: "plugins/api/salesforce/1/install",
+                defaults: new
+                {
+                    controller = "PluginSalesforce",
+                    action = "StartOAuth2Install"
+                }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "PluginSalesforceAuthenticateWithOAuth2",
+                constraints: new { httpMethod = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Get) },
+                routeTemplate: "plugins/api/salesforce/1/oauth2",
+                defaults: new
+                {
+                    controller = "PluginSalesforce",
+                    action = "AuthenticateWithOAuth2"
+                }
+            );
+
             // Salesforce Plugin
             config.Routes.MapHttpRoute(
                 name: "PluginSalesforceWorkflowRuleListener",

@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Formatting;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Polly;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ManyWho.Flow.SDK;
@@ -17,6 +18,8 @@ using ManyWho.Flow.SDK.Social;
 using ManyWho.Flow.SDK.Security;
 using ManyWho.Flow.SDK.Describe;
 using ManyWho.Flow.SDK.Draw.Elements.Type;
+using ManyWho.Flow.SDK.Draw.Elements.Value;
+using ManyWho.Flow.SDK.Draw.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Map;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Flow.SDK.Run.Elements.Config;
@@ -63,6 +66,7 @@ namespace ManyWho.Service.Salesforce
         public const String SERVICE_VALUE_CONSUMER_SECRET = "Consumer Secret";
         public const String SERVICE_VALUE_CONSUMER_KEY = "Consumer Key";
         public const String SERVICE_VALUE_AUTHENTICATION_STRATEGY = "Authentication Strategy";
+        public const String SERVICE_VALUE_REFRESH_TOKEN = "Refresh Token";
 
         public const String AUTHENTICATION_STRATEGY_STANDARD = "Standard";
         public const String AUTHENTICATION_STRATEGY_SUPER_USER = "SuperUser";
@@ -144,6 +148,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String adminEmail = null;
             String consumerSecret = null;
             String consumerKey = null;
@@ -163,12 +168,13 @@ namespace ManyWho.Service.Salesforce
             {
                 // If the configuration values are provided, then all of them are required
                 authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, describeServiceRequest.configurationValues, true);
-                username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, describeServiceRequest.configurationValues, true);
-                password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, describeServiceRequest.configurationValues, true);
                 chatterBaseUrl = ValueUtils.GetContentValue(SERVICE_VALUE_CHATTER_BASE_URL, describeServiceRequest.configurationValues, true);
                 adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, describeServiceRequest.configurationValues, true);
 
                 // Get the optional values
+                username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, describeServiceRequest.configurationValues, false);
+                password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, describeServiceRequest.configurationValues, false);
+                refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, describeServiceRequest.configurationValues, false);
                 securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, describeServiceRequest.configurationValues, false);
                 consumerSecret = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_SECRET, describeServiceRequest.configurationValues, false);
                 consumerKey = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_KEY, describeServiceRequest.configurationValues, false);
@@ -189,19 +195,20 @@ namespace ManyWho.Service.Salesforce
             describeServiceResponse.culture.variant = null;
             describeServiceResponse.providesDatabase = true;
             describeServiceResponse.providesLogic = true;
-            describeServiceResponse.providesViews = false;
+            describeServiceResponse.providesFiles = false;
             describeServiceResponse.providesIdentity = true;
             describeServiceResponse.providesSocial = true;
 
             // Create the main configuration values
             describeServiceResponse.configurationValues = new List<DescribeValueAPI>();
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_URL, authenticationUrl, true));
-            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_USERNAME, username, true));
-            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_PASSWORD, password, true));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CHATTER_BASE_URL, chatterBaseUrl, true));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_ADMIN_EMAIL, adminEmail, true));
 
             // The optional configuration values
+            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_USERNAME, username, false));
+            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_PASSWORD, password, false));
+            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_REFRESH_TOKEN, password, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_SECURITY_TOKEN, securityToken, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_CONSUMER_SECRET, consumerSecret, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CONSUMER_KEY, consumerKey, false));
@@ -214,12 +221,10 @@ namespace ManyWho.Service.Salesforce
             describeServiceResponse.configurationValues.Add(new DescribeValueAPI() { contentType = ManyWhoConstants.CONTENT_TYPE_STRING, developerName = ManyWhoUtilsSingleton.APP_SETTING_EMAIL_ACCOUNT_SMTP, contentValue = emailSmtp, isRequired = false });
 
             // If the user has provided these values as part of a re-submission, we can then go about configuring the rest of the service
-            if (authenticationUrl != null &&
-                authenticationUrl.Trim().Length > 0 && 
-                username != null &&
-                username.Trim().Length > 0 &&
-                password != null &&
-                password.Trim().Length > 0)
+            if (String.IsNullOrWhiteSpace(authenticationUrl) == false && 
+                ((String.IsNullOrWhiteSpace(username) == false &&
+                  String.IsNullOrWhiteSpace(password) == false) ||
+                 (String.IsNullOrWhiteSpace(refreshToken) == false)))
             {
                 describeServiceResponse.actions = new List<DescribeServiceActionResponseAPI>();
 
@@ -341,6 +346,237 @@ namespace ManyWho.Service.Salesforce
             }
 
             return describeServiceResponse;
+        }
+
+        public String PushServiceInstall(String authenticationUrl, String code, String authorToken, String tenantId, String serviceElementId)
+        {
+            ValueElementRequestAPI valueElementRequest = null;
+            ValueElementResponseAPI valueElementResponseAuthenticationUrl = null;
+            ValueElementResponseAPI valueElementResponseChatterBaseUrl = null;
+            ValueElementResponseAPI valueElementResponseAdminEmail = null;
+            ValueElementResponseAPI valueElementResponseAuthenticationStrategy = null;
+            ValueElementResponseAPI valueElementResponseRefreshToken = null;
+            ServiceElementRequestAPI serviceElementRequest = null;
+            ServiceElementResponseAPI serviceElementResponse = null;
+
+            // Get the authentication information about this user based on them successfully authenticating
+            SalesforceAuthenticatedWhoResultAPI authenticatedWhoResult = this.LoginUsingOAuth2Code(
+                SalesforceHttpSingleton.CONSUMER_KEY,
+                SalesforceHttpSingleton.CONSUMER_SECRET,
+                "http://localhost:20385/plugins/api/salesforce/1/oauth2",
+                authenticationUrl,
+                code);
+
+            if (String.IsNullOrWhiteSpace(serviceElementId) == true)
+            {
+                // This is a fresh installation of the service, so we simply add a new one to the modeling API
+                serviceElementRequest = new ServiceElementRequestAPI();
+                serviceElementRequest.developerName = "Salesforce Service";
+                serviceElementRequest.developerSummary = "The Service for connecting to Salesforce.";
+                serviceElementRequest.elementType = ManyWhoConstants.SERVICE_ELEMENT_TYPE_IMPLEMENTATION_SERVICE;
+                serviceElementRequest.uri = "http://localhost:20385/plugins/api/salesforce/1";
+                serviceElementRequest.format = "JSON";
+                serviceElementRequest.providesDatabase = true;
+                serviceElementRequest.providesLogic = true;
+                serviceElementRequest.providesIdentity = true;
+                serviceElementRequest.providesSocial = true;
+                serviceElementRequest.providesFiles = true;
+
+                // Create the actual values
+                valueElementRequest = new ValueElementRequestAPI();
+                valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_AUTHENTICATION_URL;
+                valueElementRequest.developerSummary = "The URL that should be used to authenticate Salesforce users.";
+                valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                valueElementRequest.isFixed = true;
+                valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_STRING;
+                valueElementRequest.defaultContentValue = authenticationUrl;
+
+                valueElementResponseAuthenticationUrl = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                valueElementRequest = new ValueElementRequestAPI();
+                valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_CHATTER_BASE_URL;
+                valueElementRequest.developerSummary = "The Chatter Base URL that should be used to interact with Salesforce.";
+                valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                valueElementRequest.isFixed = true;
+                valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_STRING;
+                valueElementRequest.defaultContentValue = authenticatedWhoResult.chatterBaseUrl;
+
+                valueElementResponseChatterBaseUrl = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                valueElementRequest = new ValueElementRequestAPI();
+                valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_ADMIN_EMAIL;
+                valueElementRequest.developerSummary = "The Admin Email that should be used for any notifications from the Salesforce Service.";
+                valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                valueElementRequest.isFixed = true;
+                valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_STRING;
+                valueElementRequest.defaultContentValue = authenticatedWhoResult.email;
+
+                valueElementResponseAdminEmail = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                valueElementRequest = new ValueElementRequestAPI();
+                valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_AUTHENTICATION_STRATEGY;
+                valueElementRequest.developerSummary = "The Authentication Strategy that should be used when accessing the Salesforce Service.";
+                valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                valueElementRequest.isFixed = true;
+                valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_STRING;
+                valueElementRequest.defaultContentValue = "Standard";
+
+                valueElementResponseAuthenticationStrategy = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                valueElementRequest = new ValueElementRequestAPI();
+                valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_REFRESH_TOKEN;
+                valueElementRequest.developerSummary = "The Refresh Token that should be used when accessing the Salesforce Service as a Flow Builder.";
+                valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                valueElementRequest.isFixed = true;
+                valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_PASSWORD;
+                valueElementRequest.defaultContentValue = authenticatedWhoResult.refreshToken;
+
+                valueElementResponseRefreshToken = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                // Create the main configuration values
+                serviceElementRequest.configurationValues = new List<ServiceValueRequestAPI>();
+                serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_URL, valueElementResponseAuthenticationUrl));
+                serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CHATTER_BASE_URL, valueElementResponseChatterBaseUrl));
+                serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_ADMIN_EMAIL, valueElementResponseAdminEmail));
+                serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_STRATEGY, valueElementResponseAuthenticationStrategy));
+                serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_REFRESH_TOKEN, valueElementResponseRefreshToken));
+
+                serviceElementResponse = SalesforceHttpSingleton.GetInstance().SaveService(authorToken, tenantId, serviceElementRequest);
+
+                // Pull out the Service Element identifier so we can return it from this call
+                serviceElementId = serviceElementResponse.id;
+            }
+            else
+            {
+                // Load the service, load the values, update everything appropriately
+                serviceElementResponse = SalesforceHttpSingleton.GetInstance().LoadService(authorToken, tenantId, serviceElementId);
+
+                if (serviceElementResponse == null)
+                {
+                    throw new ArgumentNullException("ServiceElement", "No Service could be found for the provided identifier: " + serviceElementId);
+                }
+
+                ServiceValueRequestAPI serviceValueRequestRefreshToken = null;
+                ServiceValueRequestAPI serviceValueRequestAuthenticationUrl = null;
+                ServiceValueRequestAPI serviceValueRequestChatterBaseUrl = null;
+
+                if (serviceElementResponse.configurationValues != null &&
+                    serviceElementResponse.configurationValues.Count > 0)
+                {
+                    foreach (ServiceValueRequestAPI serviceValueRequest in serviceElementResponse.configurationValues)
+                    {
+                        if (string.IsNullOrWhiteSpace(serviceValueRequest.developerName) == false)
+                        {
+                            if (serviceValueRequest.developerName.Equals(SERVICE_VALUE_REFRESH_TOKEN, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                valueElementResponseRefreshToken = SalesforceHttpSingleton.GetInstance().LoadValue(authorToken, tenantId, serviceValueRequest.valueElementToReferenceId);
+                                serviceValueRequestRefreshToken = serviceValueRequest;
+                            }
+
+                            if (serviceValueRequest.developerName.Equals(SERVICE_VALUE_AUTHENTICATION_URL, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                valueElementResponseAuthenticationUrl = SalesforceHttpSingleton.GetInstance().LoadValue(authorToken, tenantId, serviceValueRequest.valueElementToReferenceId);
+                                serviceValueRequestAuthenticationUrl = serviceValueRequest;
+                            }
+
+                            if (serviceValueRequest.developerName.Equals(SERVICE_VALUE_CHATTER_BASE_URL, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                valueElementResponseChatterBaseUrl = SalesforceHttpSingleton.GetInstance().LoadValue(authorToken, tenantId, serviceValueRequest.valueElementToReferenceId);
+                                serviceValueRequestChatterBaseUrl = serviceValueRequest;
+                            }
+                        }
+                    }
+                }
+
+                if (serviceElementRequest.configurationValues == null)
+                {
+                    serviceElementRequest.configurationValues = new List<ServiceValueRequestAPI>();
+                }
+
+                if (valueElementResponseRefreshToken == null)
+                {
+                    valueElementRequest = new ValueElementRequestAPI();
+                    valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_REFRESH_TOKEN;
+                    valueElementRequest.developerSummary = "The Refresh Token that should be used when accessing the Salesforce Service as a Flow Builder.";
+                    valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                    valueElementRequest.isFixed = true;
+                    valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                    valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_PASSWORD;
+                    valueElementRequest.defaultContentValue = authenticatedWhoResult.refreshToken;
+                }
+                else
+                {
+                    valueElementRequest = valueElementResponseRefreshToken;
+                    valueElementRequest.defaultContentValue = authenticatedWhoResult.refreshToken;
+                }
+
+                valueElementResponseRefreshToken = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                if (serviceValueRequestRefreshToken == null)
+                {
+                    serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_REFRESH_TOKEN, valueElementResponseRefreshToken));
+                }
+
+                if (valueElementResponseAuthenticationUrl == null)
+                {
+                    valueElementRequest = new ValueElementRequestAPI();
+                    valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_AUTHENTICATION_URL;
+                    valueElementRequest.developerSummary = "The URL that should be used to authenticate Salesforce users.";
+                    valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                    valueElementRequest.isFixed = true;
+                    valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                    valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_STRING;
+                    valueElementRequest.defaultContentValue = authenticationUrl;
+                }
+                else
+                {
+                    valueElementRequest = valueElementResponseAuthenticationUrl;
+                    valueElementRequest.defaultContentValue = authenticationUrl;
+                }
+
+                valueElementResponseAuthenticationUrl = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                if (serviceValueRequestAuthenticationUrl == null)
+                {
+                    serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_URL, valueElementResponseAuthenticationUrl));
+                }
+
+                if (valueElementResponseChatterBaseUrl == null)
+                {
+                    valueElementRequest = new ValueElementRequestAPI();
+                    valueElementRequest.developerName = "Salesforce " + SERVICE_VALUE_CHATTER_BASE_URL;
+                    valueElementRequest.developerSummary = "The Chatter Base URL that should be used to interact with Salesforce.";
+                    valueElementRequest.elementType = ManyWhoConstants.SHARED_ELEMENT_TYPE_IMPLEMENTATION_VARIABLE;
+                    valueElementRequest.isFixed = true;
+                    valueElementRequest.access = ManyWhoConstants.ACCESS_PRIVATE;
+                    valueElementRequest.contentType = ManyWhoConstants.CONTENT_TYPE_STRING;
+                    valueElementRequest.defaultContentValue = authenticatedWhoResult.chatterBaseUrl;
+                }
+                else
+                {
+                    valueElementRequest = valueElementResponseChatterBaseUrl;
+                    valueElementRequest.defaultContentValue = authenticatedWhoResult.chatterBaseUrl;
+                }
+
+                valueElementResponseChatterBaseUrl = SalesforceHttpSingleton.GetInstance().SaveValue(authorToken, tenantId, valueElementRequest);
+
+                if (serviceValueRequestChatterBaseUrl == null)
+                {
+                    serviceElementRequest.configurationValues.Add(DescribeUtils.CreateServiceValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CHATTER_BASE_URL, valueElementResponseChatterBaseUrl));
+                }
+
+                serviceElementResponse = SalesforceHttpSingleton.GetInstance().SaveService(authorToken, tenantId, serviceElementRequest);
+
+                // Pull out the Service Element identifier so we can return it from this call
+                serviceElementId = serviceElementResponse.id;
+            }
+
+            return serviceElementId;
         }
 
         /// <summary>
@@ -496,6 +732,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String adminEmail = null;
             Int32 outcomeCount = 0;
             Int32 percentage = 0;
@@ -519,8 +756,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to check the voting status
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, voteRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, voteRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, voteRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, voteRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, voteRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, voteRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, voteRequestAPI.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, voteRequestAPI.configurationValues, true);
 
@@ -602,6 +840,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String adminEmail = null;
 
             if (listenerServiceRequestAPI == null)
@@ -617,8 +856,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to check the voting status
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, listenerServiceRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, listenerServiceRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, listenerServiceRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, listenerServiceRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, listenerServiceRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, listenerServiceRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, listenerServiceRequestAPI.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, listenerServiceRequestAPI.configurationValues, true);
 
@@ -651,6 +891,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String textBody = null;
             String htmlBody = null;
 
@@ -673,8 +914,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to check the voting status
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, serviceNotificationRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, serviceNotificationRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, serviceNotificationRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, serviceNotificationRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, serviceNotificationRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, serviceNotificationRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, serviceNotificationRequestAPI.configurationValues, false);
 
             // We need to get the users from salesforce
@@ -718,6 +960,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String adminEmail = null;
 
             if (objectDataRequestAPI == null)
@@ -733,8 +976,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to save data to salesforce.com
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, objectDataRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, objectDataRequestAPI.configurationValues, true);
 
@@ -772,6 +1016,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
 
             if (objectDataRequestAPI == null)
             {
@@ -786,8 +1031,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to load data from salesforce.com
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, objectDataRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
 
             // Create a new response object to house our results
@@ -970,6 +1216,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
 
             if (objectDataRequestAPI == null)
             {
@@ -984,8 +1231,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to load the list of users
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, objectDataRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
 
             // Create an object data response object
@@ -1128,6 +1376,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
 
             if (objectDataRequestAPI == null)
             {
@@ -1142,8 +1391,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration values out that are needed to load the list of groups
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, objectDataRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
 
             // Create an object data response object
@@ -1286,70 +1536,7 @@ namespace ManyWho.Service.Salesforce
                 {
                     if (String.IsNullOrWhiteSpace(authenticationCredentialsAPI.code) == false)
                     {
-                        Task<HttpResponseMessage> message = null;
-                        FormUrlEncodedContent form = null;
-                        HttpClient client = null;
-                        JObject jsonObject = null;
-                        String serviceRefreshToken = null;
-                        String serviceToken = null;
-                        String result = null;
-                        String identityUrl = null;
-
-                        String endpoint = loginUrl + "/services/oauth2/token";
-                        Dictionary<String, String> body = null;
-
-                        body = new Dictionary<String, String>();
-                        body.Add("client_id", consumerKey);
-                        body.Add("redirect_uri", authenticationCredentialsAPI.redirectUri);
-                        body.Add("client_secret", consumerSecret);
-                        body.Add("grant_type", "authorization_code");
-                        body.Add("code", authenticationCredentialsAPI.code);
-
-                        client = new HttpClient();
-                        form = new FormUrlEncodedContent(body);
-
-                        // Send the request over
-                        message = client.PostAsync(endpoint, form);
-                        result = message.Result.Content.ReadAsStringAsync().Result;
-                        jsonObject = JObject.Parse(result);
-
-                        // Get the token information back
-                        serviceToken = (String)jsonObject["access_token"];
-                        serviceRefreshToken = (String)jsonObject["refresh_token"];
-                        identityUrl = (String)jsonObject["id"];
-
-                        // Now we have the identity URL, we do a GET to get the complete user info
-                        client.DefaultRequestHeaders.Add("Authorization", "Bearer " + serviceToken);
-                        message = client.GetAsync(identityUrl);
-                        result = message.Result.Content.ReadAsStringAsync().Result;
-                        jsonObject = JObject.Parse(result);
-
-                        // Assign the token to the authenticated user
-                        authenticatedUser.token = serviceToken;
-
-                        // Get the user info out so we can send it back
-                        authenticatedUser.userId = (String)jsonObject["user_id"];
-                        authenticatedUser.username = (String)jsonObject["username"];
-                        authenticatedUser.tenantName = (String)jsonObject["organization_id"];
-                        authenticatedUser.directoryId = (String)jsonObject["organization_id"];
-                        authenticatedUser.directoryName = (String)jsonObject["organization_id"];
-                        authenticatedUser.email = (String)jsonObject["email"];
-                        authenticatedUser.firstName = (String)jsonObject["first_name"];
-                        authenticatedUser.lastName = (String)jsonObject["last_name"];
-                        authenticatedUser.status = ManyWhoConstants.AUTHENTICATED_USER_STATUS_AUTHENTICATED;
-                        authenticatedUser.statusMessage = null;
-                        authenticatedUser.token = this.CreateSalesforceAuthenticationToken(serviceToken, chatterBaseUrl + "/services/Soap/u/35.0");
-
-                        // Check to make sure we're sending back a valid user as names can be empty
-                        if (String.IsNullOrWhiteSpace(authenticatedUser.firstName) == true)
-                        {
-                            authenticatedUser.firstName = "(blank)";
-                        }
-
-                        if (String.IsNullOrWhiteSpace(authenticatedUser.lastName) == true)
-                        {
-                            authenticatedUser.lastName = "(blank)";
-                        }
+                        authenticatedUser = this.LoginUsingOAuth2Code(consumerKey, consumerSecret, authenticationCredentialsAPI.redirectUri, loginUrl, authenticationCredentialsAPI.code);
                     }
                 }
                 else
@@ -1398,6 +1585,131 @@ namespace ManyWho.Service.Salesforce
             return authenticatedUser;
         }
 
+        public SalesforceAuthenticatedWhoResultAPI LoginUsingOAuth2Code(String consumerKey, String consumerSecret, String redirectUri, String loginUrl, String code)
+        {
+            SalesforceAuthenticatedWhoResultAPI authenticatedWhoResult = null;
+            Task<HttpResponseMessage> message = null;
+            FormUrlEncodedContent form = null;
+            HttpClient client = null;
+            JObject jsonObject = null;
+            String chatterBaseUrl = null;
+            String serviceRefreshToken = null;
+            String serviceToken = null;
+            String result = null;
+            String identityUrl = null;
+
+            String endpoint = loginUrl + "/services/oauth2/token";
+            Dictionary<String, String> body = null;
+
+            body = new Dictionary<String, String>();
+            body.Add("client_id", consumerKey);
+            body.Add("redirect_uri", redirectUri);
+            body.Add("client_secret", consumerSecret);
+            body.Add("grant_type", "authorization_code");
+            body.Add("code", code);
+
+            client = new HttpClient();
+            form = new FormUrlEncodedContent(body);
+
+            // Send the request over
+            message = client.PostAsync(endpoint, form);
+            result = message.Result.Content.ReadAsStringAsync().Result;
+            jsonObject = JObject.Parse(result);
+
+            // Get the token information back
+            serviceToken = (String)jsonObject["access_token"];
+            serviceRefreshToken = (String)jsonObject["refresh_token"];
+            chatterBaseUrl = (String)jsonObject["instance_url"];
+            identityUrl = (String)jsonObject["id"];
+
+            // Trim the final trailing slash from the chatter base url
+            if (chatterBaseUrl.EndsWith("/"))
+            {
+                chatterBaseUrl = chatterBaseUrl.Substring(0, chatterBaseUrl.LastIndexOf("/") - 1);
+            }
+
+            // Now we have the identity URL, we do a GET to get the complete user info
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + serviceToken);
+            message = client.GetAsync(identityUrl);
+            result = message.Result.Content.ReadAsStringAsync().Result;
+            jsonObject = JObject.Parse(result);
+
+            authenticatedWhoResult = new SalesforceAuthenticatedWhoResultAPI();
+
+            // Assign the token to the authenticated user
+            authenticatedWhoResult.token = serviceToken;
+
+            // Get the user info out so we can send it back
+            authenticatedWhoResult.userId = (String)jsonObject["user_id"];
+            authenticatedWhoResult.username = (String)jsonObject["username"];
+            authenticatedWhoResult.tenantName = (String)jsonObject["organization_id"];
+            authenticatedWhoResult.directoryId = (String)jsonObject["organization_id"];
+            authenticatedWhoResult.directoryName = (String)jsonObject["organization_id"];
+            authenticatedWhoResult.email = (String)jsonObject["email"];
+            authenticatedWhoResult.firstName = (String)jsonObject["first_name"];
+            authenticatedWhoResult.lastName = (String)jsonObject["last_name"];
+            authenticatedWhoResult.status = ManyWhoConstants.AUTHENTICATED_USER_STATUS_AUTHENTICATED;
+            authenticatedWhoResult.statusMessage = null;
+            authenticatedWhoResult.token = this.CreateSalesforceAuthenticationToken(serviceToken, chatterBaseUrl + "/services/Soap/u/35.0");
+
+            // Extension properties to assist managing identity in the service
+            authenticatedWhoResult.chatterBaseUrl = chatterBaseUrl;
+            authenticatedWhoResult.refreshToken = serviceRefreshToken;
+
+            // Check to make sure we're sending back a valid user as names can be empty
+            if (String.IsNullOrWhiteSpace(authenticatedWhoResult.firstName) == true)
+            {
+                authenticatedWhoResult.firstName = "(blank)";
+            }
+
+            if (String.IsNullOrWhiteSpace(authenticatedWhoResult.lastName) == true)
+            {
+                authenticatedWhoResult.lastName = "(blank)";
+            }
+
+            return authenticatedWhoResult;
+        }
+
+        public SforceService LoginUsingOAuth2RefreshToken(String loginUrl, String refreshToken)
+        {
+            Task<HttpResponseMessage> message = null;
+            FormUrlEncodedContent form = null;
+            HttpClient client = null;
+            JObject jsonObject = null;
+            String chatterBaseUrl = null;
+            String serviceToken = null;
+            String result = null;
+
+            String endpoint = loginUrl + "/services/oauth2/token";
+            Dictionary<String, String> body = null;
+
+            body = new Dictionary<String, String>();
+            body.Add("client_id", SalesforceHttpSingleton.CONSUMER_KEY);
+            body.Add("client_secret", SalesforceHttpSingleton.CONSUMER_SECRET);
+            body.Add("grant_type", "refresh_token");
+            body.Add("refresh_token", refreshToken);
+
+            client = new HttpClient();
+            form = new FormUrlEncodedContent(body);
+
+            // Send the request over
+            message = client.PostAsync(endpoint, form);
+            result = message.Result.Content.ReadAsStringAsync().Result;
+            jsonObject = JObject.Parse(result);
+
+            // Get the token information back
+            serviceToken = (String)jsonObject["access_token"];
+            chatterBaseUrl = (String)jsonObject["instance_url"];
+
+            // Trim the final trailing slash from the chatter base url
+            if (chatterBaseUrl.EndsWith("/"))
+            {
+                chatterBaseUrl = chatterBaseUrl.Substring(0, chatterBaseUrl.LastIndexOf("/") - 1);
+            }
+
+            return SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(serviceToken, chatterBaseUrl + "/services/Soap/u/35.0");
+        }
+
         /// <summary>
         /// This method is used to create a new activity stream in salesforce based on the provided configuration.
         /// </summary>
@@ -1410,6 +1722,7 @@ namespace ManyWho.Service.Salesforce
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String streamId = null;
             String adminEmail = null;
 
@@ -1431,8 +1744,9 @@ namespace ManyWho.Service.Salesforce
 
             // Grab the required configuration values needed to create the stream
             authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, socialServiceRequestAPI.configurationValues, true);
-            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, socialServiceRequestAPI.configurationValues, true);
-            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, socialServiceRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, socialServiceRequestAPI.configurationValues, false);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, socialServiceRequestAPI.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, socialServiceRequestAPI.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, socialServiceRequestAPI.configurationValues, false);
             adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, socialServiceRequestAPI.configurationValues, true);
 
@@ -2633,6 +2947,7 @@ namespace ManyWho.Service.Salesforce
             String parentRecordId = null;
             String authenticationUrl = null;
             String securityToken = null;
+            String refreshToken = null;
             String username = null;
             String password = null;
             String fileUrl = null;
@@ -2655,8 +2970,9 @@ namespace ManyWho.Service.Salesforce
             // Get the configuration information out of the request
             fileUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_CHATTER_BASE_URL, fileDataRequest.configurationValues, true);
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, fileDataRequest.configurationValues, true);
-            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, fileDataRequest.configurationValues, true);
-            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, fileDataRequest.configurationValues, true);
+            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, fileDataRequest.configurationValues, false);
+            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, fileDataRequest.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, fileDataRequest.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, fileDataRequest.configurationValues, false);
 
             // Get the parent record identifier
@@ -2764,6 +3080,7 @@ namespace ManyWho.Service.Salesforce
             INotifier notifier = null;
             String authenticationUrl = null;
             String securityToken = null;
+            String refreshToken = null;
             String username = null;
             String password = null;
             String parentRecordId = null;
@@ -2812,8 +3129,9 @@ namespace ManyWho.Service.Salesforce
 
             // Get the configuration information out
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, fileDataRequest.configurationValues, true);
-            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, fileDataRequest.configurationValues, true);
-            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, fileDataRequest.configurationValues, true);
+            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, fileDataRequest.configurationValues, false);
+            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, fileDataRequest.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SERVICE_VALUE_REFRESH_TOKEN, fileDataRequest.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, fileDataRequest.configurationValues, false);
 
             // Login to the salesforce service

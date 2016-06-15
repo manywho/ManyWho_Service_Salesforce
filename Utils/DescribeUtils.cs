@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ManyWho.Flow.SDK;
 using ManyWho.Flow.SDK.Describe;
-using ManyWho.Flow.SDK.Draw.Elements.UI;
-using ManyWho.Flow.SDK.Draw.Elements.Type;
-using ManyWho.Flow.SDK.Run.Elements.UI;
-using ManyWho.Flow.SDK.Run.Elements.Config;
+using ManyWho.Flow.SDK.Draw.Elements.Value;
+using ManyWho.Flow.SDK.Draw.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 
 namespace ManyWho.Service.Salesforce
@@ -25,6 +21,23 @@ namespace ManyWho.Service.Salesforce
             describeValue.isRequired = required;
 
             return describeValue;
+        }
+
+        public static ServiceValueRequestAPI CreateServiceValue(String contentType, String developerName, ValueElementResponseAPI valueElementResponse)
+        {
+            ServiceValueRequestAPI serviceValue = null;
+
+            serviceValue = new ServiceValueRequestAPI();
+            serviceValue.contentType = contentType;
+            serviceValue.developerName = developerName;
+
+            if (valueElementResponse != null)
+            {
+                serviceValue.valueElementToReferenceId = new ValueElementIdAPI();
+                serviceValue.valueElementToReferenceId.id = valueElementResponse.id;
+            }
+
+            return serviceValue;
         }
 
         public static ObjectAPI CreateAttributeObject(String label, String value)

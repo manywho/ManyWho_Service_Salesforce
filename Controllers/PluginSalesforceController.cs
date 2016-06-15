@@ -18,6 +18,7 @@ using ManyWho.Flow.SDK.Social;
 using ManyWho.Service.Salesforce;
 using ManyWho.Service.Salesforce.Utils;
 using ManyWho.Service.Salesforce.Models.Canvas;
+using ManyWho.Service.Salesforce.Singletons;
 
 /*!
 
@@ -47,6 +48,46 @@ namespace ManyWho.Flow.Web.Controllers
         public String Health()
         {
             return "OK";
+        }
+
+        [HttpGet]
+        [ActionName("StartOAuth2Install")]
+        public HttpResponseMessage StartOAuth2Install(String authentication_url = null, String tenant_id = null, String author_token = null, String service_element_id = null)
+        {
+            Validation.Instance.IsNotNullOrWhiteSpace(authentication_url, "authentication_url", "The Authentication Url cannot be null or blank when installing the Salesforce Service.")
+                .IsNotNullOrWhiteSpace(author_token, "author_token", "The Author Token cannot be null or blank when installing the Salesforce Service.")
+                .IsNotNullOrWhiteSpace(tenant_id, "tenant_id", "The Tenant Id cannot be null or blank when installing the Salesforce Service.");
+
+            String redirectUri = SalesforceHttpSingleton.GetInstance().GetOAuth2InstallUrl(authentication_url, tenant_id, author_token, service_element_id);
+
+            // Send the user to the oauth2 page for salesforce
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.RedirectMethod, redirectUri);
+            response.Headers.Add("Location", redirectUri);
+
+            return response;
+        }
+
+        [HttpGet]
+        [ActionName("AuthenticateWithOAuth2")]
+        public HttpResponseMessage AuthenticateWithOAuth2(string code = null, string state = null, string error = null, string error_description = null)
+        {
+            Validation.Instance.IsNullOrWhiteSpace(error, "Error", error + ": " + error_description)
+                               .IsNotNullOrWhiteSpace(code, "Code", "The OAuth authentication code is null or blank")
+                               .IsNotNullOrWhiteSpace(state, "State", "The OAuth authentication state is null or blank");
+
+            String authenticationUrl = SalesforceHttpSingleton.GetInstance().GetAuthenticationUrlFromOAuthState(state);
+            String authorToken = SalesforceHttpSingleton.GetInstance().GetAuthorTokenFromOAuthState(state);
+            String tenantId = SalesforceHttpSingleton.GetInstance().GetTenantIdFromOAuthState(state);
+            String serviceElementId = SalesforceHttpSingleton.GetInstance().GetServiceElementIdFromOAuthState(state);
+
+            // Install the base service information into ManyWho
+            serviceElementId = SalesforceServiceSingleton.GetInstance().PushServiceInstall(authenticationUrl, code, authorToken, tenantId, serviceElementId);
+
+            // Send the user a response page
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(serviceElementId);
+
+            return response;
         }
 
         [HttpGet]

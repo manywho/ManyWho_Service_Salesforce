@@ -1845,6 +1845,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             String authenticationStrategy = null;
             String authenticationUrl = null;
             String securityToken = null;
+            String refreshToken = null;
             String username = null;
             String password = null;
 
@@ -1877,11 +1878,19 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 // Grab the actual configuration values out
                 authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, configurationValues, true);
-                username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, configurationValues, true);
-                password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, configurationValues, true);
+                username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, configurationValues, false);
+                password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, configurationValues, false);
+                refreshToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_REFRESH_TOKEN, configurationValues, false);
                 securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, configurationValues, false);
 
-                sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
+                if (string.IsNullOrWhiteSpace(username) == false)
+                {
+                    sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
+                }
+                else
+                {
+                    sforceService = SalesforceServiceSingleton.GetInstance().LoginUsingOAuth2RefreshToken(authenticationUrl, refreshToken);
+                }
             }
             else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
                      authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)

@@ -112,6 +112,12 @@
           <xsd:element name="value" type="xsd:string" />
         </xsd:sequence>
       </xsd:complexType>
+      <xsd:complexType name="NameObjectValuePair">
+        <xsd:sequence>
+          <xsd:element name="name" type="xsd:string" />
+          <xsd:element maxOccurs="unbounded" name="value" type="xsd:anyType" />
+        </xsd:sequence>
+      </xsd:complexType>
       <xsd:complexType name="GetUpdatedResult">
         <xsd:sequence>
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="ids" type="tns:ID" />
@@ -271,6 +277,7 @@
           <xsd:enumeration value="ENVIRONMENT_HUB_MEMBERSHIP_USER_ALREADY_IN_HUB" />
           <xsd:enumeration value="ENVIRONMENT_HUB_MEMBERSHIP_USER_NOT_ORG_ADMIN" />
           <xsd:enumeration value="ERROR_IN_MAILER" />
+          <xsd:enumeration value="EXCHANGE_WEB_SERVICES_URL_INVALID" />
           <xsd:enumeration value="FAILED_ACTIVATION" />
           <xsd:enumeration value="FIELD_CUSTOM_VALIDATION_EXCEPTION" />
           <xsd:enumeration value="FIELD_FILTER_VALIDATION_EXCEPTION" />
@@ -278,9 +285,15 @@
           <xsd:enumeration value="FIELD_KEYWORD_LIST_MATCH_LIMIT" />
           <xsd:enumeration value="FIELD_MODERATION_RULE_BLOCK" />
           <xsd:enumeration value="FIELD_NOT_UPDATABLE" />
+          <xsd:enumeration value="FILE_EXTENSION_NOT_ALLOWED" />
+          <xsd:enumeration value="FILE_SIZE_LIMIT_EXCEEDED" />
           <xsd:enumeration value="FILTERED_LOOKUP_LIMIT_EXCEEDED" />
           <xsd:enumeration value="FIND_DUPLICATES_ERROR" />
           <xsd:enumeration value="FUNCTIONALITY_NOT_ENABLED" />
+          <xsd:enumeration value="GMAIL_TRANSPORT_CONNECTION_ERROR" />
+          <xsd:enumeration value="GMAIL_TRANSPORT_PERMISSION_ERROR" />
+          <xsd:enumeration value="GMAIL_TRANSPORT_TOKEN_ERROR" />
+          <xsd:enumeration value="GMAIL_TRANSPORT_UNKNOWN_ERROR" />
           <xsd:enumeration value="HTML_FILE_UPLOAD_NOT_ALLOWED" />
           <xsd:enumeration value="IMAGE_TOO_LARGE" />
           <xsd:enumeration value="INACTIVE_OWNER_OR_USER" />
@@ -309,6 +322,7 @@
           <xsd:enumeration value="INVALID_ENTITY_FOR_MATCH_ENGINE_ERROR" />
           <xsd:enumeration value="INVALID_ENTITY_FOR_MATCH_OPERATION_ERROR" />
           <xsd:enumeration value="INVALID_ENVIRONMENT_HUB_MEMBER" />
+          <xsd:enumeration value="INVALID_EVENT_DELIVERY" />
           <xsd:enumeration value="INVALID_EVENT_PUBLICATION" />
           <xsd:enumeration value="INVALID_FIELD" />
           <xsd:enumeration value="INVALID_FIELD_FOR_INSERT_UPDATE" />
@@ -374,6 +388,7 @@
           <xsd:enumeration value="MATCH_SERVICE_UNAVAILABLE_ERROR" />
           <xsd:enumeration value="MAXIMUM_CCEMAILS_EXCEEDED" />
           <xsd:enumeration value="MAXIMUM_DASHBOARD_COMPONENTS_EXCEEDED" />
+          <xsd:enumeration value="MAXIMUM_HIERARCHY_CHILDREN_REACHED" />
           <xsd:enumeration value="MAXIMUM_HIERARCHY_LEVELS_REACHED" />
           <xsd:enumeration value="MAXIMUM_SIZE_OF_ATTACHMENT" />
           <xsd:enumeration value="MAXIMUM_SIZE_OF_DOCUMENT" />
@@ -421,6 +436,8 @@
           <xsd:enumeration value="PORTAL_NO_ACCESS" />
           <xsd:enumeration value="PORTAL_USER_ALREADY_EXISTS_FOR_CONTACT" />
           <xsd:enumeration value="PRIVATE_CONTACT_ON_ASSET" />
+          <xsd:enumeration value="QA_INVALID_CREATE_FEED_ITEM" />
+          <xsd:enumeration value="QA_INVALID_SUCCESS_MESSAGE" />
           <xsd:enumeration value="QUERY_TIMEOUT" />
           <xsd:enumeration value="RECORD_IN_USE_BY_WORKFLOW" />
           <xsd:enumeration value="REPUTATION_MINIMUM_NUMBER_NOT_REACHED" />
@@ -451,6 +468,7 @@
           <xsd:enumeration value="UNAVAILABLE_RECORDTYPE_EXCEPTION" />
           <xsd:enumeration value="UNDELETE_FAILED" />
           <xsd:enumeration value="UNKNOWN_EXCEPTION" />
+          <xsd:enumeration value="UNSAFE_HTML_CONTENT" />
           <xsd:enumeration value="UNSPECIFIED_EMAIL_ADDRESS" />
           <xsd:enumeration value="UNSUPPORTED_APEX_TRIGGER_OPERATON" />
           <xsd:enumeration value="UNVERIFIED_SENDER_ADDRESS" />
@@ -509,6 +527,7 @@
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="feedItemIds" nillable="true" type="tns:ID" />
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="ids" nillable="true" type="tns:ID" />
           <xsd:element name="success" type="xsd:boolean" />
+          <xsd:element minOccurs="0" name="successMessage" nillable="true" type="xsd:string" />
         </xsd:sequence>
       </xsd:complexType>
       <xsd:complexType name="QuickActionTemplateResult">
@@ -694,6 +713,7 @@
           <xsd:element name="mruEnabled" type="xsd:boolean" />
           <xsd:element name="name" type="xsd:string" />
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="namedLayoutInfos" type="tns:NamedLayoutInfo" />
+          <xsd:element name="networkScopeFieldName" nillable="true" type="xsd:string" />
           <xsd:element name="queryable" type="xsd:boolean" />
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="recordTypeInfos" type="tns:RecordTypeInfo" />
           <xsd:element name="replicateable" type="xsd:boolean" />
@@ -825,6 +845,7 @@
       </xsd:complexType>
       <xsd:complexType name="Field">
         <xsd:sequence>
+          <xsd:element name="aggregatable" type="xsd:boolean" />
           <xsd:element name="autoNumber" type="xsd:boolean" />
           <xsd:element name="byteLength" type="xsd:int" />
           <xsd:element name="calculated" type="xsd:boolean" />
@@ -834,6 +855,7 @@
           <xsd:element minOccurs="0" name="controllerName" type="xsd:string" />
           <xsd:element name="createable" type="xsd:boolean" />
           <xsd:element name="custom" type="xsd:boolean" />
+          <xsd:element minOccurs="0" name="defaultValue" type="xsd:anyType" />
           <xsd:element minOccurs="0" name="defaultValueFormula" type="xsd:string" />
           <xsd:element name="defaultedOnCreate" type="xsd:boolean" />
           <xsd:element minOccurs="0" name="dependentPicklist" type="xsd:boolean" />
@@ -1810,7 +1832,7 @@
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:SoqlWhereCondition">
             <xsd:sequence>
-              <xsd:element maxOccurs="unbounded" name="conditions" type="tns:SoqlWhereCondition" />
+              <xsd:element minOccurs="0" maxOccurs="unbounded" name="conditions" type="tns:SoqlWhereCondition" />
               <xsd:element name="conjunction" type="tns:soqlConjunction" />
             </xsd:sequence>
           </xsd:extension>
@@ -1892,6 +1914,7 @@
       </xsd:complexType>
       <xsd:complexType name="ActionOverride">
         <xsd:sequence>
+          <xsd:element name="formFactor" type="xsd:string" />
           <xsd:element name="isAvailableInTouch" type="xsd:boolean" />
           <xsd:element name="name" type="xsd:string" />
           <xsd:element name="pageId" type="tns:ID" />
@@ -2708,6 +2731,7 @@
           <xsd:sequence>
             <xsd:element name="client" nillable="true" type="xsd:string" />
             <xsd:element name="defaultNamespace" nillable="true" type="xsd:string" />
+            <xsd:element name="returnFieldDataTypes" nillable="true" type="xsd:boolean" />
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
@@ -2892,7 +2916,9 @@
           <xsd:enumeration value="CONTENT_HUB_INVALID_OBJECT_TYPE_EXCEPTION" />
           <xsd:enumeration value="CONTENT_HUB_INVALID_PAGE_NUMBER_EXCEPTION" />
           <xsd:enumeration value="CONTENT_HUB_INVALID_PAYLOAD" />
+          <xsd:enumeration value="CONTENT_HUB_INVALID_RENDITION_PAGE_NUMBER_EXCEPTION" />
           <xsd:enumeration value="CONTENT_HUB_ITEM_TYPE_NOT_FOUND_EXCEPTION" />
+          <xsd:enumeration value="CONTENT_HUB_OBJECT_NOT_FOUND_EXCEPTION" />
           <xsd:enumeration value="CONTENT_HUB_OPERATION_NOT_SUPPORTED_EXCEPTION" />
           <xsd:enumeration value="CONTENT_HUB_SECURITY_EXCEPTION" />
           <xsd:enumeration value="CONTENT_HUB_TIMEOUT_EXCEPTION" />
@@ -2901,6 +2927,7 @@
           <xsd:enumeration value="CUSTOM_SETTINGS_LIMIT_EXCEEDED" />
           <xsd:enumeration value="DATACLOUD_API_CLIENT_EXCEPTION" />
           <xsd:enumeration value="DATACLOUD_API_DISABLED_EXCEPTION" />
+          <xsd:enumeration value="DATACLOUD_API_INVALID_QUERY_EXCEPTION" />
           <xsd:enumeration value="DATACLOUD_API_SERVER_BUSY_EXCEPTION" />
           <xsd:enumeration value="DATACLOUD_API_SERVER_EXCEPTION" />
           <xsd:enumeration value="DATACLOUD_API_TIMEOUT_EXCEPTION" />
@@ -2981,6 +3008,7 @@
           <xsd:enumeration value="MALFORMED_SEARCH" />
           <xsd:enumeration value="MISSING_ARGUMENT" />
           <xsd:enumeration value="MISSING_RECORD" />
+          <xsd:enumeration value="MODIFIED" />
           <xsd:enumeration value="MUTUAL_AUTHENTICATION_FAILED" />
           <xsd:enumeration value="NOT_ACCEPTABLE" />
           <xsd:enumeration value="NOT_MODIFIED" />
@@ -3046,7 +3074,9 @@
           <xsd:enumeration value="fns:CONTENT_HUB_INVALID_OBJECT_TYPE_EXCEPTION" />
           <xsd:enumeration value="fns:CONTENT_HUB_INVALID_PAGE_NUMBER_EXCEPTION" />
           <xsd:enumeration value="fns:CONTENT_HUB_INVALID_PAYLOAD" />
+          <xsd:enumeration value="fns:CONTENT_HUB_INVALID_RENDITION_PAGE_NUMBER_EXCEPTION" />
           <xsd:enumeration value="fns:CONTENT_HUB_ITEM_TYPE_NOT_FOUND_EXCEPTION" />
+          <xsd:enumeration value="fns:CONTENT_HUB_OBJECT_NOT_FOUND_EXCEPTION" />
           <xsd:enumeration value="fns:CONTENT_HUB_OPERATION_NOT_SUPPORTED_EXCEPTION" />
           <xsd:enumeration value="fns:CONTENT_HUB_SECURITY_EXCEPTION" />
           <xsd:enumeration value="fns:CONTENT_HUB_TIMEOUT_EXCEPTION" />
@@ -3055,6 +3085,7 @@
           <xsd:enumeration value="fns:CUSTOM_SETTINGS_LIMIT_EXCEEDED" />
           <xsd:enumeration value="fns:DATACLOUD_API_CLIENT_EXCEPTION" />
           <xsd:enumeration value="fns:DATACLOUD_API_DISABLED_EXCEPTION" />
+          <xsd:enumeration value="fns:DATACLOUD_API_INVALID_QUERY_EXCEPTION" />
           <xsd:enumeration value="fns:DATACLOUD_API_SERVER_BUSY_EXCEPTION" />
           <xsd:enumeration value="fns:DATACLOUD_API_SERVER_EXCEPTION" />
           <xsd:enumeration value="fns:DATACLOUD_API_TIMEOUT_EXCEPTION" />
@@ -3135,6 +3166,7 @@
           <xsd:enumeration value="fns:MALFORMED_SEARCH" />
           <xsd:enumeration value="fns:MISSING_ARGUMENT" />
           <xsd:enumeration value="fns:MISSING_RECORD" />
+          <xsd:enumeration value="fns:MODIFIED" />
           <xsd:enumeration value="fns:MUTUAL_AUTHENTICATION_FAILED" />
           <xsd:enumeration value="fns:NOT_ACCEPTABLE" />
           <xsd:enumeration value="fns:NOT_MODIFIED" />
@@ -5065,7 +5097,7 @@
   <service name="SforceService">
     <documentation>Sforce SOAP API</documentation>
     <port name="Soap" binding="tns:SoapBinding">
-      <soap:address location="https://login.salesforce.com/services/Soap/u/35.0" />
+      <soap:address location="https://login.salesforce.com/services/Soap/u/36.0" />
     </port>
   </service>
 </definitions>

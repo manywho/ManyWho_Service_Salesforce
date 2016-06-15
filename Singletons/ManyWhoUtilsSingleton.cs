@@ -64,12 +64,14 @@ namespace ManyWho.Service.ManyWho.Utils.Singletons
             String username = null;
             String password = null;
             String securityToken = null;
+            String refreshToken = null;
             String redirectUri = null;
 
             // Get the configuration information for salesforce
             authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, serviceRequest.configurationValues, true);
-            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, true);
-            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, true);
+            username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, serviceRequest.configurationValues, false);
+            password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, serviceRequest.configurationValues, false);
+            refreshToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_REFRESH_TOKEN, serviceRequest.configurationValues, false);
             securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, serviceRequest.configurationValues, false);
 
             // Get the values from the incoming request

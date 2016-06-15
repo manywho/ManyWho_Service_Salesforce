@@ -188,6 +188,7 @@
     <Compile Include="SalesforceServiceSingleton.cs" />
     <Compile Include="Singletons\ManyWhoUtilsSingleton.cs" />
     <Compile Include="Singletons\SalesforceCacheManagerSingleton.cs" />
+    <Compile Include="Singletons\SalesforceHttpSingleton.cs" />
     <Compile Include="Singletons\SalesforceListenerSingleton.cs" />
     <Compile Include="Singletons\SalesforceSocialSingleton.cs" />
     <Compile Include="Singletons\SalesforceAuthenticationSingleton.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="Utils\EmailNotifier.cs" />
     <Compile Include="Utils\PostgresDatabase.cs" />
     <Compile Include="Utils\PostgresDatabaseReader.cs" />
+    <Compile Include="Utils\SalesforceAuthenticatedWhoResultAPI.cs" />
     <Compile Include="Utils\SalesforceCanvasUtils.cs" />
     <Compile Include="Utils\SalesforceHttpUtils.cs" />
     <Compile Include="Utils\SettingUtils.cs" />
@@ -376,6 +378,7 @@
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.template.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Database\schema.sql" />
   </ItemGroup>
@@ -402,9 +405,6 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>ManyWho_Service_Salesforce_Salesforce_SforceService</CachedSettingsPropName>
     </WebReferenceUrl>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
