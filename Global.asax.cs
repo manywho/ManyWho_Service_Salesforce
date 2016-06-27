@@ -15,7 +15,7 @@ namespace ManyWho.Service.Salesforce
     {
         protected void Application_Start()
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             AreaRegistration.RegisterAllAreas();
 
