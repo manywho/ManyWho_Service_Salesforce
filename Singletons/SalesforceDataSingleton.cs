@@ -1799,9 +1799,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                         listFilterAPI.searchCriteria.Count > 0)
                     {
                         soql += " " + listFilterAPI.comparisonType + "(";
-                        soql += listFilterAPI.searchCriteria.Select(criteria => " " + criteria.columnName + " = " + listFilterAPI.search)
-                            .ToArray()
-                            .Join(" OR ");
+                        soql += string.Join(" OR ", listFilterAPI.searchCriteria.Select(criteria => " " + criteria.columnName + " = " + listFilterAPI.search).ToArray());                            
                         soql += ")";
                     }
                     
