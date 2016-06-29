@@ -1196,7 +1196,8 @@ namespace ManyWho.Service.Salesforce.Singletons
             // If the request has a search query, we need to alter the SOQL to SOSL
             if (listFilterAPI != null &&
                 listFilterAPI.search != null &&
-                listFilterAPI.search.Trim().Length > 0)
+                listFilterAPI.search.Trim().Length > 0 &&
+                listFilterAPI.searchCriteria == null)
             {
                 // Remove the final coma
                 String fields = soqlQuery.Substring(0, soqlQuery.Length - 2);
@@ -1794,6 +1795,15 @@ namespace ManyWho.Service.Salesforce.Singletons
                         }
                     }
 
+                    if (!string.IsNullOrEmpty(listFilterAPI.search) &&
+                        listFilterAPI.searchCriteria != null &&
+                        listFilterAPI.searchCriteria.Count > 0)
+                    {
+                        soql += " " + listFilterAPI.comparisonType + "(";
+                        soql += string.Join(" OR ", listFilterAPI.searchCriteria.Select(criteria => " " + criteria.columnName + " = '" + listFilterAPI.search + "'").ToArray());                            
+                        soql += ")";
+                    }
+                    
                     if (listFilterAPI.orderByPropertyDeveloperName != null &&
                         listFilterAPI.orderByPropertyDeveloperName.Trim().Length > 0)
                     {
