@@ -1014,6 +1014,7 @@ namespace ManyWho.Service.Salesforce
                 typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
                 typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Email" });
                 typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Title" });
+                typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "IsActive" });
 
                 // We need to add a little more the list filter to make sure we're only loading active users
                 if (listFilterAPI == null)
