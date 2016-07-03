@@ -1027,14 +1027,23 @@ namespace ManyWho.Service.Salesforce
                     listFilterAPI.where = new List<ListFilterWhereAPI>();
                 }
 
-                // Now we need to add the "Active" piece
-                listFilterWhereAPI = new ListFilterWhereAPI();
-                listFilterWhereAPI.columnName = "IsActive";
-                listFilterWhereAPI.criteriaType = ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_EQUAL;
-                listFilterWhereAPI.value = "true";
+                // If we're provided with the objects to filter by, we don't want to check the active status as we don't care about this
+                if (objectDataRequestAPI.listFilter != null &&
+                    objectDataRequestAPI.listFilter.filterByProvidedObjects == true)
+                {
+                    // Don't add the active piece
+                }
+                else
+                {
+                    // Now we need to add the "Active" piece
+                    listFilterWhereAPI = new ListFilterWhereAPI();
+                    listFilterWhereAPI.columnName = "IsActive";
+                    listFilterWhereAPI.criteriaType = ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_EQUAL;
+                    listFilterWhereAPI.value = "true";
 
-                // Add the extra filter for the user lookup
-                listFilterAPI.where.Add(listFilterWhereAPI);
+                    // Add the extra filter for the user lookup
+                    listFilterAPI.where.Add(listFilterWhereAPI);
+                }
 
                 // Do the actual selection to populate one or many of these object types
                 // TODO: For now, we pass in a null for the filter
