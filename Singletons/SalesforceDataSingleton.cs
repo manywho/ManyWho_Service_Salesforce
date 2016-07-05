@@ -55,10 +55,11 @@ namespace ManyWho.Service.Salesforce.Singletons
         public const String KEY_SECURITY_TOKEN = "SecurityToken";
 
         private static SalesforceDataSingleton salesforceDataSingleton;
+        private QueryConstructorUtil queryConstructorUtil;
 
         private SalesforceDataSingleton()
         {
-
+            queryConstructorUtil = new QueryConstructorUtil();
         }
 
         public static SalesforceDataSingleton GetInstance()
@@ -1140,7 +1141,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 }
 
                 // Add the additional filtering to the command soql
-                soqlQuery += this.ConstructQuery(listFilterAPI, null);
+                soqlQuery += this.queryConstructorUtil.ConstructQuery(listFilterAPI, null);
 
                 // Dispatch the query and get the results
                 objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, true, propertyAPIs, currencyFields);
@@ -1204,7 +1205,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                 // Construct the sosl query - we don't need the columns
                 soqlQuery = "FIND {" + listFilterAPI.search + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
-                soqlQuery += this.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties) + ")";
+                soqlQuery += this.queryConstructorUtil.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties) + ")";
 
                 // Dispatch the search and get the results
                 objectAPIs = CreateObjectAPIsFromSearchSObjects(null, sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, listFilterAPI, currencyFields);
@@ -1213,7 +1214,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 2) + " ";
                 soqlQuery += "FROM " + objectName;
-                soqlQuery += this.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties);
+                soqlQuery += this.queryConstructorUtil.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties);
 
                 // Dispatch the query and get the results
                 objectAPIs = CreateObjectAPIsFromQuerySObjects(sforceService, objectName, soqlQuery, includesId, objectDataTypeProperties, currencyFields);
@@ -1646,207 +1647,6 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             return saveObject;
-        }
-
-        private String ConstructQuery(ListFilterAPI listFilterAPI, CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties)
-        {
-            String soql = "";
-
-            if (listFilterAPI != null)
-            {
-                // We add this defensive code as the comparison type was not checked for "required"
-                if (listFilterAPI.comparisonType == null ||
-                    listFilterAPI.comparisonType.Trim().Length == 0)
-                {
-                    // Assume "AND"
-                    listFilterAPI.comparisonType = ManyWhoConstants.LIST_FILTER_CONFIG_COMPARISON_TYPE_AND;
-                }
-
-                // We're filtering for a unique object
-                if (listFilterAPI.id != null &&
-                    listFilterAPI.id.Trim().Length > 0)
-                {
-                    // Despite this being a little silly as we only have one filter, it makes the logic a little easier to manage on the string construction
-                    soql += " " + listFilterAPI.comparisonType + " Id = '" + listFilterAPI.id + "'";
-                }
-                else
-                {
-                    // Check to see if we have an actual WHERE filter to apply
-                    if (listFilterAPI.where != null &&
-                        listFilterAPI.where.Count > 0)
-                    {
-                        foreach (ListFilterWhereAPI listFilterWhereAPI in listFilterAPI.where)
-                        {
-                            soql += " " + listFilterAPI.comparisonType + " " + listFilterWhereAPI.columnName;
-
-                            if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_EQUAL, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " =";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_GREATER_THAN, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " >";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_GREATER_THAN_OR_EQUAL, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " >=";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_LESS_THAN, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " <";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_LESS_THAN_OR_EQUAL, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " <=";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_NOT_EQUAL, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " !=";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_STARTS_WITH, StringComparison.InvariantCultureIgnoreCase) == true ||
-                                     listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_ENDS_WITH, StringComparison.InvariantCultureIgnoreCase) == true ||
-                                     listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_CONTAINS, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " LIKE";
-                            }
-                            else
-                            {
-                                throw new NotImplementedException();
-                            }
-
-                            if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_STARTS_WITH, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " '" + listFilterWhereAPI.value + "%'";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_ENDS_WITH, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " '%" + listFilterWhereAPI.value + "'";
-                            }
-                            else if (listFilterWhereAPI.criteriaType.Equals(ManyWhoConstants.CONTENT_VALUE_IMPLEMENTATION_CRITERIA_TYPE_CONTAINS, StringComparison.InvariantCultureIgnoreCase) == true)
-                            {
-                                soql += " '%" + listFilterWhereAPI.value + "%'";
-                            }
-                            else
-                            {
-                                Boolean valueAssigned = false;
-
-                                if (cleanedObjectDataTypeProperties != null)
-                                {
-                                    Boolean isDataType = false;
-
-                                    if (cleanedObjectDataTypeProperties.BooleanFields != null &&
-                                        cleanedObjectDataTypeProperties.BooleanFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
-                                    {
-                                        Boolean booleanValue = false;
-                                        Boolean.TryParse(listFilterWhereAPI.value, out booleanValue);
-
-                                        soql += " " + booleanValue.ToString().ToLower() + "";
-
-                                        valueAssigned = true;
-                                    }
-                                    else if (cleanedObjectDataTypeProperties.DateTimeFields != null &&
-                                             cleanedObjectDataTypeProperties.DateTimeFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
-                                    {
-                                        DateTime dateTimeValue;
-                                        DateTime.TryParse(listFilterWhereAPI.value, out dateTimeValue);
-
-                                        soql += " " + dateTimeValue.ToString("yyyy-MM-ddThh:mm:ssZ") + "";
-
-                                        valueAssigned = true;
-                                    }
-                                    else if (cleanedObjectDataTypeProperties.DateFields != null &&
-                                             cleanedObjectDataTypeProperties.DateFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
-                                    {
-                                        DateTime dateTimeValue;
-                                        DateTime.TryParse(listFilterWhereAPI.value, out dateTimeValue);
-
-                                        soql += " " + dateTimeValue.ToString("yyyy-MM-dd") + "";
-
-                                        valueAssigned = true;
-                                    }
-                                    else if (cleanedObjectDataTypeProperties.NumberFields != null &&
-                                             cleanedObjectDataTypeProperties.NumberFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
-                                    {
-                                        Double doubleValue;
-                                        Double.TryParse(listFilterWhereAPI.value, out doubleValue);
-
-                                        soql += " " + doubleValue.ToString() + "";
-
-                                        valueAssigned = true;
-                                    }
-                                    else if (cleanedObjectDataTypeProperties.CurrencyFields != null &&
-                                             cleanedObjectDataTypeProperties.CurrencyFields.TryGetValue(listFilterWhereAPI.columnName, out isDataType) == true)
-                                    {
-                                        Double doubleValue;
-                                        Double.TryParse(listFilterWhereAPI.value, out doubleValue);
-
-                                        soql += " " + doubleValue.ToString() + "";
-
-                                        valueAssigned = true;
-                                    }
-                                }
-
-                                // If the value has not been assigned based on type information, we assign it as a string query
-                                if (valueAssigned == false)
-                                {
-                                    soql += " '" + listFilterWhereAPI.value + "'";
-                                }
-                            }
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(listFilterAPI.search) &&
-                        listFilterAPI.searchCriteria != null &&
-                        listFilterAPI.searchCriteria.Count > 0)
-                    {
-                        soql += " " + listFilterAPI.comparisonType + "(";
-                        soql += string.Join(" OR ", listFilterAPI.searchCriteria.Select(criteria => " " + criteria.columnName + " = '" + listFilterAPI.search + "'").ToArray());                            
-                        soql += ")";
-                    }
-                    
-                    if (listFilterAPI.orderByPropertyDeveloperName != null &&
-                        listFilterAPI.orderByPropertyDeveloperName.Trim().Length > 0)
-                    {
-                        soql += " ORDER BY " + listFilterAPI.orderByPropertyDeveloperName + " " + listFilterAPI.orderByDirectionType;
-                    }
-
-                    if (listFilterAPI.limit > 0)
-                    {
-                        if (listFilterAPI.search != null &&
-                            listFilterAPI.search.Trim().Length > 0)
-                        {
-                            // Search does not support offset, we so we need to do a little calculation to manage that limitation
-                            // We basically limit by the offset and then need to ignore the records that come before the offset
-                            soql += " LIMIT " + (listFilterAPI.limit + 1 + listFilterAPI.offset);
-                        }
-                        else
-                        {
-                            // We grab one extra record so we know if there are any more to get
-                            soql += " LIMIT " + (listFilterAPI.limit + 1);
-                        }
-                    }
-
-                    // Search does not support offset
-                    if (listFilterAPI.offset > 0 &&
-                        (listFilterAPI.search == null ||
-                         listFilterAPI.search.Trim().Length == 0))
-                    {
-                        soql += " OFFSET " + listFilterAPI.offset;
-                    }
-                }
-
-                if (soql.Trim().Length > 0 &&
-                    soql.IndexOf(" " + listFilterAPI.comparisonType) == 0)
-                {
-                    // Add the where clause if we have anything
-                    soql = " WHERE" + soql;
-
-                    // This is to get rid of any preceding ANDs
-                    soql = soql.Replace("WHERE " + listFilterAPI.comparisonType, "WHERE");
-                }
-            }
-
-            return soql;
         }
 
         public SforceService Login(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, Boolean preferElevatedAccess, Boolean isModelingOperation)

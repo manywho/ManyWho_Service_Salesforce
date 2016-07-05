@@ -201,6 +201,7 @@
     <Compile Include="Utils\EmailNotifier.cs" />
     <Compile Include="Utils\PostgresDatabase.cs" />
     <Compile Include="Utils\PostgresDatabaseReader.cs" />
+    <Compile Include="Utils\QueryConstructorUtil.cs" />
     <Compile Include="Utils\SalesforceCanvasUtils.cs" />
     <Compile Include="Utils\SalesforceHttpUtils.cs" />
     <Compile Include="Utils\SettingUtils.cs" />
