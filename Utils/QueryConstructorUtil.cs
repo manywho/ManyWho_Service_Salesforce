@@ -96,12 +96,16 @@ namespace ManyWho.Service.Salesforce.Utils
         {
             String soql = "";
 
-            foreach (ListFilterWhereAPI listFilterWhereAPI in where)
+            if (where != null)
             {
-                if(listFilterWhereAPI != null)
+                foreach (ListFilterWhereAPI listFilterWhereAPI in where)
                 {
-                    soql = soql + this.GenerateCondition(false, listFilterWhereAPI, comparisonType, cleanedObjectDataTypeProperties);
+                    if (listFilterWhereAPI != null)
+                    {
+                        soql = soql + this.GenerateCondition(false, listFilterWhereAPI, comparisonType, cleanedObjectDataTypeProperties);
+                    }
                 }
+
             }
 
             if (listFilters != null)
