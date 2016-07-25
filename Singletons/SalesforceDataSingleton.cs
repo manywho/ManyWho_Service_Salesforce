@@ -1342,7 +1342,8 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                         // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
                         // field names from a standard select which confuses the binding logic
-                        //propertyAPI.developerName = element.LocalName;
+                        // WE NOW HAVE A SEPARATE METHOD FOR SEARCH, SO THIS IS NOW RELIABLE
+                        propertyAPI.developerName = element.LocalName;
 
                         // This only works because the SOQL columns will have been generated from the ordered list of properties
                         // If the user has a final column of Id that's been added, we just keep the local name. The purpose of this
@@ -1351,7 +1352,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                         //if (properties.Count >= y)
                         //{
                         // Always use the name as defined by the binding properties as this will be consistent in all situations
-                        propertyAPI.developerName = properties[y].developerName;
+                        //propertyAPI.developerName = properties[y].developerName;
                         //}
 
                         if (propertyAPI.developerName.EndsWith(".name", StringComparison.OrdinalIgnoreCase) == true)
