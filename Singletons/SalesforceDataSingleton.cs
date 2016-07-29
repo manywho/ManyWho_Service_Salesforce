@@ -1362,6 +1362,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                             if (element.LastChild != null)
                             {
                                 // We need to append the name piece on the end of the field to reconstruct the reference correctly in the return
+                                // This will ensure the property name correctly matches.
                                 propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 propertyAPI.contentValue = element.LastChild.InnerText;
                             }
