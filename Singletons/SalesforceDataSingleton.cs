@@ -1355,12 +1355,14 @@ namespace ManyWho.Service.Salesforce.Singletons
                         //propertyAPI.developerName = properties[y].developerName;
                         //}
 
-                        if (propertyAPI.developerName.EndsWith(".name", StringComparison.OrdinalIgnoreCase) == true)
+                        if (propertyAPI.developerName.EndsWith("__r", StringComparison.OrdinalIgnoreCase) == true)
                         {
                             // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
                             // additional XML
                             if (element.LastChild != null)
                             {
+                                // We need to append the name piece on the end of the field to reconstruct the reference correctly in the return
+                                propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 propertyAPI.contentValue = element.LastChild.InnerText;
                             }
                         }
