@@ -1352,7 +1352,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                         //if (properties.Count >= y)
                         //{
                         // Always use the name as defined by the binding properties as this will be consistent in all situations
-                        //propertyAPI.developerName = properties[y].developerName;
+                        //propertyAPI.developerName = properties[y].developerName; 
                         //}
 
                         if (propertyAPI.developerName.EndsWith("__r", StringComparison.OrdinalIgnoreCase) == true)
