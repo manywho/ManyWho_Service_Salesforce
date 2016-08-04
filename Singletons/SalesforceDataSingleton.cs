@@ -1368,7 +1368,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                             {
                                 // We need to append the name piece on the end of the field to reconstruct the reference correctly in the return
                                 // This will ensure the property name correctly matches.
-                                propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 propertyAPI.contentValue = element.LastChild.InnerText;
 
                                 // This is a patch for the odd naming inconsistency with salesforce
@@ -1376,6 +1375,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     properties[y].developerName.EndsWith(".Name", StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     propertyAPI.developerName = properties[y].developerName;
+                                }
+                                else
+                                {
+                                    // Assign the name based on the actual reference
+                                    propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 }
                             }
                         }
