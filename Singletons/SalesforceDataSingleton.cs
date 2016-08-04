@@ -1339,6 +1339,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     {
                         XmlElement element = queryObject.Any[y];
                         PropertyAPI propertyAPI = new PropertyAPI();
+                        bool nameFound = false;
 
                         // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
                         // field names from a standard select which confuses the binding logic
@@ -1355,7 +1356,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                         //propertyAPI.developerName = properties[y].developerName; 
                         //}
 
-                        if (propertyAPI.developerName.EndsWith("__r", StringComparison.OrdinalIgnoreCase) == true)
+                        // This is a patch for the odd naming inconsistency with salesforce
+                        if (nameFound == false &&
+                            (propertyAPI.developerName.EndsWith("__r", StringComparison.OrdinalIgnoreCase) == true ||
+                             (!string.IsNullOrWhiteSpace(properties[y].developerName) &&
+                              properties[y].developerName.EndsWith(".Name", StringComparison.OrdinalIgnoreCase) == true)))
                         {
                             // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
                             // additional XML
@@ -1365,6 +1370,13 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 // This will ensure the property name correctly matches.
                                 propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 propertyAPI.contentValue = element.LastChild.InnerText;
+
+                                // This is a patch for the odd naming inconsistency with salesforce
+                                if (!string.IsNullOrWhiteSpace(properties[y].developerName) &&
+                                    properties[y].developerName.EndsWith(".Name", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    propertyAPI.developerName = properties[y].developerName;
+                                }
                             }
                         }
                         else
