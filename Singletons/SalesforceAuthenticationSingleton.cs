@@ -122,6 +122,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                         // Check to see if the user is a member of the specified profile
                         authenticationUtilsResponse = this.ProfileMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
                     }
+                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ROLE, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        // Check to see if the user is a member of the specified role
+                        authenticationUtilsResponse = this.RoleMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
+                    }
                     else
                     {
                         // Check to see if the user is a member of the specified group
@@ -141,6 +147,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                     {
                         // Check to see if the user is a member of the specified profile - we don't support owner
                         authenticationUtilsResponse = this.ProfileMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
+                    }
+                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ROLE, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        // Check to see if the user is a member of the specified role - we don't support owner
+                        authenticationUtilsResponse = this.RoleMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
                     }
                     else
                     {
@@ -363,6 +375,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                                         // Check to see if the user is a member of the specified profile
                                         authenticationUtilsResponse = this.ProfileMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
                                     }
+                                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ROLE, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        // Check to see if the user is a member of the specified role
+                                        authenticationUtilsResponse = this.RoleMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                    }
                                     else
                                     {
                                         // Check to see if the user is a member of the specified group
@@ -382,6 +400,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     {
                                         // Check to see if the user is a member of the specified profile
                                         authenticationUtilsResponse = this.ProfileMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                    }
+                                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ROLE, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        // Check to see if the user is a member of the specified profile
+                                        authenticationUtilsResponse = this.RoleMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
                                     }
                                     else
                                     {
@@ -1242,6 +1266,98 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     // Select from the users to see if this user has the matching queue
                     soql = "SELECT GroupId FROM GroupMember WHERE GroupId = '" + referenceQueueId + "' AND UserOrGroupId = '" + thisUserId + "'";
+                }
+            }
+
+            // Create a new authentication utils response object to house the results
+            authenticationUtilsResponse = new AuthenticationUtilsResponse();
+
+            // Check to make sure we should bother executing the query
+            if (executeQuery == true)
+            {
+                // Query salesforce to see if anything comes back
+                queryResult = sforceService.query(soql);
+            }
+
+            // Check to see if the query returned any results
+            if (queryResult != null &&
+                queryResult.records != null &&
+                queryResult.records.Length > 0)
+            {
+                if (isUserCount == true)
+                {
+                    if (queryResult.records[0].Any != null &&
+                        queryResult.records[0].Any.Length > 0)
+                    {
+                        // Just get the count out of the result
+                        authenticationUtilsResponse.Count = Int32.Parse(queryResult.records[0].Any[0].InnerText);
+                    }
+                }
+                else
+                {
+                    // If we have a result, then the user is in context
+                    authenticationUtilsResponse.IsInContext = true;
+
+                    // Now we query the system again, but this time with the query for the actual user
+                    where = "Id = '" + thisUserId + "'";
+
+                    // Grab the user object
+                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                }
+            }
+
+            return authenticationUtilsResponse;
+        }
+
+        /// <summary>
+        /// Check to see if the user is a member of the provided role. We do this based on role name.
+        /// </summary>
+        private AuthenticationUtilsResponse RoleMember(SforceService sforceService, String referenceRoleName, String thisUserId, Boolean isUserCount)
+        {
+            AuthenticationUtilsResponse authenticationUtilsResponse = null;
+            QueryResult queryResult = null;
+            Boolean executeQuery = true;
+            String referenceRoleId = null;
+            String soql = null;
+            String where = null;
+
+            // First we need to get the unique identifier for the role as we're provided the name
+            soql = "SELECT Id FROM UserRole WHERE DeveloperName = '" + referenceRoleName + "'";
+
+            queryResult = sforceService.query(soql);
+
+            if (queryResult != null &&
+                queryResult.records != null &&
+                queryResult.records.Length > 0)
+            {
+                if (queryResult.records[0].Any != null &&
+                    queryResult.records[0].Any.Length > 0)
+                {
+                    // Get the unique identifier out
+                    referenceRoleId = queryResult.records[0].Any[0].InnerText;
+                }
+            }
+
+            // Check to make sure we could find the reference role name in the system
+            if (string.IsNullOrWhiteSpace(referenceRoleId) == false)
+            {
+                // Check to see what type of group member lookup we're doing
+                if (isUserCount == true)
+                {
+                    // If we're counting the users, we don't want to filter by a specific user, we just want the count
+                    soql = "SELECT Count(UserRoleId) FROM User WHERE UserRoleId = '" + referenceRoleId + "'";
+                }
+                else
+                {
+                    // Check to make sure we're not dealing with a public user as there's no point executing the query
+                    if (String.IsNullOrWhiteSpace(thisUserId) == false &&
+                        thisUserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        executeQuery = false;
+                    }
+
+                    // Select from the users to see if this user has the matching role
+                    soql = "SELECT Id FROM User WHERE UserRoleId = '" + referenceRoleId + "' AND Id = '" + thisUserId + "'";
                 }
             }
 
