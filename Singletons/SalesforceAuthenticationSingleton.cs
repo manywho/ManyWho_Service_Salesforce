@@ -47,6 +47,8 @@ namespace ManyWho.Service.Salesforce.Singletons
         public const String SALESFORCE_SOBJECT_EMAIL = "sf:Email";
         public const String SALESFORCE_SOBJECT_FIRST_NAME = "sf:FirstName";
         public const String SALESFORCE_SOBJECT_LAST_NAME = "sf:LastName";
+        public const String SALESFORCE_SOBJECT_ROLE_ID = "sf:UserRoleId";
+        public const String SALESFORCE_SOBJECT_ROLE_NAME = "sf:UserRole";
 
         private SalesforceAuthenticationSingleton()
         {
@@ -1061,6 +1063,14 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     // Grab the user object
                     authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+
+                    // Add the additional group information if this group validates the user
+                    if (authenticationUtilsResponse.UserObject != null)
+                    {
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = referenceGroupId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        // At the moment we return an empty name for the chatter group
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = "", contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                    }
                 }
             }
 
@@ -1211,6 +1221,13 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     // Grab the user object
                     authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+
+                    // Add the additional group information if this group validates the user
+                    if (authenticationUtilsResponse.UserObject != null)
+                    {
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = referenceProfileId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = referenceProfileName, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                    }
                 }
             }
 
@@ -1303,6 +1320,13 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     // Grab the user object
                     authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+
+                    // Add the additional group information if this group validates the user
+                    if (authenticationUtilsResponse.UserObject != null)
+                    {
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = referenceQueueId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = referenceQueueDeveloperName, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                    }
                 }
             }
 
@@ -1395,6 +1419,13 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     // Grab the user object
                     authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+
+                    // Add the additional group information if this group validates the user
+                    if (authenticationUtilsResponse.UserObject != null)
+                    {
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = referenceRoleId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = referenceRoleName, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                    }
                 }
             }
 
@@ -1447,7 +1478,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             queryResponseHelper = new QueryResponseHelper();
 
             // Query salesforce to see if anything comes back
-            queryResult = sforceService.query("SELECT Id, Username, Email, FirstName, LastName, ManagerId FROM User WHERE " + where);
+            queryResult = sforceService.query("SELECT Id, Username, Email, FirstName, LastName, ManagerId, UserRoleId, UserRole.DeveloperName FROM User WHERE " + where);
 
             // Check to see if the query returned any results
             if (queryResult != null &&
@@ -1479,8 +1510,17 @@ namespace ManyWho.Service.Salesforce.Singletons
                     }
                     else
                     {
-                        // Remap the salesforce property to a manywho property and create the object
-                        userProperty = this.CreateProperty(this.RemapName(element.Name), element.InnerText);
+                        if (y == 7 &&
+                            element.LastChild != null)
+                        {
+                            // This is the relationship field for the user role name
+                            userProperty = this.CreateProperty(this.RemapName(element.Name), element.LastChild.InnerText);
+                        }
+                        else
+                        {
+                            // Remap the salesforce property to a manywho property and create the object
+                            userProperty = this.CreateProperty(this.RemapName(element.Name), element.InnerText);
+                        }
 
                         // If this is the ID property, we assign that as the external id so manywho can track the value properly
                         if (userProperty.developerName.Equals(ManyWhoConstants.MANYWHO_USER_PROPERTY_USER_ID, StringComparison.InvariantCultureIgnoreCase) == true)
@@ -1573,6 +1613,14 @@ namespace ManyWho.Service.Salesforce.Singletons
             else if (salesforceName.Equals(SALESFORCE_SOBJECT_LAST_NAME, StringComparison.InvariantCultureIgnoreCase) == true)
             {
                 manywhoName = ManyWhoConstants.MANYWHO_USER_PROPERTY_LAST_NAME;
+            }
+            else if (salesforceName.Equals(SALESFORCE_SOBJECT_ROLE_ID, StringComparison.InvariantCultureIgnoreCase) == true)
+            {
+                manywhoName = ManyWhoConstants.MANYWHO_USER_PROPERTY_ROLE_ID;
+            }
+            else if (salesforceName.Equals(SALESFORCE_SOBJECT_ROLE_NAME, StringComparison.InvariantCultureIgnoreCase) == true)
+            {
+                manywhoName = ManyWhoConstants.MANYWHO_USER_PROPERTY_ROLE_NAME;
             }
             else
             {

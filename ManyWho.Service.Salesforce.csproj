@@ -43,7 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManyWho.Flow.SDK, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\ManyWho.SDK.1.14.0\lib\ManyWho.Flow.SDK.dll</HintPath>
+      <HintPath>packages\ManyWho.SDK.1.15.0\lib\ManyWho.Flow.SDK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />

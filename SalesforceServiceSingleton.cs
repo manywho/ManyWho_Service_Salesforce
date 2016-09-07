@@ -1495,6 +1495,10 @@ namespace ManyWho.Service.Salesforce
                         authenticatedUser.tenantName = (String)jsonObject["organization_id"];
                         authenticatedUser.directoryId = (String)jsonObject["organization_id"];
                         authenticatedUser.directoryName = (String)jsonObject["organization_id"];
+                        authenticatedUser.roleId = "test role id";
+                        authenticatedUser.roleName = "test role name";
+                        authenticatedUser.primaryGroupId = "test group id";
+                        authenticatedUser.primaryGroupName = "test group name";
                         authenticatedUser.email = (String)jsonObject["email"];
                         authenticatedUser.firstName = (String)jsonObject["first_name"];
                         authenticatedUser.lastName = (String)jsonObject["last_name"];
@@ -1543,6 +1547,10 @@ namespace ManyWho.Service.Salesforce
                     authenticatedUser.tenantName = userInfoResult.organizationName;
                     authenticatedUser.directoryId = userInfoResult.organizationId;
                     authenticatedUser.directoryName = userInfoResult.organizationName;
+                    authenticatedUser.roleId = "test role id";
+                    authenticatedUser.roleName = "test role name";
+                    authenticatedUser.primaryGroupId = "test group id";
+                    authenticatedUser.primaryGroupName = "test group name";
                     authenticatedUser.email = userInfoResult.userEmail;
                     authenticatedUser.firstName = userInfoResult.userFullName;
                     authenticatedUser.lastName = userInfoResult.userFullName;
