@@ -64,6 +64,7 @@ namespace ManyWho.Service.Salesforce
         public const String SERVICE_VALUE_CONSUMER_KEY = "Consumer Key";
         public const String SERVICE_VALUE_AUTHENTICATION_STRATEGY = "Authentication Strategy";
         public const String SERVICE_VALUE_GROUP_SELECTION = "Group Selection";
+        public const String SERVICE_VALUE_INCLUDE_SYSTEM_TYPES = "Include System Types";
 
         public const String AUTHENTICATION_STRATEGY_STANDARD = "Standard";
         public const String AUTHENTICATION_STRATEGY_SUPER_USER = "SuperUser";
@@ -158,6 +159,7 @@ namespace ManyWho.Service.Salesforce
             String emailPassword = null;
             String emailSmtp = null;
             String groupSelection = null;
+            String includeSystemTypes = null;
 
             if (describeServiceRequest == null)
             {
@@ -181,6 +183,7 @@ namespace ManyWho.Service.Salesforce
                 consumerKey = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_KEY, describeServiceRequest.configurationValues, false);
                 authenticationStrategy = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_STRATEGY, describeServiceRequest.configurationValues, false);
                 groupSelection = ValueUtils.GetContentValue(SERVICE_VALUE_GROUP_SELECTION, describeServiceRequest.configurationValues, false);
+                includeSystemTypes = ValueUtils.GetContentValue(SERVICE_VALUE_INCLUDE_SYSTEM_TYPES, describeServiceRequest.configurationValues, false);
 
                 // Get the optional email properties
                 defaultEmail = ValueUtils.GetContentValue(ManyWhoUtilsSingleton.APP_SETTING_DEFAULT_FROM_EMAIL, describeServiceRequest.configurationValues, false);
@@ -215,6 +218,7 @@ namespace ManyWho.Service.Salesforce
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CONSUMER_KEY, consumerKey, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_STRATEGY, authenticationStrategy, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_GROUP_SELECTION, authenticationStrategy, false));
+            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_BOOLEAN, SERVICE_VALUE_INCLUDE_SYSTEM_TYPES, includeSystemTypes, false));
 
             // The configuration values for the email stuff
             describeServiceResponse.configurationValues.Add(new DescribeValueAPI() { contentType = ManyWhoConstants.CONTENT_TYPE_STRING, developerName = ManyWhoUtilsSingleton.APP_SETTING_DEFAULT_FROM_EMAIL, contentValue = defaultEmail, isRequired = false });
