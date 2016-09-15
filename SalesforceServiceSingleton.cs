@@ -157,6 +157,7 @@ namespace ManyWho.Service.Salesforce
             String emailUsername = null;
             String emailPassword = null;
             String emailSmtp = null;
+            String groupSelection = null;
 
             if (describeServiceRequest == null)
             {
@@ -179,6 +180,7 @@ namespace ManyWho.Service.Salesforce
                 consumerSecret = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_SECRET, describeServiceRequest.configurationValues, false);
                 consumerKey = ValueUtils.GetContentValue(SERVICE_VALUE_CONSUMER_KEY, describeServiceRequest.configurationValues, false);
                 authenticationStrategy = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_STRATEGY, describeServiceRequest.configurationValues, false);
+                groupSelection = ValueUtils.GetContentValue(SERVICE_VALUE_GROUP_SELECTION, describeServiceRequest.configurationValues, false);
 
                 // Get the optional email properties
                 defaultEmail = ValueUtils.GetContentValue(ManyWhoUtilsSingleton.APP_SETTING_DEFAULT_FROM_EMAIL, describeServiceRequest.configurationValues, false);
@@ -212,6 +214,7 @@ namespace ManyWho.Service.Salesforce
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_PASSWORD, SERVICE_VALUE_CONSUMER_SECRET, consumerSecret, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_CONSUMER_KEY, consumerKey, false));
             describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_AUTHENTICATION_STRATEGY, authenticationStrategy, false));
+            describeServiceResponse.configurationValues.Add(DescribeUtils.CreateDescribeValue(ManyWhoConstants.CONTENT_TYPE_STRING, SERVICE_VALUE_GROUP_SELECTION, authenticationStrategy, false));
 
             // The configuration values for the email stuff
             describeServiceResponse.configurationValues.Add(new DescribeValueAPI() { contentType = ManyWhoConstants.CONTENT_TYPE_STRING, developerName = ManyWhoUtilsSingleton.APP_SETTING_DEFAULT_FROM_EMAIL, contentValue = defaultEmail, isRequired = false });

@@ -1129,6 +1129,14 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                     // Grab the user object
                     authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+
+                    // Add the additional group information if this group validates the user
+                    if (authenticationUtilsResponse.UserObject != null)
+                    {
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = referenceGroupId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        // At the moment we return an empty name for the chatter group
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = "", contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                    }
                 }
             }
 
