@@ -1283,6 +1283,9 @@ namespace ManyWho.Service.Salesforce.Singletons
                 {
                     foreach (ObjectAPI objectAPI in objectAPIs)
                     {
+                        // Translate the object name to the label also
+                        objectAPI.developerName = describeSObjectResult.label;
+
                         // Go through the properties in the object
                         if (objectAPI.properties != null &
                             objectAPI.properties.Count > 0)
