@@ -382,7 +382,7 @@ namespace ManyWho.Flow.Web.Controllers
         {
             try
             {
-                return SalesforceServiceSingleton.GetInstance().Delete(objectDataRequestAPI);
+                return SalesforceServiceSingleton.GetInstance().Delete(EmailNotifier.GetInstance(this.GetWho(), objectDataRequestAPI.configurationValues, "PluginSalesforceController.Delete"), this.GetWho(), objectDataRequestAPI);
             }
             catch (Exception exception)
             {
