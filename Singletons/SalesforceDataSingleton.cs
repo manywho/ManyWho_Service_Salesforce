@@ -396,6 +396,8 @@ namespace ManyWho.Service.Salesforce.Singletons
             DescribeSObjectResult[] describeSObjectResults = null;
             Dictionary<String, Int32> objectNames = null;
             Dictionary<String, Int32> fieldNames = null;
+            String includeSystemTypesString = null;
+            Boolean includeSystemTypes = false;
             String[] tables = null;
             Int32 entryCounter = 0;
 
@@ -405,6 +407,14 @@ namespace ManyWho.Service.Salesforce.Singletons
             if (sforceService == null)
             {
                 throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+            }
+
+            // Get the types configuration out
+            includeSystemTypesString = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_INCLUDE_SYSTEM_TYPES, configurationValues, false);
+
+            if (!string.IsNullOrWhiteSpace(includeSystemTypesString))
+            {
+                Boolean.TryParse(includeSystemTypesString, out includeSystemTypes);
             }
 
             // Get all the objects available in the org
@@ -445,6 +455,18 @@ namespace ManyWho.Service.Salesforce.Singletons
                             {
                                 DescribeSObjectResult describeSObjectResult = describeSObjectResults[y];
                                 String typeDeveloperName = null;
+
+                                // Check to see if this is a system Type
+                                if (includeSystemTypes == false &&
+                                    describeSObjectResult.name != null &&
+                                    (describeSObjectResult.name.EndsWith("History", StringComparison.OrdinalIgnoreCase) ||
+                                     describeSObjectResult.name.EndsWith("Feed", StringComparison.OrdinalIgnoreCase) ||
+                                     describeSObjectResult.name.EndsWith("Tag", StringComparison.OrdinalIgnoreCase) ||
+                                     describeSObjectResult.name.EndsWith("Share", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    // Skip this Type, it's a system, low level one
+                                    continue;
+                                }
 
                                 typeDeveloperName = describeSObjectResult.label;
 
@@ -1261,6 +1283,9 @@ namespace ManyWho.Service.Salesforce.Singletons
                 {
                     foreach (ObjectAPI objectAPI in objectAPIs)
                     {
+                        // Translate the object name to the label also
+                        objectAPI.developerName = describeSObjectResult.label;
+
                         // Go through the properties in the object
                         if (objectAPI.properties != null &
                             objectAPI.properties.Count > 0)
@@ -1368,7 +1393,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                             {
                                 // We need to append the name piece on the end of the field to reconstruct the reference correctly in the return
                                 // This will ensure the property name correctly matches.
-                                propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 propertyAPI.contentValue = element.LastChild.InnerText;
 
                                 // This is a patch for the odd naming inconsistency with salesforce
@@ -1376,6 +1400,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     properties[y].developerName.EndsWith(".Name", StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     propertyAPI.developerName = properties[y].developerName;
+                                }
+                                else
+                                {
+                                    // Assign the name based on the actual reference
+                                    propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
                                 }
                             }
                         }
