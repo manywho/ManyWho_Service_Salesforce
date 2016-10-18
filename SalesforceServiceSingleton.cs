@@ -1378,10 +1378,52 @@ namespace ManyWho.Service.Salesforce
             return objectDataResponseAPI;
         }
 
-        public ObjectDataResponseAPI Delete(ObjectDataRequestAPI objectDataRequestAPI)
+        public ObjectDataResponseAPI Delete(INotifier notifier, IAuthenticatedWho authenticatedWho, ObjectDataRequestAPI objectDataRequestAPI)
         {
-            // Ixnay on the implementay
-            throw new NotImplementedException();
+            ObjectDataResponseAPI objectDataResponseAPI = null;
+            String authenticationUrl = null;
+            String username = null;
+            String password = null;
+            String securityToken = null;
+            String adminEmail = null;
+
+            if (objectDataRequestAPI == null)
+            {
+                throw new ArgumentNullException("ObjectDataRequest", "ObjectDataRequest object cannot be null.");
+            }
+
+            if (objectDataRequestAPI.configurationValues == null ||
+                objectDataRequestAPI.configurationValues.Count == 0)
+            {
+                throw new ArgumentNullException("ObjectDataRequest.ConfigurationValues", "ObjectDataRequest.ConfigurationValues cannot be null or empty.");
+            }
+
+            // Get the configuration values out that are needed to delete data from salesforce.com
+            authenticationUrl = ValueUtils.GetContentValue(SERVICE_VALUE_AUTHENTICATION_URL, objectDataRequestAPI.configurationValues, true);
+            username = ValueUtils.GetContentValue(SERVICE_VALUE_USERNAME, objectDataRequestAPI.configurationValues, true);
+            password = ValueUtils.GetContentValue(SERVICE_VALUE_PASSWORD, objectDataRequestAPI.configurationValues, true);
+            securityToken = ValueUtils.GetContentValue(SERVICE_VALUE_SECURITY_TOKEN, objectDataRequestAPI.configurationValues, false);
+            adminEmail = ValueUtils.GetContentValue(SERVICE_VALUE_ADMIN_EMAIL, objectDataRequestAPI.configurationValues, true);
+
+            // We only perform the delete if there's actually something to delete!
+            if (objectDataRequestAPI.objectData != null &&
+                objectDataRequestAPI.objectData.Count > 0)
+            {
+                if (objectDataRequestAPI.objectDataType == null)
+                {
+                    throw new ArgumentNullException("ObjectDataRequest.ObjectDataType", "The ObjectDataRequest.ObjectDataType property cannot be null as the Service needs a description of the fields to use for the Delete.");
+                }
+
+                // Delete the data from salesforce.com
+                SalesforceDataSingleton.GetInstance().Delete(notifier, authenticatedWho, objectDataRequestAPI.configurationValues, objectDataRequestAPI.objectDataType.properties, objectDataRequestAPI.objectData);
+            }
+
+            // Create the object data response object
+            objectDataResponseAPI = new ObjectDataResponseAPI();
+            // TODO: Should really get the culture that the authenticated user is running under
+            objectDataResponseAPI.culture = objectDataRequestAPI.culture;
+
+            return objectDataResponseAPI;
         }
 
         /// <summary>

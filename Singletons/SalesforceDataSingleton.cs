@@ -1120,6 +1120,89 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
+        public void Delete(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, List<ObjectAPI> objectAPIs)
+        {
+            DeleteResult[] deleteResults = null;
+            SforceService sforceService = null;
+            String objectName = null;
+            List<string> ids = null;
+
+            // Check to make sure we have some objects to save
+            if (objectAPIs != null &&
+                objectAPIs.Count > 0)
+            {
+                // We have objects so we create a list to store the ids of those to be deleted
+                ids = new List<string>();
+
+                // Step 1: Login to the service so we can do a bunch of things
+                sforceService = this.Login(authenticatedWho, configurationValues, false, false);
+
+                if (sforceService == null)
+                {
+                    throw new ArgumentNullException("SalesforceService", "Unable to log into Salesforce.");
+                }
+
+                // We need to get the name of the table from the first object in the list
+                objectName = objectAPIs[0].developerName;
+
+                if (objectName == null ||
+                    objectName.Trim().Length == 0)
+                {
+                    String errorMessage = "One or more of the objects being deleted does not have a DeveloperName.";
+
+                    ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+
+                    throw new ArgumentNullException("BadRequest", errorMessage);
+                }
+
+                // First, we go through each object in the list - that's the outer most loop
+                foreach (ObjectAPI objectAPI in objectAPIs)
+                {
+                    // Check to see if we have an external id and that it's not a guid (though the guid problem is now fixed)
+                    if (string.IsNullOrWhiteSpace(objectAPI.externalId))
+                    {
+                        String errorMessage = "One or more of the objects being deleted does not have an external identifier.";
+
+                        ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+
+                        throw new ArgumentNullException("BadRequest", errorMessage);
+                    }
+
+                    // Test the object is the same type as the first entry
+                    if (objectAPI.developerName.Equals(objectName, StringComparison.InvariantCultureIgnoreCase) == false)
+                    {
+                        String errorMessage = "The object list contains objects of varying types - this is not supported in a single delete call";
+
+                        ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+
+                        throw new ArgumentNullException("BadRequest", errorMessage);
+                    }
+
+                    // Add the identifier
+                    ids.Add(objectAPI.externalId);
+                }
+
+                // Perform the delete operation for all objects that need to be deleted
+                if (ids != null &&
+                    ids.Count > 0)
+                {
+                    // Perform the update - this is where we can also save the inner objects - not mapped in yet
+                    deleteResults = sforceService.delete(ids.ToArray());
+
+                    // Go through the save results and get the ids out of the saved objects or throw any errors
+                    for (int x = 0; x < deleteResults.Length; x++)
+                    {
+                        DeleteResult deleteResult = deleteResults[x];
+
+                        if (deleteResult.success == false)
+                        {
+                            throw new Exception(deleteResult.errors[x].message);
+                        }
+                    }
+                }
+            }
+        }
+
         public List<ObjectAPI> Select(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, String objectName, List<ObjectDataTypePropertyAPI> propertyAPIs, ListFilterAPI listFilterAPI, String soqlQuery, Dictionary<String, Boolean> currencyFields)
         {
             List<ObjectAPI> objectAPIs = null;
