@@ -1585,6 +1585,25 @@ namespace ManyWho.Service.Salesforce
                     // Get the user info from the service
                     userInfoResult = sforceService.getUserInfo();
 
+                    // Names are given as the full name, but our authenticated user object requires a split first and last
+                    string firstName;
+                    string lastName;
+
+                    // First check if the full name contains a space, so we can naively split on it
+                    if (userInfoResult.userFullName.Contains(' '))
+                    {
+                        var names = userInfoResult.userFullName.Split(" ".ToCharArray(), 2);
+
+                        firstName = names[0];
+                        lastName = names[1];
+                    }
+                    else
+                    {
+                        // Otherwise fallback to the current behaviour of using the full name for both
+                        firstName = userInfoResult.userFullName;
+                        lastName = userInfoResult.userFullName;
+                    }
+
                     // Looks like the credentials are OK, so we create an authenticated user object for this user
                     authenticatedUser.userId = userInfoResult.userId;
                     authenticatedUser.username = userInfoResult.userName;
@@ -1593,8 +1612,8 @@ namespace ManyWho.Service.Salesforce
                     authenticatedUser.directoryId = userInfoResult.organizationId;
                     authenticatedUser.directoryName = userInfoResult.organizationName;
                     authenticatedUser.email = userInfoResult.userEmail;
-                    authenticatedUser.firstName = userInfoResult.userFullName;
-                    authenticatedUser.lastName = userInfoResult.userFullName;
+                    authenticatedUser.firstName = firstName;
+                    authenticatedUser.lastName = lastName;
                     authenticatedUser.status = ManyWhoConstants.AUTHENTICATED_USER_STATUS_AUTHENTICATED;
                     authenticatedUser.statusMessage = null;
                 }
