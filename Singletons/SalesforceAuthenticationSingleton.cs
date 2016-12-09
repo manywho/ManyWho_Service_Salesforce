@@ -49,6 +49,8 @@ namespace ManyWho.Service.Salesforce.Singletons
         public const String SALESFORCE_SOBJECT_LAST_NAME = "sf:LastName";
         public const String SALESFORCE_SOBJECT_ROLE_ID = "sf:UserRoleId";
         public const String SALESFORCE_SOBJECT_ROLE_NAME = "sf:UserRole";
+        public const String SALESFORCE_SOBJECT_PROFILE_ID = "sf:ProfileId";
+        public const String SALESFORCE_SOBJECT_PROFILE_NAME = "sf:Profile";
 
         private SalesforceAuthenticationSingleton()
         {
@@ -245,8 +247,9 @@ namespace ManyWho.Service.Salesforce.Singletons
                         authenticatedWho.UserId.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_USER_ID, StringComparison.InvariantCultureIgnoreCase) == false)
                     {
                         // Check to see if the user is in fact a user in the org. We do this by checking the authenticated who object as this is the user actually
-                        // requesting access
-                        objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                        // requesting access - we pass in the group selection as we may populate that optimistically if there is only one option possible for the user
+                        // in the provided group selection context
+                        objectAPI = this.User(sforceService, authenticatedWho.UserId, groupSelection).UserObject;
                     }
                 }
                 else if (objectDataRequest.authorization.globalAuthenticationType.Equals(ManyWhoConstants.GROUP_AUTHORIZATION_GLOBAL_AUTHENTICATION_TYPE_SPECIFIED, StringComparison.InvariantCultureIgnoreCase) == true)
@@ -272,7 +275,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 if (user.authenticationId.Equals(authenticatedWho.UserId, StringComparison.InvariantCultureIgnoreCase) == true)
                                 {
                                     // Get the user object from salesforce (which may not exist)
-                                    objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                                    objectAPI = this.User(sforceService, authenticatedWho.UserId, null).UserObject;
 
                                     // This is our user - no need to do anything else as the lookup will now determine if they have access
                                     doMoreWork = false;
@@ -451,7 +454,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 {
                     // Check to see if the user is in fact a user in the org. We do this by checking the authenticated who object as this is the user actually
                     // requesting access
-                    objectAPI = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                    objectAPI = this.User(sforceService, authenticatedWho.UserId, null).UserObject;
 
                     if (objectAPI == null)
                     {
@@ -678,17 +681,17 @@ namespace ManyWho.Service.Salesforce.Singletons
         /// <summary>
         /// Check to see if this user exists in the system for the provided user id.
         /// </summary>
-        private AuthenticationUtilsResponse User(SforceService sforceService, String thisUserId)
+        private AuthenticationUtilsResponse User(SforceService sforceService, string thisUserId, string groupSelection)
         {
             AuthenticationUtilsResponse authenticationUtilsResponse = null;
-            String where = null;
+            string where = null;
 
             // Get the user based on this identifier
             where = "Id = '" + thisUserId + "'";
 
             // Execute the query and grab the user response as this is also our user
             authenticationUtilsResponse = new AuthenticationUtilsResponse();
-            authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+            authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, groupSelection).UserObject;
 
             // If we have a user object then we can assume the user is in context
             if (authenticationUtilsResponse.UserObject != null)
@@ -712,7 +715,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             where = "Id = '" + referenceUserId + "'";
 
             // Grab the manager id from our helper
-            managerId = this.ExecuteUserQuery(sforceService, where).ManagerId;
+            managerId = this.ExecuteUserQuery(sforceService, where, null).ManagerId;
 
             //  Check to see if we found a manager id for this user
             if (managerId == null ||
@@ -729,7 +732,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                 // Execute the query and grab the user response as this is also our user
                 authenticationUtilsResponse = new AuthenticationUtilsResponse();
-                authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
                 // If we have a user object then we can assume the user is in context
                 if (authenticationUtilsResponse.UserObject != null)
@@ -756,7 +759,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
             // We assign the user object as this query will return the correct user also - so we can keep that without requerying salesforce
-            authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+            authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
             // If we have a user object, then we can assume the user has authenticated
             if (authenticationUtilsResponse.UserObject != null)
@@ -818,7 +821,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     if (chatterUserInfo.Id.Equals(authenticatedWho.UserId, StringComparison.InvariantCultureIgnoreCase) == true)
                                     {
                                         // This user is a follower, we need to get their full user object details
-                                        authenticationUtilsResponse.UserObject = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                                        authenticationUtilsResponse.UserObject = this.User(sforceService, authenticatedWho.UserId, null).UserObject;
                                         authenticationUtilsResponse.IsInContext = true;
 
                                         // We have our user, break out of the following list
@@ -904,7 +907,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     if (chatterUserInfo.Id.Equals(authenticatedWho.UserId, StringComparison.InvariantCultureIgnoreCase) == true)
                                     {
                                         // This user is a follower, we need to get their full user object details
-                                        authenticationUtilsResponse.UserObject = this.User(sforceService, authenticatedWho.UserId).UserObject;
+                                        authenticationUtilsResponse.UserObject = this.User(sforceService, authenticatedWho.UserId, null).UserObject;
                                         authenticationUtilsResponse.IsInContext = true;
 
                                         // We have our user, break out of the following list
@@ -954,7 +957,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
             // If the query returns results, we know the user is valid
-            if (this.ExecuteUserQuery(sforceService, where) != null)
+            if (this.ExecuteUserQuery(sforceService, where, null) != null)
             {
                 // Ths user is in the specified context
                 authenticationUtilsResponse.IsInContext = true;
@@ -963,7 +966,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 where = "Id = '" + thisUserId + "'";
 
                 // Grab the correct user object
-                authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
             }
 
             return authenticationUtilsResponse;
@@ -984,7 +987,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
             // Check to see if the query returns and results - if it doesn then we know this user is a manager of the reference user
-            if (this.ExecuteUserQuery(sforceService, where).UserObject != null)
+            if (this.ExecuteUserQuery(sforceService, where, null).UserObject != null)
             {
                 // Set the flag to indicate that this user is in the context
                 authenticationUtilsResponse.IsInContext = true;
@@ -993,7 +996,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 where = "Id = '" + thisUserId + "'";
 
                 // Grab the correct user object
-                authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
             }
 
             return authenticationUtilsResponse;
@@ -1061,8 +1064,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // Now we query the system again, but this time with the query for the actual user
                     where = "Id = '" + thisUserId + "'";
 
-                    // Grab the user object
-                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                    // Grab the user object - sending null for the group selection as we'll do it in the logic in this method
+                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
                     // Add the additional group information if this group validates the user
                     if (authenticationUtilsResponse.UserObject != null)
@@ -1127,8 +1130,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // Now we query the system again, but this time with the query for the actual user
                     where = "Id = '" + thisUserId + "'";
 
-                    // Grab the user object
-                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                    // Grab the user object - sending null for the group selection as we'll do it in the logic in this method
+                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
                     // Add the additional group information if this group validates the user
                     if (authenticationUtilsResponse.UserObject != null)
@@ -1227,8 +1230,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // Now we query the system again, but this time with the query for the actual user
                     where = "Id = '" + thisUserId + "'";
 
-                    // Grab the user object
-                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                    // Grab the user object - sending null for the group selection as we'll do it in the logic in this method
+                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
                     // Add the additional group information if this group validates the user
                     if (authenticationUtilsResponse.UserObject != null)
@@ -1326,8 +1329,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // Now we query the system again, but this time with the query for the actual user
                     where = "Id = '" + thisUserId + "'";
 
-                    // Grab the user object
-                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                    // Grab the user object - sending null for the group selection as we'll do it in the logic in this method
+                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
                     // Add the additional group information if this group validates the user
                     if (authenticationUtilsResponse.UserObject != null)
@@ -1425,8 +1428,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // Now we query the system again, but this time with the query for the actual user
                     where = "Id = '" + thisUserId + "'";
 
-                    // Grab the user object
-                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where).UserObject;
+                    // Grab the user object - sending null for the group selection as we'll do it in the logic in this method
+                    authenticationUtilsResponse.UserObject = this.ExecuteUserQuery(sforceService, where, null).UserObject;
 
                     // Add the additional group information if this group validates the user
                     if (authenticationUtilsResponse.UserObject != null)
@@ -1475,19 +1478,30 @@ namespace ManyWho.Service.Salesforce.Singletons
         /// <summary>
         /// Utility method for executing user queries against salesforce.com
         /// </summary>
-        private QueryResponseHelper ExecuteUserQuery(SforceService sforceService, String where)
+        private QueryResponseHelper ExecuteUserQuery(SforceService sforceService, string where, string groupSelection)
         {
             QueryResponseHelper queryResponseHelper = null;
             ObjectAPI userObject = null;
             QueryResult queryResult = null;
             sObject queryObject = null;
+            string soql = null;
+
+            // By default we execute the standard user query
+            soql = "SELECT Id, Username, Email, FirstName, LastName, ManagerId, UserRoleId, UserRole.DeveloperName, ProfileId, Profile.Name FROM User WHERE ";
+
+            // If the user is using profile group selection, we get that column also as we can populate it regardless of group context
+            if (!string.IsNullOrWhiteSpace(groupSelection) &&
+                groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_PROFILE, StringComparison.InvariantCultureIgnoreCase))
+            {
+                soql = "SELECT Id, Username, Email, FirstName, LastName, ManagerId, UserRoleId, UserRole.DeveloperName, ProfileId, Profile.Name FROM User WHERE ";
+            }
 
             // Create a new instance of the query response helper
             queryResponseHelper = new QueryResponseHelper();
 
             // Query salesforce to see if anything comes back
-            queryResult = sforceService.query("SELECT Id, Username, Email, FirstName, LastName, ManagerId, UserRoleId, UserRole.DeveloperName FROM User WHERE " + where);
-
+            queryResult = sforceService.query(soql + where);
+            
             // Check to see if the query returned any results
             if (queryResult != null &&
                 queryResult.records != null &&
@@ -1518,7 +1532,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     }
                     else
                     {
-                        if (y == 7 &&
+                        if ((y == 7 || y == 9) &&
                             element.LastChild != null)
                         {
                             // This is the relationship field for the user role name
@@ -1629,6 +1643,14 @@ namespace ManyWho.Service.Salesforce.Singletons
             else if (salesforceName.Equals(SALESFORCE_SOBJECT_ROLE_NAME, StringComparison.InvariantCultureIgnoreCase) == true)
             {
                 manywhoName = ManyWhoConstants.MANYWHO_USER_PROPERTY_ROLE_NAME;
+            }
+            else if (salesforceName.Equals(SALESFORCE_SOBJECT_PROFILE_ID, StringComparison.InvariantCultureIgnoreCase) == true)
+            {
+                manywhoName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID;
+            }
+            else if (salesforceName.Equals(SALESFORCE_SOBJECT_PROFILE_NAME, StringComparison.InvariantCultureIgnoreCase) == true)
+            {
+                manywhoName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME;
             }
             else
             {

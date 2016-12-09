@@ -1003,6 +1003,14 @@ namespace ManyWho.Service.Salesforce.Singletons
                     Boolean isUpdate = false;
                     Guid testGuid = Guid.Empty;
 
+                    // Check to make sure the properties are not null or empty
+                    if (objectAPI.properties == null ||
+                        (objectAPI.properties != null &&
+                         objectAPI.properties.Count == 0))
+                    {
+                        throw new ArgumentNullException("ObjectAPI.Properties", string.Format("The object being saved has no properties. The object name is: {0}. The object identifier is: {1}.", objectAPI.developerName, objectAPI.externalId));
+                    }
+
                     // Check to see if we have an external id and that it's not a guid (though the guid problem is now fixed)
                     if (objectAPI.externalId != null &&
                         objectAPI.externalId.Trim().Length > 0 &&
@@ -1878,7 +1886,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             // Log the user into the main authentication endpoint
-            sforceService.Url = authenticationUrl + "/services/Soap/u/35.0";
+            sforceService.Url = authenticationUrl + "/services/Soap/u/38.0";
             loginResult = sforceService.login(username, password + securityToken);
 
             if (loginResult.passwordExpired)

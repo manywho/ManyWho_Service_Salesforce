@@ -26,7 +26,7 @@ namespace ManyWho.Service.Salesforce.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://login.salesforce.com/services/Soap/u/35.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://login.salesforce.com/services/Soap/u/38.0")]
         public string ManyWho_Service_Salesforce_Salesforce_SforceService {
             get {
                 return ((string)(this["ManyWho_Service_Salesforce_Salesforce_SforceService"]));
