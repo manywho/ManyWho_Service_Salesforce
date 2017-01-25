@@ -1292,6 +1292,26 @@ namespace ManyWho.Service.Salesforce.Singletons
             // Create the columns for the query
             foreach (ObjectDataTypePropertyAPI objectDataTypeProperty in objectDataTypeProperties)
             {
+                // We potentially skip the Body field as this will automatically limit selection results from attachments
+                if (!string.IsNullOrWhiteSpace(objectName) &&
+                    objectName.Equals("Attachment", StringComparison.InvariantCultureIgnoreCase) &&
+                    !string.IsNullOrWhiteSpace(objectDataTypeProperty.developerName) &&
+                    objectDataTypeProperty.developerName.Equals("Body", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    // Additional logic specific to the Attachment object
+                    if (listFilterAPI != null &&
+                        !string.IsNullOrWhiteSpace(listFilterAPI.id))
+                    {
+                        // Leave the body in the request as we're looking up a specific attachment
+                    }
+                    else
+                    {
+                        // Remove the body from the request as this query is expected to return multiple results and Salesforce
+                        // will only return multiple results if the body is excluded from an Attachment lookup
+                        continue;
+                    }
+                }
+
                 soqlQuery += objectDataTypeProperty.developerName + ", ";
 
                 if (includesId == false &&
