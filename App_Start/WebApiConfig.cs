@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNet.WebApi.Extensions.Compression.Server;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Web;
+using System.Net.Http.Extensions.Compression.Core.Compressors;
 using System.Web.Http;
 
 namespace ManyWho.Service.Salesforce
@@ -12,6 +10,8 @@ namespace ManyWho.Service.Salesforce
     {
         public static void Register(HttpConfiguration config)
         {
+            config.MessageHandlers.Insert(0, new ServerCompressionHandler(new GZipCompressor(), new DeflateCompressor()));
+
             config.Routes.MapHttpRoute(
                 name: "PluginSalesforceHealthCheck",
                 routeTemplate: "plugins/api/salesforce/1/health",
