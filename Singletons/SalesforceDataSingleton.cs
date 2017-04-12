@@ -21,6 +21,9 @@ using ManyWho.Flow.SDK.Run.Elements.Config;
 using ManyWho.Flow.SDK.Run.Elements.Type;
 using ManyWho.Service.Salesforce.Utils;
 using ManyWho.Service.Salesforce.Salesforce;
+using MoreLinq;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 /*!
 
@@ -386,19 +389,12 @@ namespace ManyWho.Service.Salesforce.Singletons
 
         public List<TypeElementRequestAPI> GetTypeElements(IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues)
         {
-            TypeElementRequestAPI typeElement = null;
-            List<TypeElementRequestAPI> typeElements = null;
-            TypeElementBindingAPI typeElementBinding = null;
-            TypeElementPropertyAPI typeElementEntry = null;
-            TypeElementPropertyBindingAPI typeElementFieldBinding = null;
+            ConcurrentBag<TypeElementRequestAPI> typeElements = null;
             SforceService sforceService = null;
             DescribeGlobalResult describeGlobalResult = null;
-            DescribeSObjectResult[] describeSObjectResults = null;
-            Dictionary<String, Int32> objectNames = null;
-            Dictionary<String, Int32> fieldNames = null;
+            IDictionary<String, Int32> objectNames = null;
             String includeSystemTypesString = null;
             Boolean includeSystemTypes = false;
-            String[] tables = null;
             Int32 entryCounter = 0;
 
             // Login to the service
@@ -421,7 +417,13 @@ namespace ManyWho.Service.Salesforce.Singletons
             describeGlobalResult = sforceService.describeGlobal();
 
             // Create a new dictionary to store the object names so we can detect conflicts
-            objectNames = new Dictionary<String, Int32>();
+            objectNames = new ConcurrentDictionary<String, Int32>();
+
+            // Check to see if the list of type elements is null - it will be for the first chunk
+            if (typeElements == null)
+            {
+                typeElements = new ConcurrentBag<TypeElementRequestAPI>();
+            }
 
             // Get the names of all of the objects so we can then do a full object query
             if (describeGlobalResult != null &&
@@ -429,172 +431,155 @@ namespace ManyWho.Service.Salesforce.Singletons
                 describeGlobalResult.sobjects.Length > 0)
             {
                 // 100 is the maximum number of describes that can be done for salesforce
-                tables = new String[100];
+                var batches = describeGlobalResult.sobjects.Batch(100);
 
-                for (int x = 0; x < describeGlobalResult.sobjects.Length; x++)
+                Parallel.ForEach(batches, batch => 
                 {
-                    tables[entryCounter] = describeGlobalResult.sobjects[x].name;
+                    string[] tables = batch.Select(sobject => sobject.name).ToArray();
 
-                    // We're at the 100th or last entry in the list and need to call the describe call with this chunk
-                    if (entryCounter == 99 || x == (describeGlobalResult.sobjects.Length - 1))
+                    // Now grab the full object descriptions
+                    var describeSObjectResults = sforceService.describeSObjects(tables);
+
+                    // Now we go through the full object descriptions to create the types
+                    if (describeSObjectResults != null &&
+                        describeSObjectResults.Length > 0)
                     {
-                        // Now grab the full object descriptions
-                        describeSObjectResults = sforceService.describeSObjects(tables);
-
-                        // Now we go through the full object descriptions to create the types
-                        if (describeSObjectResults != null &&
-                            describeSObjectResults.Length > 0)
+                        for (int y = 0; y < describeSObjectResults.Length; y++)
                         {
-                            // Check to see if the list of type elements is null - it will be for the first chunk
-                            if (typeElements == null)
+                            DescribeSObjectResult describeSObjectResult = describeSObjectResults[y];
+                            String typeDeveloperName = null;
+
+                            // Check to see if this is a system Type
+                            if (includeSystemTypes == false &&
+                                describeSObjectResult.name != null &&
+                                (describeSObjectResult.name.EndsWith("History", StringComparison.OrdinalIgnoreCase) ||
+                                 describeSObjectResult.name.EndsWith("Feed", StringComparison.OrdinalIgnoreCase) ||
+                                 describeSObjectResult.name.EndsWith("Tag", StringComparison.OrdinalIgnoreCase) ||
+                                 describeSObjectResult.name.EndsWith("Share", StringComparison.OrdinalIgnoreCase)))
                             {
-                                typeElements = new List<TypeElementRequestAPI>();
+                                // Skip this Type, it's a system, low level one
+                                continue;
                             }
 
-                            for (int y = 0; y < describeSObjectResults.Length; y++)
+                            typeDeveloperName = describeSObjectResult.label;
+
+                            // Check to see if this object name already exists
+                            if (objectNames.ContainsKey(describeSObjectResult.label.ToLower()) == true)
                             {
-                                DescribeSObjectResult describeSObjectResult = describeSObjectResults[y];
-                                String typeDeveloperName = null;
+                                Int32 counter = 0;
 
-                                // Check to see if this is a system Type
-                                if (includeSystemTypes == false &&
-                                    describeSObjectResult.name != null &&
-                                    (describeSObjectResult.name.EndsWith("History", StringComparison.OrdinalIgnoreCase) ||
-                                     describeSObjectResult.name.EndsWith("Feed", StringComparison.OrdinalIgnoreCase) ||
-                                     describeSObjectResult.name.EndsWith("Tag", StringComparison.OrdinalIgnoreCase) ||
-                                     describeSObjectResult.name.EndsWith("Share", StringComparison.OrdinalIgnoreCase)))
+                                // Get the object name counter out of the dictionary
+                                objectNames.TryGetValue(describeSObjectResult.label.ToLower(), out counter);
+
+                                // Increment the counter
+                                counter++;
+
+                                // Change the developer name
+                                typeDeveloperName += " " + counter;
+
+                                // Apply the counter back so we know what the next counter needs to be
+                                objectNames[describeSObjectResult.label.ToLower()] = counter;
+                            }
+                            else
+                            {
+                                // Add this table to our list so we're tracking it for future rounds
+                                objectNames.Add(describeSObjectResult.label.ToLower(), 0);
+                            }
+
+                            var typeElement = new TypeElementRequestAPI();
+                            typeElement.developerName = typeDeveloperName;
+                            typeElement.developerSummary = null;
+                            typeElement.bindings = new List<TypeElementBindingAPI>();
+                            typeElement.elementType = ManyWhoConstants.TYPE_ELEMENT_TYPE_IMPLEMENTATION_TYPE;
+
+                            var typeElementBinding = new TypeElementBindingAPI();
+                            typeElementBinding.databaseTableName = describeSObjectResult.name;
+                            typeElementBinding.developerName = "Salesforce.com " + describeSObjectResult.name + " Binding";
+                            typeElementBinding.developerSummary = "The binding to save " + describeSObjectResult.name + " objects into salesforce.com";
+
+                            typeElement.bindings.Add(typeElementBinding);
+
+                            if (describeSObjectResult.fields != null &&
+                                describeSObjectResult.fields.Length > 0)
+                            {
+                                // The dictionary to make we don't have fields with the same name
+                                var fieldNames = new Dictionary<String, Int32>();
+
+                                typeElement.properties = new List<TypeElementPropertyAPI>();
+                                typeElementBinding.propertyBindings = new List<TypeElementPropertyBindingAPI>();
+
+                                for (int z = 0; z < describeSObjectResult.fields.Length; z++)
                                 {
-                                    // Skip this Type, it's a system, low level one
-                                    continue;
-                                }
+                                    Field field = describeSObjectResult.fields[z];
+                                    String fieldDeveloperName = null;
 
-                                typeDeveloperName = describeSObjectResult.label;
+                                    fieldDeveloperName = field.label;
 
-                                // Check to see if this object name already exists
-                                if (objectNames.ContainsKey(describeSObjectResult.label.ToLower()) == true)
-                                {
-                                    Int32 counter = 0;
-
-                                    // Get the object name counter out of the dictionary
-                                    objectNames.TryGetValue(describeSObjectResult.label.ToLower(), out counter);
-
-                                    // Increment the counter
-                                    counter++;
-
-                                    // Change the developer name
-                                    typeDeveloperName += " " + counter;
-
-                                    // Apply the counter back so we know what the next counter needs to be
-                                    objectNames[describeSObjectResult.label.ToLower()] = counter;
-                                }
-                                else
-                                {
-                                    // Add this table to our list so we're tracking it for future rounds
-                                    objectNames.Add(describeSObjectResult.label.ToLower(), 0);
-                                }
-
-                                typeElement = new TypeElementRequestAPI();
-                                typeElement.developerName = typeDeveloperName;
-                                typeElement.developerSummary = null;
-                                typeElement.bindings = new List<TypeElementBindingAPI>();
-                                typeElement.elementType = ManyWhoConstants.TYPE_ELEMENT_TYPE_IMPLEMENTATION_TYPE;
-
-                                typeElementBinding = new TypeElementBindingAPI();
-                                typeElementBinding.databaseTableName = describeSObjectResult.name;
-                                typeElementBinding.developerName = "Salesforce.com " + describeSObjectResult.name + " Binding";
-                                typeElementBinding.developerSummary = "The binding to save " + describeSObjectResult.name + " objects into salesforce.com";
-
-                                typeElement.bindings.Add(typeElementBinding);
-
-                                if (describeSObjectResult.fields != null &&
-                                    describeSObjectResult.fields.Length > 0)
-                                {
-                                    // The dictionary to make we don't have fields with the same name
-                                    fieldNames = new Dictionary<String, Int32>();
-
-                                    typeElement.properties = new List<TypeElementPropertyAPI>();
-                                    typeElementBinding.propertyBindings = new List<TypeElementPropertyBindingAPI>();
-
-                                    for (int z = 0; z < describeSObjectResult.fields.Length; z++)
+                                    // Check to see if this field name already exists
+                                    if (fieldNames.ContainsKey(field.label.ToLower()) == true)
                                     {
-                                        Field field = describeSObjectResult.fields[z];
-                                        String fieldDeveloperName = null;
+                                        Int32 counter = 0;
 
-                                        fieldDeveloperName = field.label;
+                                        // Get the field name counter out of the dictionary
+                                        fieldNames.TryGetValue(field.label.ToLower(), out counter);
 
-                                        // Check to see if this field name already exists
-                                        if (fieldNames.ContainsKey(field.label.ToLower()) == true)
-                                        {
-                                            Int32 counter = 0;
+                                        // Increment the counter
+                                        counter++;
 
-                                            // Get the field name counter out of the dictionary
-                                            fieldNames.TryGetValue(field.label.ToLower(), out counter);
+                                        // Change the developer name
+                                        fieldDeveloperName += " " + counter;
 
-                                            // Increment the counter
-                                            counter++;
+                                        // Apply the counter back so we know what the next counter needs to be
+                                        fieldNames[field.label.ToLower()] = counter;
+                                    }
+                                    else
+                                    {
+                                        // Add this field to our list so we're tracking it for future rounds
+                                        fieldNames.Add(field.label.ToLower(), 0);
+                                    }
 
-                                            // Change the developer name
-                                            fieldDeveloperName += " " + counter;
+                                    var typeElementFieldBinding = new TypeElementPropertyBindingAPI();
+                                    typeElementFieldBinding.databaseFieldName = field.name;
+                                    typeElementFieldBinding.databaseContentType = field.type.ToString();
+                                    typeElementFieldBinding.typeElementPropertyDeveloperName = fieldDeveloperName;
 
-                                            // Apply the counter back so we know what the next counter needs to be
-                                            fieldNames[field.label.ToLower()] = counter;
-                                        }
-                                        else
-                                        {
-                                            // Add this field to our list so we're tracking it for future rounds
-                                            fieldNames.Add(field.label.ToLower(), 0);
-                                        }
+                                    typeElementBinding.propertyBindings.Add(typeElementFieldBinding);
 
+                                    var typeElementEntry = new TypeElementPropertyAPI();
+                                    typeElementEntry.contentType = this.TranslateToManyWhoContentType(field.type.ToString());
+                                    typeElementEntry.developerName = fieldDeveloperName;
+                                    typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
+
+                                    typeElement.properties.Add(typeElementEntry);
+
+                                    // Check to see if this field reference should be added
+                                    if (this.AddReferenceField(describeSObjectResult.name, field) == true)
+                                    {
+                                        // Add the reference to the binding
                                         typeElementFieldBinding = new TypeElementPropertyBindingAPI();
-                                        typeElementFieldBinding.databaseFieldName = field.name;
+                                        typeElementFieldBinding.databaseFieldName = field.relationshipName + ".Name";
                                         typeElementFieldBinding.databaseContentType = field.type.ToString();
-                                        typeElementFieldBinding.typeElementPropertyDeveloperName = fieldDeveloperName;
+                                        typeElementFieldBinding.typeElementPropertyDeveloperName = fieldDeveloperName + " Name";
 
                                         typeElementBinding.propertyBindings.Add(typeElementFieldBinding);
 
                                         typeElementEntry = new TypeElementPropertyAPI();
                                         typeElementEntry.contentType = this.TranslateToManyWhoContentType(field.type.ToString());
-                                        typeElementEntry.developerName = fieldDeveloperName;
+                                        typeElementEntry.developerName = fieldDeveloperName + " Name";
                                         typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
 
                                         typeElement.properties.Add(typeElementEntry);
-
-                                        // Check to see if this field reference should be added
-                                        if (this.AddReferenceField(describeSObjectResult.name, field) == true)
-                                        {
-                                            // Add the reference to the binding
-                                            typeElementFieldBinding = new TypeElementPropertyBindingAPI();
-                                            typeElementFieldBinding.databaseFieldName = field.relationshipName + ".Name";
-                                            typeElementFieldBinding.databaseContentType = field.type.ToString();
-                                            typeElementFieldBinding.typeElementPropertyDeveloperName = fieldDeveloperName + " Name";
-
-                                            typeElementBinding.propertyBindings.Add(typeElementFieldBinding);
-
-                                            typeElementEntry = new TypeElementPropertyAPI();
-                                            typeElementEntry.contentType = this.TranslateToManyWhoContentType(field.type.ToString());
-                                            typeElementEntry.developerName = fieldDeveloperName + " Name";
-                                            typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
-
-                                            typeElement.properties.Add(typeElementEntry);
-                                        }
                                     }
                                 }
-
-                                typeElements.Add(typeElement);
                             }
-                        }
 
-                        entryCounter = 0;
-                        tables = new String[100];
+                            typeElements.Add(typeElement);
+                        }
                     }
-                    else
-                    {
-                        entryCounter++;
-                    }
-                }
+                });
             }
 
-            return typeElements;
+            return typeElements.ToList();
         }
 
         public List<ObjectAPI> Save(INotifier notifier, IAuthenticatedWho authenticatedWho, List<EngineValueAPI> configurationValues, List<ObjectDataTypePropertyAPI> objectDataTypeProperties, List<ObjectAPI> objectAPIs)
