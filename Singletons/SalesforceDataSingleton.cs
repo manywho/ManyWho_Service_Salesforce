@@ -1868,6 +1868,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             SforceService sforceService = null;
 
             sforceService = new SforceService();
+            sforceService.EnableDecompression = true;
             sforceService.Timeout = 60000;
             sforceService.Url = sessionUrl;
             sforceService.SessionHeaderValue = new SessionHeader();
@@ -1882,6 +1883,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             SforceService sforceService = null;
 
             sforceService = new SforceService();
+            sforceService.EnableDecompression = true;
             sforceService.Timeout = 60000;
 
             // The user is not required to provide a security token
