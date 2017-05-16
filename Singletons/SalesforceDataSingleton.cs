@@ -1906,10 +1906,10 @@ namespace ManyWho.Service.Salesforce.Singletons
                     sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
 
                     // Check to make sure the urls match with the expected result
-                    if (sessionUrl.IndexOf(sforceService.Url, StringComparison.OrdinalIgnoreCase) < 0)
-                    {
-                        throw new ArgumentNullException("InvalidSession", "The provided session information does not match the expected value.");
-                    }
+                    //if (sessionUrl.IndexOf(sforceService.Url, StringComparison.OrdinalIgnoreCase) < 0)
+                    //{
+                    //    throw new ArgumentNullException("InvalidSession", "The provided session information does not match the expected value.");
+                    //}
                 }
                 else
                 {
