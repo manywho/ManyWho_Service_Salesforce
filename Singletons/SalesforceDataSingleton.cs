@@ -720,21 +720,23 @@ namespace ManyWho.Service.Salesforce.Singletons
                             // Grab the content type for the field - the content type as it should be from ManyWho
                             contentType = TranslateToManyWhoContentType(field.type.ToString());
 
+                            // 15 May 2017 - The rule below has been modified to only apply to date-time fields as they can be problematic
                             // If the property does not have a value, we exclude it from the update. We assume that the user will be providing a value
                             // if they want to perform a save. The driver therefore does not currently support "nulling" or "blanking" field values. This will
                             // help prevent any data loss issues and blanking values feels like an edge case that's more likely to cause problems than solve them!
                             if (referencedPropertyAPI != null)
                             {
-                                if (referencedPropertyAPI.contentValue == null ||
-                                    referencedPropertyAPI.contentValue.Trim().Length == 0)
-                                {
-                                    propertiesToRemove.Add(referencedPropertyAPI);
-                                    continue;
-                                }
-                                else if (contentType != null &&
-                                         contentType.Equals(ManyWhoConstants.CONTENT_TYPE_DATETIME) == true)
+                                if (contentType != null &&
+                                    contentType.Equals(ManyWhoConstants.CONTENT_TYPE_DATETIME) == true)
                                 {
                                     DateTime dateTimeCheck;
+
+                                    if (referencedPropertyAPI.contentValue == null ||
+                                        referencedPropertyAPI.contentValue.Trim().Length == 0)
+                                    {
+                                        propertiesToRemove.Add(referencedPropertyAPI);
+                                        continue;
+                                    }
 
                                     if (DateTime.TryParse(referencedPropertyAPI.contentValue, out dateTimeCheck) == true &&
                                         dateTimeCheck == DateTime.MinValue)
@@ -865,11 +867,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     }
                                     else
                                     {
-                                        String errorMessage = "An attempt is being made to set a non-nillable field to a null value. The name of the field is: " + field.name;
-
-                                        ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
-
-                                        throw new ArgumentNullException("BadRequest", errorMessage);
+                                        // We're attempting to set a property that's not nillable to nill
+                                        propertiesToRemove.Add(referencedPropertyAPI);
                                     }
                                 }
                             }
@@ -1716,11 +1715,11 @@ namespace ManyWho.Service.Salesforce.Singletons
         private sObject CreateSObjectFromObjectAPI(ObjectAPI objectAPI)
         {
             XmlDocument fieldsXmlDoc = null;
-            XmlElement[] fieldsElements = null;
+            List<XmlElement> fieldsElements = null;
             XmlElement fieldXmlElement = null;
             sObject saveObject = null;
+            List<String> fieldsToNull = null;
             String idInObject = null;
-            Int32 fieldCounter = 0;
 
             if (objectAPI != null &&
                 objectAPI.properties != null &&
@@ -1731,28 +1730,42 @@ namespace ManyWho.Service.Salesforce.Singletons
 
                 // Create the fields xml doc
                 fieldsXmlDoc = new XmlDocument();
-
-                fieldsElements = new XmlElement[objectAPI.properties.Count];
+                fieldsToNull = new List<String>();
+                fieldsElements = new List<XmlElement>();
 
                 foreach (var property in objectAPI.properties)
                 {
-                    // Create the xml element for this field
-                    fieldXmlElement = fieldsXmlDoc.CreateElement(property.developerName);
-                    fieldXmlElement.InnerText = property.contentValue;
-
-                    // Add the field value to the object
-                    fieldsElements[fieldCounter] = fieldXmlElement;
-
-                    // Check to see if this property is an id, if so, grab it here and apply it to the root object
-                    if (property.developerName.Equals("id", StringComparison.InvariantCultureIgnoreCase) == true)
+                    if (string.IsNullOrWhiteSpace(property.contentValue))
                     {
-                        idInObject = property.contentValue;
+                        // If the value is empty, we set it to the fields to nill rather than sending in a blank
+                        fieldsToNull.Add(property.developerName);
                     }
+                    else
+                    {
+                        // Create the xml element for this field
+                        fieldXmlElement = fieldsXmlDoc.CreateElement(property.developerName);
+                        fieldXmlElement.InnerText = property.contentValue;
 
-                    fieldCounter++;
+                        // Add the field value to the object
+                        fieldsElements.Add(fieldXmlElement);
+
+                        // Check to see if this property is an id, if so, grab it here and apply it to the root object
+                        if (property.developerName.Equals("id", StringComparison.InvariantCultureIgnoreCase) == true)
+                        {
+                            idInObject = property.contentValue;
+                        }
+                    }
                 }
 
-                saveObject.Any = fieldsElements;
+                if (fieldsElements.Count > 0)
+                {
+                    saveObject.Any = fieldsElements.ToArray();
+                }
+
+                if (fieldsToNull.Count > 0)
+                {
+                    saveObject.fieldsToNull = fieldsToNull.ToArray();
+                }
 
                 if (idInObject != null &&
                     idInObject.Trim().Length > 0 &&
