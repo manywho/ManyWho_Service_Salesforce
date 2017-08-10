@@ -796,16 +796,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 }
                             }
 
-                            // If the field is null and we're dealing with a boolean, we assign false as booleans can't be null really
-                            if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_BOOLEAN, StringComparison.InvariantCultureIgnoreCase) == true &&
-                                referencedPropertyAPI != null &&
-                                (referencedPropertyAPI.contentValue == null ||
-                                 referencedPropertyAPI.contentValue.Trim().Length == 0))
-                            {
-                                // Set null boolean values to false
-                                referencedPropertyAPI.contentValue = "false";
-                            }
-
                             // We don't currently support object data saving, so we only need to check against the content value for the validation stuff
                             if (field.nillable == false)
                             {
@@ -880,13 +870,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 // Now we need to parse the value for the given type
                                 if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_BOOLEAN, StringComparison.InvariantCultureIgnoreCase) == true)
                                 {
-                                    Boolean booleanValue = false;
-
                                     // Parse the content value to find out if it's true or false and to ensure it's a valid boolean
-                                    Boolean.TryParse(referencedPropertyAPI.contentValue, out booleanValue);
-
-                                    // Make sure the content value is in fact a valid boolean
-                                    referencedPropertyAPI.contentValue = booleanValue.ToString().ToLower();
+                                    var isParsed = bool.TryParse(referencedPropertyAPI.contentValue, out var booleanValue);
+                                    if (isParsed)
+                                    {
+                                        referencedPropertyAPI.contentValue = booleanValue.ToString().ToLower();
+                                    }
                                 }
                                 else if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_DATETIME, StringComparison.InvariantCultureIgnoreCase) == true)
                                 {
@@ -921,13 +910,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                                 }
                                 else if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_NUMBER, StringComparison.InvariantCultureIgnoreCase) == true)
                                 {
-                                    Double numberValue = 0;
-
                                     // Parse the content value to find out if it's a true number and to ensure it's a valid number
-                                    Double.TryParse(referencedPropertyAPI.contentValue, out numberValue);
-
-                                    // Make sure the content value is in fact a valid number
-                                    referencedPropertyAPI.contentValue = numberValue.ToString();
+                                    var isParsed = Double.TryParse(referencedPropertyAPI.contentValue, out var numberValue);
+                                    if (isParsed)
+                                    {
+                                        referencedPropertyAPI.contentValue = numberValue.ToString();
+                                    }
                                 }
                                 else if (contentType.Equals(ManyWhoConstants.CONTENT_TYPE_LIST, StringComparison.InvariantCultureIgnoreCase) == true ||
                                          contentType.Equals(ManyWhoConstants.CONTENT_TYPE_OBJECT, StringComparison.InvariantCultureIgnoreCase) == true)
@@ -1738,8 +1726,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                 {
                     if (string.IsNullOrWhiteSpace(property.contentValue))
                     {
-                        // If the value is empty, we set it to the fields to nill rather than sending in a blank
-                        fieldsToNull.Add(property.developerName);
+                        // If we're updating, then we want to set the field to null - otherwise, we want to ignore it when creating
+                        if (string.IsNullOrWhiteSpace(objectAPI.externalId) == false)
+                        {
+                            fieldsToNull.Add(property.developerName);
+                        }
                     }
                     else
                     {
