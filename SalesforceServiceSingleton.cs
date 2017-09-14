@@ -70,8 +70,8 @@ namespace ManyWho.Service.Salesforce
         public const String AUTHENTICATION_STRATEGY_SUPER_USER = "SuperUser";
         public const String AUTHENTICATION_STRATEGY_ACTIVE_USER = "ActiveUser";
 
-        public const String GROUP_SELECTION_GROUP = "Group";
         public const String GROUP_SELECTION_QUEUE = "Queue";
+        public const String GROUP_SELECTION_ALL_GROUPS = "Groups";
         public const String GROUP_SELECTION_PROFILE = "Profile";
         public const String GROUP_SELECTION_ROLE = "Role";
 
@@ -1228,6 +1228,51 @@ namespace ManyWho.Service.Salesforce
                                 if (propertyAPI.developerName.Equals("DeveloperName", StringComparison.InvariantCultureIgnoreCase) == true)
                                 {
                                     propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_AUTHENTICATION_ID;
+                                }
+                                else if (propertyAPI.developerName.Equals("Name", StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_FRIENDLY_NAME;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                    groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ALL_GROUPS, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    // We construct the object data type for the salesforce user implementation - we then reassign the property names to the supported ManyWho property names
+                    // for Group Authorization User
+                    typePropertyAPIs = new List<ObjectDataTypePropertyAPI>();
+                    typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Id" });
+                    typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "DeveloperName" });
+                    typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
+
+                    // If the user has provided object data, we want to filter our request by the provided object data
+                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "DeveloperName");
+
+                    // Do the actual selection to populate one or many of these object types
+                    objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "Group", typePropertyAPIs, listFilterAPI, true);
+
+                    // Check to see if the query returned any data
+                    if (objectDataResponseAPI.objectData != null &&
+                        objectDataResponseAPI.objectData.Count > 0)
+                    {
+                        // Go through the list of returned objects and turn them into group objects that are compatible with ManyWho
+                        foreach (ObjectAPI objectAPI in objectDataResponseAPI.objectData)
+                        {
+                            // Tell ManyWho that this is a group object
+                            objectAPI.developerName = ManyWhoConstants.AUTHENTICATION_GROUP_AUTHORIZATION_GROUP_OBJECT_DEVELOPER_NAME;
+
+                            // Go through each of the properties in the salesforce object and translate them to the ManyWho equivalent
+                            foreach (PropertyAPI propertyAPI in objectAPI.properties)
+                            {
+                                if (propertyAPI.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_AUTHENTICATION_ID;
+                                }
+                                else if (propertyAPI.developerName.Equals("DeveloperName", StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_DEVELOPER_SUMMARY;
                                 }
                                 else if (propertyAPI.developerName.Equals("Name", StringComparison.InvariantCultureIgnoreCase) == true)
                                 {

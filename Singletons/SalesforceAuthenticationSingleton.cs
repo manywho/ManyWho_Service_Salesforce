@@ -52,6 +52,8 @@ namespace ManyWho.Service.Salesforce.Singletons
         public const String SALESFORCE_SOBJECT_PROFILE_ID = "sf:ProfileId";
         public const String SALESFORCE_SOBJECT_PROFILE_NAME = "sf:Profile";
 
+        private const String GROUP_TYPE_QUEUE = "QUEUE";
+
         private SalesforceAuthenticationSingleton()
         {
 
@@ -117,8 +119,16 @@ namespace ManyWho.Service.Salesforce.Singletons
                     if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_QUEUE, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        string groupId = GroupId(sforceService, authorization.groups[0].authenticationId, GROUP_TYPE_QUEUE);
+
                         // Check to see if the user is a member of the specified queue
-                        authenticationUtilsResponse = this.QueueMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
+                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, authorization.groups[0].authenticationId, groupId, authenticatedWho.UserId, true);
+                    }
+                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ALL_GROUPS, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        string groupId = GroupId(sforceService, authorization.groups[0].authenticationId);
+                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, authorization.groups[0].authenticationId, groupId, authenticatedWho.UserId, true);
                     }
                     else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_PROFILE, StringComparison.InvariantCultureIgnoreCase))
@@ -135,7 +145,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     else
                     {
                         // Check to see if the user is a member of the specified group
-                        authenticationUtilsResponse = this.GroupMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
+                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
                     }
                 }
                 else if (authorization.groups[0].attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_OWNERS, StringComparison.InvariantCultureIgnoreCase) == true)
@@ -143,8 +153,15 @@ namespace ManyWho.Service.Salesforce.Singletons
                     if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_QUEUE, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        string groupId = GroupId(sforceService, authorization.groups[0].authenticationId, GROUP_TYPE_QUEUE);
                         // Check to see if the user is a member of the specified profile - we don't support owner
-                        authenticationUtilsResponse = this.QueueMember(sforceService, authorization.groups[0].authenticationId, authenticatedWho.UserId, true);
+                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, authorization.groups[0].authenticationId, groupId, authenticatedWho.UserId, true);
+                    }
+                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ALL_GROUPS, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        string groupId = GroupId(sforceService, authorization.groups[0].authenticationId);
+                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, authorization.groups[0].authenticationId, groupId, authenticatedWho.UserId, true);
                     }
                     else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_PROFILE, StringComparison.InvariantCultureIgnoreCase))
@@ -371,8 +388,15 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_QUEUE, StringComparison.InvariantCultureIgnoreCase))
                                     {
+                                        string groupId = GroupId(sforceService, group.authenticationId, GROUP_TYPE_QUEUE);
                                         // Check to see if the user is a member of the specified queue
-                                        authenticationUtilsResponse = this.QueueMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, group.authenticationId, groupId, authenticatedWho.UserId, false);
+                                    }
+                                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ALL_GROUPS, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        string groupId = GroupId(sforceService, group.authenticationId);
+                                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, group.authenticationId, groupId, authenticatedWho.UserId, false);
                                     }
                                     else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_PROFILE, StringComparison.InvariantCultureIgnoreCase))
@@ -389,7 +413,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     else
                                     {
                                         // Check to see if the user is a member of the specified group
-                                        authenticationUtilsResponse = this.GroupMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
                                     }
                                 }
                                 else if (group.attribute.Equals(SalesforceServiceSingleton.SERVICE_VALUE_OWNERS, StringComparison.InvariantCultureIgnoreCase) == true)
@@ -397,8 +421,15 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_QUEUE, StringComparison.InvariantCultureIgnoreCase))
                                     {
+                                        string groupId = GroupId(sforceService, group.authenticationId, GROUP_TYPE_QUEUE);
                                         // Check to see if the user is a member of the specified queue
-                                        authenticationUtilsResponse = this.QueueMember(sforceService, group.authenticationId, authenticatedWho.UserId, false);
+                                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, group.authenticationId, groupId, authenticatedWho.UserId, false);
+                                    }
+                                    else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
+                                        groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_ALL_GROUPS, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        string groupId = GroupId(sforceService, group.authenticationId);
+                                        authenticationUtilsResponse = this.GroupTypeMember(sforceService, group.authenticationId, groupId, authenticatedWho.UserId, false);
                                     }
                                     else if (string.IsNullOrWhiteSpace(groupSelection) == false &&
                                         groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_PROFILE, StringComparison.InvariantCultureIgnoreCase))
@@ -1005,7 +1036,7 @@ namespace ManyWho.Service.Salesforce.Singletons
         /// <summary>
         /// Check to see if this user is a member of the reference group id.
         /// </summary>
-        private AuthenticationUtilsResponse GroupMember(SforceService sforceService, String referenceGroupId, String thisUserId, Boolean isUserCount)
+        private AuthenticationUtilsResponse GroupTypeMember(SforceService sforceService, String referenceGroupId, String thisUserId, Boolean isUserCount)
         {
             AuthenticationUtilsResponse authenticationUtilsResponse = null;
             QueryResult queryResult = null;
@@ -1246,42 +1277,77 @@ namespace ManyWho.Service.Salesforce.Singletons
         }
 
         /// <summary>
-        /// Check to see if the user is a member of the provided queue. We do this based on queue developer name.
+        /// It gets the group id, using the developerName of the group and the type.
+        /// It returns null if it is not found
         /// </summary>
-        private AuthenticationUtilsResponse QueueMember(SforceService sforceService, String referenceQueueDeveloperName, String thisUserId, Boolean isUserCount)
+        private string GroupId(SforceService sforceService, String referenceGroupDeveloperName, string groupType)
         {
-            AuthenticationUtilsResponse authenticationUtilsResponse = null;
             QueryResult queryResult = null;
-            Boolean executeQuery = true;
-            String referenceQueueId = null;
-            String soql = null;
-            String where = null;
+            String referenceGroupId = null;
 
             // First we need to get the unique identifier for the queue as we're provided the developer name
-            soql = "SELECT Id FROM Group WHERE DeveloperName = '" + referenceQueueDeveloperName + "' AND Type = 'QUEUE'";
+            string soql = "SELECT Id FROM Group WHERE DeveloperName = '" + referenceGroupDeveloperName + "' AND Type = '" + groupType + "'";
 
             queryResult = sforceService.query(soql);
 
-            if (queryResult != null &&
-                queryResult.records != null &&
-                queryResult.records.Length > 0)
+            if (queryResult?.records?.Length > 0)
             {
                 if (queryResult.records[0].Any != null &&
                     queryResult.records[0].Any.Length > 0)
                 {
                     // Get the unique identifier out
-                    referenceQueueId = queryResult.records[0].Any[0].InnerText;
+                    referenceGroupId = queryResult.records[0].Any[0].InnerText;
                 }
             }
 
+            return referenceGroupId;
+        }
+
+        /// <summary>
+        /// It returns the group Id if the group exists and null in other case
+        /// </summary>
+        private string GroupId(SforceService sforceService, String groupId)
+        {
+            QueryResult queryResult = null;
+            String referenceGroupId = null;
+
+            // First we need to get the unique identifier for the queue as we're provided the developer name
+            String soql = "SELECT Id FROM Group WHERE Id = '" + groupId + "'";
+
+            queryResult = sforceService.query(soql);
+
+            if (queryResult?.records?.Length > 0)
+            {
+                if (queryResult.records[0].Any != null &&
+                    queryResult.records[0].Any.Length > 0)
+                {
+                    // Get the unique identifier out
+                    referenceGroupId = queryResult.records[0].Any[0].InnerText;
+                }
+            }
+
+            return referenceGroupId;
+        }
+
+        /// <summary>
+        /// Check to see if the user is a member of the provided queue. We do this based on queue developer name.
+        /// </summary>
+        private AuthenticationUtilsResponse GroupTypeMember(SforceService sforceService, String referenceGroupIdentifier, string groupId, String thisUserId, Boolean isUserCount)
+        {
+            AuthenticationUtilsResponse authenticationUtilsResponse = null;
+            QueryResult queryResult = null;
+            Boolean executeQuery = true;
+            String soql = null;
+            String where = null;
+
             // Check to make sure we could find the reference profile name in the system
-            if (string.IsNullOrWhiteSpace(referenceQueueId) == false)
+            if (string.IsNullOrWhiteSpace(groupId) == false)
             {
                 // Check to see what type of group member lookup we're doing
                 if (isUserCount == true)
                 {
                     // If we're counting the users, we don't want to filter by a specific user, we just want the count
-                    soql = "SELECT Count(GroupId) FROM GroupMember WHERE GroupId = '" + referenceQueueId + "'";
+                    soql = "SELECT Count(GroupId) FROM GroupMember WHERE GroupId = '" + groupId + "'";
                 }
                 else
                 {
@@ -1293,7 +1359,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     }
 
                     // Select from the users to see if this user has the matching queue
-                    soql = "SELECT GroupId FROM GroupMember WHERE GroupId = '" + referenceQueueId + "' AND UserOrGroupId = '" + thisUserId + "'";
+                    soql = "SELECT GroupId FROM GroupMember WHERE GroupId = '" + groupId + "' AND UserOrGroupId = '" + thisUserId + "'";
                 }
             }
 
@@ -1335,8 +1401,8 @@ namespace ManyWho.Service.Salesforce.Singletons
                     // Add the additional group information if this group validates the user
                     if (authenticationUtilsResponse.UserObject != null)
                     {
-                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = referenceQueueId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
-                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = referenceQueueDeveloperName, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_ID, contentValue = groupId, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
+                        authenticationUtilsResponse.UserObject.properties.Add(new PropertyAPI() { developerName = ManyWhoConstants.MANYWHO_USER_PROPERTY_PRIMARY_GROUP_NAME, contentValue = referenceGroupIdentifier, contentType = ManyWhoConstants.CONTENT_TYPE_STRING });
                     }
                 }
             }
