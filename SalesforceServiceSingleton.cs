@@ -1613,7 +1613,7 @@ namespace ManyWho.Service.Salesforce
                     if (String.IsNullOrWhiteSpace(authenticationCredentialsAPI.sessionToken) == false)
                     {
                         // The user has already logged into salesforce so we simply check them against the session
-                        sforceService = SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(authenticationCredentialsAPI.configurationValues, authenticationCredentialsAPI.sessionToken, authenticationCredentialsAPI.sessionUrl);
+                        sforceService = SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(authenticationCredentialsAPI.sessionToken, authenticationCredentialsAPI.sessionUrl);
                     }
                     else
                     {

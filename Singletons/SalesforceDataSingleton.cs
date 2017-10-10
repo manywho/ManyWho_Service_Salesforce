@@ -1859,7 +1859,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                 {
                     // We should log the user in using their session information that's been provided via a previous explicit login
                     sforceService = this.LogUserInBasedOnSession(
-                        configurationValues,
                         SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).Token,
                         SalesforceHttpUtils.GetAuthenticationDetails(authenticatedWho.Token).PartnerUrl
                     );
@@ -1869,49 +1868,16 @@ namespace ManyWho.Service.Salesforce.Singletons
             return sforceService;
         }
 
-        public SforceService LogUserInBasedOnSession(List<EngineValueAPI> configurationValues, String sessionToken, String sessionUrl)
+        public SforceService LogUserInBasedOnSession(String sessionToken, String sessionUrl)
         {
             SforceService sforceService = null;
 
             sforceService = new SforceService();
             sforceService.EnableDecompression = true;
             sforceService.Timeout = 60000;
+            sforceService.Url = sessionUrl;
             sforceService.SessionHeaderValue = new SessionHeader();
             sforceService.SessionHeaderValue.sessionId = sessionToken;
-
-            if (!string.IsNullOrWhiteSpace(sessionUrl) &&
-                sessionUrl.IndexOf("?") > 0)
-            {
-                // We have a modified url and therefore need to look at the modifications to determine if it's a correctly configured
-                // portal login
-                NameValueCollection queryParameters = HttpUtility.ParseQueryString(sessionUrl.Substring(sessionUrl.IndexOf("?")));
-
-                if (!string.IsNullOrWhiteSpace(queryParameters["portalLogin"]))
-                {
-                    // Grab the actual configuration values out
-                    string authenticationUrl = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_AUTHENTICATION_URL, configurationValues, true);
-                    string username = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_USERNAME, configurationValues, true);
-                    string password = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_PASSWORD, configurationValues, true);
-                    string securityToken = ValueUtils.GetContentValue(SalesforceServiceSingleton.SERVICE_VALUE_SECURITY_TOKEN, configurationValues, false);
-
-                    sforceService = this.LoginUsingCredentials(authenticationUrl, username, password, securityToken);
-
-                    // Check to make sure the urls match with the expected result
-                    //if (sessionUrl.IndexOf(sforceService.Url, StringComparison.OrdinalIgnoreCase) < 0)
-                    //{
-                    //    throw new ArgumentNullException("InvalidSession", "The provided session information does not match the expected value.");
-                    //}
-                }
-                else
-                {
-                    throw new ArgumentNullException("PortalLogin", "The provided session URL parameters are not recognized. 'portalLogin' is the only supported option.");
-                }
-            }
-            else
-            {
-                // We have a standard salesforce login url, nothing special required
-                sforceService.Url = sessionUrl;
-            }
 
             return sforceService;
         }
