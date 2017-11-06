@@ -1182,12 +1182,21 @@ namespace ManyWho.Service.Salesforce.Singletons
         /// </summary>
         private AuthenticationUtilsResponse ProfileMember(SforceService sforceService, String referenceProfileName, String thisUserId, Boolean isUserCount)
         {
-            AuthenticationUtilsResponse authenticationUtilsResponse = null;
+            var authenticationUtilsResponse = new AuthenticationUtilsResponse();
             QueryResult queryResult = null;
             Boolean executeQuery = true;
             String referenceProfileId = null;
             String soql = null;
             String where = null;
+
+            try
+            {
+                sforceService.describeSObject("Profile");
+            } catch
+            {
+                // if the user doesn't have permissions for read Profile we can not authorize
+                return authenticationUtilsResponse;
+            }
 
             // First we need to get the unique identifier for the profile as we're provided the name
             soql = "SELECT Id FROM Profile WHERE Name = '" + referenceProfileName + "'";
@@ -1228,9 +1237,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                     soql = "SELECT Id FROM User WHERE ProfileId = '" + referenceProfileId + "' AND Id = '" + thisUserId + "'";
                 }
             }
-
-            // Create a new authentication utils response object to house the results
-            authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
             // Check to make sure we should bother executing the query
             if (executeQuery == true)
@@ -1552,7 +1558,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             foreach (var field in userFields)
             {
-                // only add profile fields if the user have permissions for read the ProfileId
+                // only add Profile fields if the user have permissions for read the ProfileId
                 if ("ProfileId".Equals(field.name))
                 {
                     profileFields = "ProfileId, Profile.Name,";
@@ -1562,7 +1568,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     managerFields = "ManagerId,";
                 } else if ("UserRoleId".Equals("UserRoleId"))
                 {
-                    // only add Manager fields if the user have permissions for read the UserRoleId
+                    // only add Role fields if the user have permissions for read the UserRoleId
                     roleFields = "UserRoleId, UserRole.DeveloperName,";
                 }
             }
