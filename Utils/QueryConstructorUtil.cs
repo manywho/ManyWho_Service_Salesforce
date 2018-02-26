@@ -49,6 +49,18 @@ namespace ManyWho.Service.Salesforce.Utils
                         listFilterAPI.orderByPropertyDeveloperName.Trim().Length > 0)
                     {
                         soql += " ORDER BY " + listFilterAPI.orderByPropertyDeveloperName + " " + listFilterAPI.orderByDirectionType;
+                    } else if ((listFilterAPI.orderBy == null || listFilterAPI.orderBy.Count == 0) && string.IsNullOrEmpty(listFilterAPI.orderByPropertyDeveloperName))
+                    {
+                        soql += " ORDER BY Id";
+                        
+                        if (string.IsNullOrEmpty(listFilterAPI.orderByDirectionType))
+                        {
+                            soql += " ASC";
+                        }
+                        else
+                        {
+                            soql += " " + listFilterAPI.orderByDirectionType;
+                        }
                     }
 
                     if (listFilterAPI.limit > 0)
