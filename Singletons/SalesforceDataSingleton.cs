@@ -25,6 +25,8 @@ using MoreLinq;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Specialized;
+using Microsoft.Extensions.Caching.Memory;
+using Xenolope.Extensions;
 
 /*!
 
@@ -46,17 +48,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 {
     public class SalesforceDataSingleton
     {
-        public const String SELECTABLE = "Selectable";
-        public const String INSERTABLE = "Createable";
-        public const String UPDATEABLE = "Updateable";
-        public const String DELETABLE = "Deletable";
-
-        public const String MANAGER_FIELD_NAME = "Manager";
-
-        public const String KEY_AUTHENTICATION_URL = "AuthenticationUrl";
-        public const String KEY_USERNAME = "Username";
-        public const String KEY_PASSWORD = "Password";
-        public const String KEY_SECURITY_TOKEN = "SecurityToken";
+        static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
 
         private static SalesforceDataSingleton salesforceDataSingleton;
         private QueryConstructorUtil queryConstructorUtil;
@@ -141,10 +133,10 @@ namespace ManyWho.Service.Salesforce.Singletons
             describeSObjectResult = sforceService.describeSObject(tableName);
 
             // Execute the internal method
-            return this.DescribeFields(authenticatedWho, sforceService, describeSObjectResult, tableName);
+            return this.DescribeFields(describeSObjectResult, tableName);
         }
 
-        private List<TypeElementPropertyBindingAPI> DescribeFields(IAuthenticatedWho authenticatedWho, SforceService sforceService, DescribeSObjectResult describeSObjectResult, String tableName)
+        private List<TypeElementPropertyBindingAPI> DescribeFields(DescribeSObjectResult describeSObjectResult, String tableName)
         {
             TypeElementPropertyBindingAPI typeElementFieldBinding = null;
             List<TypeElementPropertyBindingAPI> typeElementFieldBindings = null;
@@ -1398,173 +1390,167 @@ namespace ManyWho.Service.Salesforce.Singletons
             return objectAPIs;
         }
 
-        private List<ObjectAPI> CreateObjectAPIsFromQuerySObjects(SforceService sforceService, String objectName, String soqlQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, Dictionary<String, Boolean> currencyFields)
+        List<ObjectAPI> CreateObjectAPIsFromQuerySObjects(SforceService sforceService, string objectName, string soqlQuery, bool includesId, List<ObjectDataTypePropertyAPI> properties, Dictionary<string, bool> currencyFields)
         {
-            QueryResult queryResult = null;
-            sObject queryObject = null;
-            ObjectAPI objectAPI = null;
-            List<ObjectAPI> objectAPIs = null;
-            Boolean isAggregate = false;
-            Int32 order = 0;
+            var isAggregate = false;
+            var order = 0;
 
             // Make the query call and get the query results
-            queryResult = sforceService.query(soqlQuery);
+            var queryResult = sforceService.query(soqlQuery);
 
             // Check to see if the soql query is contains any aggregate stuff - in which case we take the first expr as the unique identifier
-            if (soqlQuery.IndexOf("sum(", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                soqlQuery.IndexOf("max(", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                soqlQuery.IndexOf("min(", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                soqlQuery.IndexOf("avg(", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                soqlQuery.IndexOf("count(", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                soqlQuery.IndexOf("count_distinct(", StringComparison.InvariantCultureIgnoreCase) > 0)
+            if (soqlQuery.ContainsIgnoreCase("sum(") ||
+                soqlQuery.ContainsIgnoreCase("max(") ||
+                soqlQuery.ContainsIgnoreCase("min(") ||
+                soqlQuery.ContainsIgnoreCase("avg(") ||
+                soqlQuery.ContainsIgnoreCase("count(") ||
+                soqlQuery.ContainsIgnoreCase("count_distinct("))
             {
                 isAggregate = true;
             }
 
-            // Process the query results
-            if (queryResult != null &&
-                queryResult.records != null &&
-                queryResult.records.Length > 0)
+            // Process the query results in parallel
+            if (queryResult?.records != null)
             {
-                objectAPIs = new List<ObjectAPI>();
-
-                for (int x = 0; x < queryResult.records.Length; x++)
-                {
-                    queryObject = queryResult.records[x];
-
-                    String externalId = null;
-
-                    objectAPI = new ObjectAPI();
-                    objectAPI.developerName = objectName;
-                    objectAPI.properties = new List<PropertyAPI>();
-                    objectAPI.order = order++;
-
-                    if (queryObject.Any.Length > properties.Count)
-                    {
-                        throw new ArgumentNullException("ObjectData.Properties", "The list of properties being requested does not match the number of properties being returned by Salesforce.");
-                    }
-
-                    for (int y = 0; y < queryObject.Any.Length; y++)
-                    {
-                        XmlElement element = queryObject.Any[y];
-                        PropertyAPI propertyAPI = new PropertyAPI();
-                        bool nameFound = false;
-
-                        // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
-                        // field names from a standard select which confuses the binding logic
-                        // WE NOW HAVE A SEPARATE METHOD FOR SEARCH, SO THIS IS NOW RELIABLE
-                        propertyAPI.developerName = element.LocalName;
-
-                        // This only works because the SOQL columns will have been generated from the ordered list of properties
-                        // If the user has a final column of Id that's been added, we just keep the local name. The purpose of this
-                        // is to preserve the deep name references that are difficult to resolve as they can be blank and have no
-                        // child fields to do detection. This is much more explicit.
-                        //if (properties.Count >= y)
-                        //{
-                        // Always use the name as defined by the binding properties as this will be consistent in all situations
-                        //propertyAPI.developerName = properties[y].developerName; 
-                        //}
-
-                        // This is a patch for the odd naming inconsistency with salesforce
-                        if (nameFound == false &&
-                            (propertyAPI.developerName.EndsWith("__r", StringComparison.OrdinalIgnoreCase) == true ||
-                             (!string.IsNullOrWhiteSpace(properties[y].developerName) &&
-                              properties[y].developerName.EndsWith(".Name", StringComparison.OrdinalIgnoreCase) == true)))
-                        {
-                            // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
-                            // additional XML
-                            if (element.LastChild != null)
-                            {
-                                // We need to append the name piece on the end of the field to reconstruct the reference correctly in the return
-                                // This will ensure the property name correctly matches.
-                                propertyAPI.contentValue = element.LastChild.InnerText;
-
-                                // This is a patch for the odd naming inconsistency with salesforce
-                                if (!string.IsNullOrWhiteSpace(properties[y].developerName) &&
-                                    properties[y].developerName.EndsWith(".Name", StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    propertyAPI.developerName = properties[y].developerName;
-                                }
-                                else
-                                {
-                                    // Assign the name based on the actual reference
-                                    propertyAPI.developerName = propertyAPI.developerName + "." + element.LastChild.LocalName;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            propertyAPI.contentValue = element.InnerText;
-                        }
-
-                        // Check to see if this is a currency field, if so, we need to change the formatting slightly
-                        if (currencyFields != null &&
-                            String.IsNullOrWhiteSpace(propertyAPI.contentValue) == false &&
-                            currencyFields.ContainsKey(propertyAPI.developerName) == true)
-                        {
-                            Double currencyValue = Double.MinValue;
-                            // This is a currency field, so we need to improve the formatting so it's a proper number
-
-                            // If the value parses OK, we convert it over, otherwise we leave it alone
-                            if (Double.TryParse(propertyAPI.contentValue, out currencyValue) == true)
-                            {
-                                propertyAPI.contentValue = currencyValue.ToString("0.##");
-                            }
-                        }
-
-                        if (element.LocalName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
-                        {
-                            objectAPI.externalId = propertyAPI.contentValue;
-
-                            // Don't add the property to the object if the user hasn't asked for it
-                            if (includesId == true)
-                            {
-                                // Add the property to the new object
-                                objectAPI.properties.Add(propertyAPI);
-                            }
-                        }
-                        else if (isAggregate == true &&
-                                 element.LocalName.Equals("expr0", StringComparison.InvariantCultureIgnoreCase) == true)
-                        {
-                            // Assign the external identifier to the first expression "expr0"
-                            objectAPI.externalId = propertyAPI.contentValue;
-
-                            // Make sure we add the property also
-                            objectAPI.properties.Add(propertyAPI);
-                        }
-                        else if (element.LocalName.Equals("ExternalId", StringComparison.InvariantCultureIgnoreCase) == true)
-                        {
-                            // We also grab the external id as the id will be blank for the new data integration stuff
-                            externalId = propertyAPI.contentValue;
-
-                            // Make sure we add the property also
-                            objectAPI.properties.Add(propertyAPI);
-                        }
-                        else
-                        {
-                            objectAPI.properties.Add(propertyAPI);
-                        }
-                    }
-
-                    // If we're using an x object, we use the external identifier
-                    if (objectName.EndsWith("__x", StringComparison.InvariantCultureIgnoreCase) == true)
-                    {
-                        // If the external id is also null, we then throw an exception
-                        if (externalId == null ||
-                            externalId.Trim().Length == 0)
-                        {
-                            throw new ArgumentNullException("BadRequest", "An object identifier could not be found.");
-                        }
-
-                        objectAPI.externalId = externalId;
-                    }
-
-                    // Add the object to the response list
-                    objectAPIs.Add(objectAPI);
-                }
+                return queryResult.records
+                    .AsParallel()
+                    .Select(queryObject => ConvertQueryObjectToObject(queryObject, objectName, order++, properties, currencyFields, includesId, isAggregate))
+                    .ToList();
             }
 
-            return objectAPIs;
+            return new List<ObjectAPI>();
+        }
+
+        static ObjectAPI ConvertQueryObjectToObject(
+            sObject queryObject,
+            string objectName,
+            int order,
+            List<ObjectDataTypePropertyAPI> properties,
+            Dictionary<string, bool> currencyFields,
+            bool includesId,
+            bool isAggregate
+        )
+        {
+            string externalId = null;
+
+            var objectApi = new ObjectAPI
+            {
+                developerName = objectName,
+                properties = new List<PropertyAPI>(),
+                order = order
+            };
+
+            if (queryObject.Any.Length > properties.Count)
+            {
+                throw new ArgumentNullException("ObjectData.Properties",
+                    "The list of properties being requested does not match the number of properties being returned by Salesforce.");
+            }
+
+            PropertyAPI ConvertQueryPropertyToProperty(XmlElement element, ObjectDataTypePropertyAPI property)
+            {
+                // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
+                // field names from a standard select which confuses the binding logic
+                // WE NOW HAVE A SEPARATE METHOD FOR SEARCH, SO THIS IS NOW RELIABLE
+                var propertyApi = new PropertyAPI { developerName = element.LocalName };
+
+                // This is a patch for the odd naming inconsistency with salesforce
+                if (element.LocalName.EndsWith("__r", StringComparison.OrdinalIgnoreCase) ||
+                    string.IsNullOrWhiteSpace(property.developerName) == false && 
+                    property.developerName.EndsWith(".Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    // If we're dealing with a compound field, we need to grab the text a little differently as it will sit inside                            
+                    // additional XML
+                    if (element.LastChild != null)
+                    {
+                        // We need to append the name piece on the end of the field to reconstruct the reference correctly in the return
+                        // This will ensure the property name correctly matches.
+                        propertyApi.contentValue = element.LastChild.InnerText;
+
+                        // This is a patch for the odd naming inconsistency with salesforce
+                        if (string.IsNullOrWhiteSpace(property.developerName) == false &&
+                            property.developerName.EndsWith(".Name", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            propertyApi.developerName = property.developerName;
+                        }
+                        else
+                        {
+                            // Assign the name based on the actual reference
+                            propertyApi.developerName = propertyApi.developerName + "." + element.LastChild.LocalName;
+                        }
+                    }
+                }
+                else
+                {
+                    propertyApi.contentValue = element.InnerText;
+                }
+
+                // Check to see if this is a currency field, if so, we need to format it so it's a proper number
+                if (currencyFields != null &&
+                    currencyFields.ContainsKey(propertyApi.developerName) &&
+                    string.IsNullOrWhiteSpace(propertyApi.contentValue) == false)
+                {
+                    // If the value parses OK, we convert it over, otherwise we leave it alone
+                    if (double.TryParse(propertyApi.contentValue, out var currencyValue))
+                    {
+                        propertyApi.contentValue = currencyValue.ToString("0.##");
+                    }
+                }
+
+                if (element.LocalName.EqualsIgnoreCase("Id"))
+                {
+                    objectApi.externalId = propertyApi.contentValue;
+
+                    // Don't add the property to the object if the user hasn't asked for it
+                    if (includesId)
+                    {
+                        // Add the property to the new object
+                        return propertyApi;
+                    }
+                }
+                else if (isAggregate && element.LocalName.EqualsIgnoreCase("expr0"))
+                {
+                    // Assign the external identifier to the first expression "expr0"
+                    objectApi.externalId = propertyApi.contentValue;
+
+                    // Make sure we add the property also
+                    return propertyApi;
+                }
+                else if (element.LocalName.EqualsIgnoreCase("ExternalId"))
+                {
+                    // We also grab the external id as the id will be blank for the new data integration stuff
+                    externalId = propertyApi.contentValue;
+
+                    // Make sure we add the property also
+                    return propertyApi;
+                }
+                else
+                {
+                    return propertyApi;
+                }
+
+                return null;
+            }
+
+            // Zip the two lists together, and convert each query result property to a ManyWho property
+            objectApi.properties = queryObject.Any
+                .AsParallel()
+                .Zip(properties.AsParallel(), ConvertQueryPropertyToProperty)
+                .ToList();
+
+            // If we're using an x object, we use the external identifier
+            if (objectName.EndsWith("__x", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // If the external id is also null, we then throw an exception
+                if (string.IsNullOrWhiteSpace(externalId))
+                {
+                    throw new ArgumentNullException("BadRequest", "An object identifier could not be found.");
+                }
+
+                objectApi.externalId = externalId;
+            }
+
+            // Add the object to the response list
+            return objectApi;
         }
 
         private List<ObjectAPI> CreateObjectAPIsFromSearchSObjects(IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName, String soslQuery, Boolean includesId, List<ObjectDataTypePropertyAPI> properties, ListFilterAPI listFilterAPI, Dictionary<String, Boolean> currencyFields)
@@ -1969,7 +1955,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             // Get the type information for this user so we can reference that to ensure we're not looking up on a field that doesn't match
-            typeElementPropertyBindings = this.DescribeFields(authenticatedWho, sforceService, describeSObjectResult, objectName);
+            typeElementPropertyBindings = this.DescribeFields(describeSObjectResult, objectName);
 
             // Make sure we're actually getting some properties before doing anything more
             if (objectDataTypeProperties != null &&
@@ -2044,17 +2030,20 @@ namespace ManyWho.Service.Salesforce.Singletons
             return cleanedObjectDataTypeProperties;
         }
 
-        private DescribeSObjectResult GetDescribeResult(INotifier notifier, IAuthenticatedWho authenticatedWho, SforceService sforceService, String objectName)
+        private DescribeSObjectResult GetDescribeResult(INotifier notifier, IAuthenticatedWho user, SforceService sforceService, String objectName)
         {
-            DescribeSObjectResult describeSObjectResult = null;
-
-            describeSObjectResult = sforceService.describeSObject(objectName);
+            var describeSObjectResult = Cache.GetOrCreate($"describe:result:{user.Token}:{objectName}", entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromMinutes(1);
+                
+                return sforceService.describeSObject(objectName);
+            });
 
             if (describeSObjectResult == null)
             {
                 String errorMessage = "The object being referenced in the save does not exist! The name of the object in salesforce.com is: " + objectName;
 
-                ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+                ErrorUtils.SendAlert(notifier, user, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
 
                 throw new ArgumentNullException("BadRequest", errorMessage);
             }
@@ -2064,7 +2053,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             {
                 String errorMessage = "The object being referenced does not have any fields! The name of the object in salesforce.com is: " + objectName;
 
-                ErrorUtils.SendAlert(notifier, authenticatedWho, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
+                ErrorUtils.SendAlert(notifier, user, ErrorUtils.ALERT_TYPE_WARNING, errorMessage);
 
                 throw new ArgumentNullException("BadRequest", errorMessage);
             }
