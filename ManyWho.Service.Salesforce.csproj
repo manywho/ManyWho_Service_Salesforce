@@ -92,6 +92,18 @@
       <HintPath>packages\Polly-Signed.4.3.0\lib\net45\Polly.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sharpbrake.Client, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\Sharpbrake.Client.5.0.0\lib\net452\Sharpbrake.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Sharpbrake.Http.Module, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\Sharpbrake.Http.Module.3.0.0\lib\net452\Sharpbrake.Http.Module.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Sharpbrake.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\Sharpbrake.Web.2.0.0\lib\net452\Sharpbrake.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />
