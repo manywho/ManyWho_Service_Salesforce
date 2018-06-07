@@ -173,7 +173,7 @@ namespace ManyWho.Service.Salesforce
                                 authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_STANDARD, StringComparison.OrdinalIgnoreCase) == true ||
                                 authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_ACTIVE_USER, StringComparison.OrdinalIgnoreCase) == true)
                             {
-                                sforceService = SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(workflowRuleNotification.SessionID, workflowRuleNotification.SessionURL);
+                                sforceService = SalesforceDataSingleton.GetInstance().LogUserInBasedOnSession(listenerServiceRequest.configurationValues, workflowRuleNotification.SessionID, workflowRuleNotification.SessionURL);
                             }
                             else if (authenticationStrategy.Equals(SalesforceServiceSingleton.AUTHENTICATION_STRATEGY_SUPER_USER, StringComparison.OrdinalIgnoreCase) == true)
                             {
