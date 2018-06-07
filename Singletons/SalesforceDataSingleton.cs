@@ -1304,7 +1304,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             if (listFilterAPI != null &&
                 listFilterAPI.search != null &&
                 listFilterAPI.search.Trim().Length > 0 &&
-                listFilterAPI.searchCriteria == null)
+                listFilterAPI.searchCriteria.IsNullOrEmpty())
             {
                 // Remove the final coma
                 String fields = soqlQuery.Substring(0, soqlQuery.Length - 2);
