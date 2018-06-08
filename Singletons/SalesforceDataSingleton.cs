@@ -1277,7 +1277,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     }
                 }
 
-                soqlQuery += objectDataTypeProperty.developerName + ", ";
+                soqlQuery += objectDataTypeProperty.developerName + ",";
 
                 if (includesId == false &&
                     objectDataTypeProperty.developerName.ToLower() == "id")
@@ -1289,7 +1289,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             // If the user didn't include the id in the select, we need to add it
             if (includesId == false)
             {
-                soqlQuery += "Id, ";
+                soqlQuery += "Id,";
             }
 
             // If the request has a search query, we need to alter the SOQL to SOSL
@@ -1310,7 +1310,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
             else
             {
-                soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 2) + " ";
+                soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 1) + " ";
                 soqlQuery += "FROM " + objectName;
                 soqlQuery += this.queryConstructorUtil.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties);
 
@@ -1340,12 +1340,12 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             for (int i = 0; i < fields.Length - 1; i++)
             {
-                soql += fields[i].name + ", ";
+                soql += fields[i].name + ",";
                 properties.Add(new ObjectDataTypePropertyAPI() { developerName = fields[i].name });
             }
 
             // Re-orient the select query so everything is in the right place
-            soql = soql.Substring(0, soql.Length - 2);
+            soql = soql.Substring(0, soql.Length - 1);
             soql = "SELECT " + soql + " FROM " + objectName + " WHERE Id = '" + objectId + "'";
 
             // Execute the query on the remote system
