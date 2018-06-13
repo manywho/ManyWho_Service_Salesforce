@@ -1299,7 +1299,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 listFilterAPI.searchCriteria.IsNullOrEmpty())
             {
                 // Remove the final coma
-                String fields = soqlQuery.Substring(0, soqlQuery.Length - 2);
+                String fields = soqlQuery.Substring(0, soqlQuery.Length - 1);
 
                 // Construct the sosl query - we don't need the columns
                 soqlQuery = "FIND {" + listFilterAPI.search + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
