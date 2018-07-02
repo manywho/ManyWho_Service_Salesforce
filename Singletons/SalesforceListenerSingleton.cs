@@ -164,6 +164,7 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             // And we put the updated map, back into the data store
             StorageUtils.SetStoredJson((listenerServiceRequest.tenantId + objectId).ToLower(), JsonConvert.SerializeObject(salesforceListenerEntries));
+            StorageUtils.SetRequestToken(listenerServiceRequest.stateId, (AuthenticatedWho)authenticatedWho );
         }
     }
 }

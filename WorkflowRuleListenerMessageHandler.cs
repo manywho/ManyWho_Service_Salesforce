@@ -194,8 +194,10 @@ namespace ManyWho.Service.Salesforce
                             {
                                 if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Executing event against ManyWho"); }
 
+                                AuthenticatedWho authenticatedWho = StorageUtils.GetRequestToken(listenerServiceRequest.stateId);
+                                
                                 // Dispatch a listen response to the engine as an event has occurred
-                                invokeType = RunSingleton.GetInstance().Event(notifier, null, tenantId, listenerServiceRequest.callbackUri, listenerServiceResponse);
+                                invokeType = RunSingleton.GetInstance().Event(notifier, authenticatedWho, tenantId, listenerServiceRequest.callbackUri, listenerServiceResponse);
                             }
                             catch (Exception exception)
                             {
@@ -215,6 +217,7 @@ namespace ManyWho.Service.Salesforce
                                 if (SettingUtils.IsDebugging(mode)) { notifier.AddLogEntry("Removing entry from listeners for invoke type: " + invokeType); }
 
                                 SalesforceListenerSingleton.GetInstance().UnregisterListener(tenantId, objectId, listenerServiceRequest);
+                                StorageUtils.RemoveRequestToken(listenerServiceRequest.stateId);
                             }
                         }
                     }
