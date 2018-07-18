@@ -198,6 +198,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                             (field.referenceTo[i].EndsWith("__c", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("Account", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountContactRelation", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountTag", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountTerritoryAssignmentRule", StringComparison.OrdinalIgnoreCase) == true ||
