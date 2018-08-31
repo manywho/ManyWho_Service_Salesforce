@@ -34,13 +34,14 @@ namespace ManyWho.Service.Salesforce.Utils
                 else
                 {
                     // Check to see if we have an actual WHERE filter to apply
-                    soql = soql + this.GenerateWhereConditions(listFilterAPI.comparisonType, listFilterAPI.where, listFilterAPI.listFilters, cleanedObjectDataTypeProperties);
+                    soql = this.GenerateWhereConditions(listFilterAPI.comparisonType, listFilterAPI.where, listFilterAPI.listFilters, cleanedObjectDataTypeProperties) ;
 
                     if (!string.IsNullOrEmpty(listFilterAPI.search) &&
                         listFilterAPI.searchCriteria != null &&
                         listFilterAPI.searchCriteria.Count > 0)
                     {
-                        soql += " " + listFilterAPI.comparisonType + "(";
+                        // we need to do a binary comparison (content comparison) and ( where search)
+                        soql = "(" + soql + ") AND (";
                         soql += string.Join(" OR ", listFilterAPI.searchCriteria.Select(criteria => " " + criteria.columnName + " LIKE '%" + listFilterAPI.search + "%'").ToArray());
                         soql += ")";
                     }
@@ -88,8 +89,8 @@ namespace ManyWho.Service.Salesforce.Utils
                     }
                 }
 
-                if (soql.Trim().Length > 0 &&
-                    soql.IndexOf(" " + listFilterAPI.comparisonType) == 0)
+                if (soql.Trim().Length > 0 && 
+                    (soql.IndexOf(" " + listFilterAPI.comparisonType) == 0 || soql.IndexOf("( " + listFilterAPI.comparisonType) == 0))
                 {
                     // Add the where clause if we have anything
                     soql = " WHERE" + soql;
