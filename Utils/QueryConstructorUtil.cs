@@ -106,7 +106,7 @@ namespace ManyWho.Service.Salesforce.Utils
                 }
             }
 
-            return soql;
+            return " " + soql;
         }
 
         private String GenerateWhereConditions(String comparisonType, List<ListFilterWhereAPI> where, List<ListFilterMinimalAPI> listFilters, CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties)
