@@ -89,12 +89,13 @@ namespace ManyWho.Service.Salesforce.Utils
                     }
                 }
 
-                if (soql.Trim().Length > 0 && soql.Trim().StartsWith("ORDER BY") == false && soql.Trim().StartsWith("LIMIT") == false &&
-                    (soql.Trim().StartsWith(listFilterAPI.comparisonType) ||
-                     soql.Trim().StartsWith("( " + listFilterAPI.comparisonType) ||
-                     soql.Trim().StartsWith("() AND") == true))
+                soql = soql.Trim();
+                if (soql.Length > 0 && soql.StartsWith("ORDER BY") == false && soql.StartsWith("LIMIT") == false &&
+                    (soql.StartsWith(listFilterAPI.comparisonType) ||
+                     soql.StartsWith("( " + listFilterAPI.comparisonType) ||
+                     soql.StartsWith("() AND") == true))
                 {
-                    soql = " WHERE" + soql;
+                    soql = " WHERE " + soql;
                     // remove (), this case happens when there is a searchCriteria with no WHERE part in the listFilter
                     soql = soql.Replace("WHERE () AND ", "WHERE ");
                     // This is to get rid of any preceding ANDs and ORs
