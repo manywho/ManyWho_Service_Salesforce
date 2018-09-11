@@ -39,8 +39,9 @@ namespace ManyWho.Service.Salesforce.Utils
                         listFilterAPI.searchCriteria != null &&
                         listFilterAPI.searchCriteria.Count > 0)
                     {
+                        string searchWithWildcards = listFilterAPI.search.Replace(" ", "%");
                         string searchCriteriaPart = string.Join(" OR ", listFilterAPI.searchCriteria.Select(
-                            criteria => " " + criteria.columnName + " LIKE '%" + listFilterAPI.search + "%'").ToArray());
+                            criteria => " " + criteria.columnName + " LIKE '%" + searchWithWildcards + "%'").ToArray());
 
                          // we need to do a binary comparison (content comparison) and ( where search)
                         soql = " (" + soql + ") AND (" + searchCriteriaPart + ")";
