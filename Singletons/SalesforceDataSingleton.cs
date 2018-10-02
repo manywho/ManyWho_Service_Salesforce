@@ -1441,12 +1441,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                 order = order
             };
 
-            if (queryObject.Any.Length > properties.Count)
-            {
-                throw new ArgumentNullException("ObjectData.Properties",
-                    "The list of properties being requested does not match the number of properties being returned by Salesforce.");
-            }
-
             PropertyAPI ConvertQueryPropertyToProperty(XmlElement element, ObjectDataTypePropertyAPI property)
             {
                 // Do not rely on the element name as this has proven to be inconsistent from Salesforce - the search gives different
@@ -1537,6 +1531,12 @@ namespace ManyWho.Service.Salesforce.Singletons
                 .AsParallel()
                 .Zip(properties.AsParallel(), ConvertQueryPropertyToProperty)
                 .ToList();
+
+            // If the query didn't ask for an ID field, we set the one the query result gives back as the external ID
+            if (objectApi.externalId == null)
+            {
+                objectApi.externalId = queryObject.Id;
+            }
 
             // If we're using an x object, we use the external identifier
             if (objectName.EndsWith("__x", StringComparison.InvariantCultureIgnoreCase))
