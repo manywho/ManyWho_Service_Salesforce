@@ -4,7 +4,6 @@ using ManyWho.Service.Salesforce.Singletons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace ManyWho.Service.Salesforce.Utils
 {
@@ -40,10 +39,12 @@ namespace ManyWho.Service.Salesforce.Utils
                         listFilterAPI.searchCriteria != null &&
                         listFilterAPI.searchCriteria.Count > 0)
                     {
-                        // we need to do a binary comparison (content comparison) and ( where search)
-                        soql = "(" + soql + ") AND (";
-                        soql += string.Join(" OR ", listFilterAPI.searchCriteria.Select(criteria => " " + criteria.columnName + " LIKE '%" + listFilterAPI.search + "%'").ToArray());
-                        soql += ")";
+                        string searchWithWildcards = listFilterAPI.search.Replace(" ", "%");
+                        string searchCriteriaPart = string.Join(" OR ", listFilterAPI.searchCriteria.Select(
+                            criteria => " " + criteria.columnName + " LIKE '%" + searchWithWildcards + "%'").ToArray());
+
+                         // we need to do a binary comparison (content comparison) and ( where search)
+                        soql = " (" + soql + ") AND (" + searchCriteriaPart + ")";
                     }
 
                     if (listFilterAPI.orderByPropertyDeveloperName != null &&
@@ -89,20 +90,24 @@ namespace ManyWho.Service.Salesforce.Utils
                     }
                 }
 
-                if (soql.Trim().Length > 0 && 
-                    (soql.IndexOf(" " + listFilterAPI.comparisonType) == 0 || soql.IndexOf("( " + listFilterAPI.comparisonType) == 0))
+                soql = soql.Trim();
+                if (soql.Length > 0 && soql.StartsWith("ORDER BY") == false && soql.StartsWith("LIMIT") == false &&
+                    (soql.StartsWith(listFilterAPI.comparisonType) ||
+                     soql.StartsWith("( " + listFilterAPI.comparisonType) ||
+                     soql.StartsWith("() AND") == true))
                 {
-                    // Add the where clause if we have anything
-                    soql = " WHERE" + soql;
-
+                    soql = " WHERE " + soql;
+                    // remove (), this case happens when there is a searchCriteria with no WHERE part in the listFilter
+                    soql = soql.Replace("WHERE () AND ", "WHERE ");
                     // This is to get rid of any preceding ANDs and ORs
-                    soql = soql.Replace("WHERE " + listFilterAPI.comparisonType, "WHERE");
+                    soql = soql.Replace("WHERE " + listFilterAPI.comparisonType, "WHERE ");
+                    soql = soql.Replace("() AND ", "");
                     soql = soql.Replace("( OR", "(");
                     soql = soql.Replace("( AND", "(");
                 }
             }
 
-            return soql;
+            return " " + soql;
         }
 
         private String GenerateWhereConditions(String comparisonType, List<ListFilterWhereAPI> where, List<ListFilterMinimalAPI> listFilters, CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties)
@@ -133,26 +138,6 @@ namespace ManyWho.Service.Salesforce.Utils
             }
 
             return soql;
-        }
-
-        private Boolean haveWhereFilterToApply(ListFilterAPI listFilterAPI)
-        {
-            // exist where condition
-            if (listFilterAPI.where != null && listFilterAPI.where.Count > 0)
-            {
-                return true;
-            }
-
-            // exist a filter with a where condition
-            if (listFilterAPI.listFilters != null && listFilterAPI.listFilters.Count> 0)
-            {
-                if (listFilterAPI.listFilters.First().where != null && listFilterAPI.listFilters.First().where.Count > 0)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private String GenerateCondition(Boolean first, ListFilterWhereAPI listFilterWhereAPI, String comparisonType, CleanedObjectDataTypeProperties cleanedObjectDataTypeProperties)

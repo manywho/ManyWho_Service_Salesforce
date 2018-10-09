@@ -198,6 +198,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                             (field.referenceTo[i].EndsWith("__c", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("Account", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountCleanInfo", StringComparison.OrdinalIgnoreCase) == true ||
+                             field.referenceTo[i].Equals("AccountContactRelation", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountOwnerSharingRule", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountTag", StringComparison.OrdinalIgnoreCase) == true ||
                              field.referenceTo[i].Equals("AccountTerritoryAssignmentRule", StringComparison.OrdinalIgnoreCase) == true ||
@@ -1277,7 +1278,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                     }
                 }
 
-                soqlQuery += objectDataTypeProperty.developerName + ", ";
+                soqlQuery += objectDataTypeProperty.developerName + ",";
 
                 if (includesId == false &&
                     objectDataTypeProperty.developerName.ToLower() == "id")
@@ -1289,7 +1290,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             // If the user didn't include the id in the select, we need to add it
             if (includesId == false)
             {
-                soqlQuery += "Id, ";
+                soqlQuery += "Id,";
             }
 
             // If the request has a search query, we need to alter the SOQL to SOSL
@@ -1299,7 +1300,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 listFilterAPI.searchCriteria.IsNullOrEmpty())
             {
                 // Remove the final coma
-                String fields = soqlQuery.Substring(0, soqlQuery.Length - 2);
+                String fields = soqlQuery.Substring(0, soqlQuery.Length - 1);
 
                 // Construct the sosl query - we don't need the columns
                 soqlQuery = "FIND {" + listFilterAPI.search + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
@@ -1310,7 +1311,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
             else
             {
-                soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 2) + " ";
+                soqlQuery = "SELECT " + soqlQuery.Substring(0, soqlQuery.Length - 1) + " ";
                 soqlQuery += "FROM " + objectName;
                 soqlQuery += this.queryConstructorUtil.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties);
 
@@ -1340,12 +1341,12 @@ namespace ManyWho.Service.Salesforce.Singletons
 
             for (int i = 0; i < fields.Length - 1; i++)
             {
-                soql += fields[i].name + ", ";
+                soql += fields[i].name + ",";
                 properties.Add(new ObjectDataTypePropertyAPI() { developerName = fields[i].name });
             }
 
             // Re-orient the select query so everything is in the right place
-            soql = soql.Substring(0, soql.Length - 2);
+            soql = soql.Substring(0, soql.Length - 1);
             soql = "SELECT " + soql + " FROM " + objectName + " WHERE Id = '" + objectId + "'";
 
             // Execute the query on the remote system
