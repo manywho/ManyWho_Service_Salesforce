@@ -1302,8 +1302,16 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // Remove the final coma
                 String fields = soqlQuery.Substring(0, soqlQuery.Length - 1);
 
+                // make sure we escape the query, see:
+                // https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_sosl_find.htm#reserved_chars
+                // for list of reserved chars
+                String escapedSearch = listFilterAPI.search;
+                foreach (char r in ("?&|!{}[]()^~*:\\\"'+-").ToCharArray())
+                {
+                    escapedSearch = escapedSearch.Replace(r.ToString(), "\\"+r);
+                }
                 // Construct the sosl query - we don't need the columns
-                soqlQuery = "FIND {" + listFilterAPI.search + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
+                soqlQuery = "FIND {" + escapedSearch + "} IN ALL FIELDS RETURNING " + objectName + " (" + fields;
                 soqlQuery += this.queryConstructorUtil.ConstructQuery(listFilterAPI, cleanedObjectDataTypeProperties) + ")";
 
                 // Dispatch the search and get the results
