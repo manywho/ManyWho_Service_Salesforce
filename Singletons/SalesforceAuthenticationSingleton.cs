@@ -1182,12 +1182,21 @@ namespace ManyWho.Service.Salesforce.Singletons
         /// </summary>
         private AuthenticationUtilsResponse ProfileMember(SforceService sforceService, String referenceProfileName, String thisUserId, Boolean isUserCount)
         {
-            AuthenticationUtilsResponse authenticationUtilsResponse = null;
+            var authenticationUtilsResponse = new AuthenticationUtilsResponse();
             QueryResult queryResult = null;
             Boolean executeQuery = true;
             String referenceProfileId = null;
             String soql = null;
             String where = null;
+
+            try
+            {
+                sforceService.describeSObject("Profile");
+            } catch
+            {
+                // if the user doesn't have permissions for read Profile we can not authorize
+                return authenticationUtilsResponse;
+            }
 
             // First we need to get the unique identifier for the profile as we're provided the name
             soql = "SELECT Id FROM Profile WHERE Name = '" + referenceProfileName + "'";
@@ -1228,9 +1237,6 @@ namespace ManyWho.Service.Salesforce.Singletons
                     soql = "SELECT Id FROM User WHERE ProfileId = '" + referenceProfileId + "' AND Id = '" + thisUserId + "'";
                 }
             }
-
-            // Create a new authentication utils response object to house the results
-            authenticationUtilsResponse = new AuthenticationUtilsResponse();
 
             // Check to make sure we should bother executing the query
             if (executeQuery == true)
@@ -1541,6 +1547,36 @@ namespace ManyWho.Service.Salesforce.Singletons
             return authenticationUtilsResponse;
         }
 
+
+        private String UserSelectWithValidProperties(SforceService sforceService)
+        {
+            var userFields = sforceService.describeSObject("User").fields;
+
+            var profileFields = "";
+            var managerFields = "";
+            var roleFields = "";
+
+            foreach (var field in userFields)
+            {
+                // only add Profile fields if the user have permissions for read the ProfileId
+                if ("ProfileId".Equals(field.name))
+                {
+                    profileFields = "ProfileId, Profile.Name,";
+                } else if ("ManagerId".Equals(field.name))
+                {
+                    // only add Manager fields if the user have permissions for read the ManagerId
+                    managerFields = "ManagerId,";
+                } else if ("UserRoleId".Equals("UserRoleId"))
+                {
+                    // only add Role fields if the user have permissions for read the UserRoleId
+                    roleFields = "UserRoleId, UserRole.DeveloperName,";
+                }
+            }
+
+            return String.Format("SELECT Id, {0} {1} {2} Username, Email, FirstName, LastName FROM User WHERE ",
+                managerFields, roleFields, profileFields);
+        }
+
         /// <summary>
         /// Utility method for executing user queries against salesforce.com
         /// </summary>
@@ -1552,15 +1588,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             sObject queryObject = null;
             string soql = null;
 
-            // By default we execute the standard user query
-            soql = "SELECT Id, Username, Email, FirstName, LastName, ManagerId, UserRoleId, UserRole.DeveloperName, ProfileId, Profile.Name FROM User WHERE ";
-
-            // If the user is using profile group selection, we get that column also as we can populate it regardless of group context
-            if (!string.IsNullOrWhiteSpace(groupSelection) &&
-                groupSelection.Equals(SalesforceServiceSingleton.GROUP_SELECTION_PROFILE, StringComparison.InvariantCultureIgnoreCase))
-            {
-                soql = "SELECT Id, Username, Email, FirstName, LastName, ManagerId, UserRoleId, UserRole.DeveloperName, ProfileId, Profile.Name FROM User WHERE ";
-            }
+            soql = UserSelectWithValidProperties(sforceService);
 
             // Create a new instance of the query response helper
             queryResponseHelper = new QueryResponseHelper();

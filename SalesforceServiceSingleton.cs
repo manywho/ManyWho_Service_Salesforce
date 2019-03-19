@@ -1308,16 +1308,24 @@ namespace ManyWho.Service.Salesforce
                             // Tell ManyWho that this is a group object
                             objectAPI.developerName = ManyWhoConstants.AUTHENTICATION_GROUP_AUTHORIZATION_GROUP_OBJECT_DEVELOPER_NAME;
 
+                            String friendlyName = null;
+
                             // Go through each of the properties in the salesforce object and translate them to the ManyWho equivalent
                             foreach (PropertyAPI propertyAPI in objectAPI.properties)
                             {
-                                if (propertyAPI.developerName.Equals("DeveloperName", StringComparison.InvariantCultureIgnoreCase) == true)
-                                {
-                                    propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_AUTHENTICATION_ID;
-                                }
-                                else if (propertyAPI.developerName.Equals("Name", StringComparison.InvariantCultureIgnoreCase) == true)
+                                if (propertyAPI.developerName.Equals("Name", StringComparison.InvariantCultureIgnoreCase) == true)
                                 {
                                     propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_FRIENDLY_NAME;
+                                    friendlyName = propertyAPI.contentValue;
+                                }
+                            }
+
+                            foreach (PropertyAPI propertyAPI in objectAPI.properties)
+                            {
+                                if (propertyAPI.developerName.Equals("Id", StringComparison.InvariantCultureIgnoreCase) == true)
+                                {
+                                    propertyAPI.developerName = ManyWhoConstants.AUTHENTICATION_OBJECT_AUTHENTICATION_ID;
+                                    propertyAPI.contentValue = friendlyName;
                                 }
                             }
                         }
