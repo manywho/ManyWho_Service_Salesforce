@@ -1183,7 +1183,6 @@ namespace ManyWho.Service.Salesforce.Singletons
         private AuthenticationUtilsResponse ProfileMember(SforceService sforceService, String referenceProfileName, String thisUserId, Boolean isUserCount)
         {
             var authenticationUtilsResponse = new AuthenticationUtilsResponse();
-            QueryResult queryResult = null;
             Boolean executeQuery = true;
             String referenceProfileId = null;
             String soql = null;
@@ -1201,17 +1200,17 @@ namespace ManyWho.Service.Salesforce.Singletons
             // First we need to get the unique identifier for the profile as we're provided the name
             soql = "SELECT Id FROM Profile WHERE Name = '" + referenceProfileName + "'";
 
-            queryResult = sforceService.query(soql);
+            QueryResult queryResultProfile = sforceService.query(soql);
 
-            if (queryResult != null &&
-                queryResult.records != null &&
-                queryResult.records.Length > 0)
+            if (queryResultProfile != null &&
+                queryResultProfile.records != null &&
+                queryResultProfile.records.Length > 0)
             {
-                if (queryResult.records[0].Any != null &&
-                    queryResult.records[0].Any.Length > 0)
+                if (queryResultProfile.records[0].Any != null &&
+                    queryResultProfile.records[0].Any.Length > 0)
                 {
                     // Get the unique identifier out
-                    referenceProfileId = queryResult.records[0].Any[0].InnerText;
+                    referenceProfileId = queryResultProfile.records[0].Any[0].InnerText;
                 }
             }
 
@@ -1237,26 +1236,28 @@ namespace ManyWho.Service.Salesforce.Singletons
                     soql = "SELECT Id FROM User WHERE ProfileId = '" + referenceProfileId + "' AND Id = '" + thisUserId + "'";
                 }
             }
+            
+            QueryResult queryUserProfileResult = null;
 
             // Check to make sure we should bother executing the query
             if (executeQuery == true)
             {
                 // Query salesforce to see if anything comes back
-                queryResult = sforceService.query(soql);
+                queryUserProfileResult = sforceService.query(soql);
             }
 
             // Check to see if the query returned any results
-            if (queryResult != null &&
-                queryResult.records != null &&
-                queryResult.records.Length > 0)
+            if (queryUserProfileResult != null &&
+                queryUserProfileResult.records != null &&
+                queryUserProfileResult.records.Length > 0)
             {
                 if (isUserCount == true)
                 {
-                    if (queryResult.records[0].Any != null &&
-                        queryResult.records[0].Any.Length > 0)
+                    if (queryUserProfileResult.records[0].Any != null &&
+                        queryUserProfileResult.records[0].Any.Length > 0)
                     {
                         // Just get the count out of the result
-                        authenticationUtilsResponse.Count = Int32.Parse(queryResult.records[0].Any[0].InnerText);
+                        authenticationUtilsResponse.Count = Int32.Parse(queryUserProfileResult.records[0].Any[0].InnerText);
                     }
                 }
                 else
