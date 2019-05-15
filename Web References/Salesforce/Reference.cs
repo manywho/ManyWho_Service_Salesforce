@@ -7894,7 +7894,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private string labelField;
         
-        private ListViewRecordColumn[][] recordsField;
+        private ListViewRecordColumn[] recordsField;
         
         private int sizeField;
         
@@ -7951,7 +7951,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayItemAttribute("columns", typeof(ListViewRecordColumn), IsNullable=false)]
-        public ListViewRecordColumn[][] records {
+        public ListViewRecordColumn[] records {
             get {
                 return this.recordsField;
             }

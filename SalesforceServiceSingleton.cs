@@ -1594,7 +1594,7 @@ namespace ManyWho.Service.Salesforce
                         authenticatedUser.lastName = (String)jsonObject["last_name"];
                         authenticatedUser.status = ManyWhoConstants.AUTHENTICATED_USER_STATUS_AUTHENTICATED;
                         authenticatedUser.statusMessage = null;
-                        authenticatedUser.token = this.CreateSalesforceAuthenticationToken(serviceToken, chatterBaseUrl + "/services/Soap/u/38.0");
+                        authenticatedUser.token = this.CreateSalesforceAuthenticationToken(serviceToken, chatterBaseUrl + "/services/Soap/u/45.0");
 
                         // Check to make sure we're sending back a valid user as names can be empty
                         if (String.IsNullOrWhiteSpace(authenticatedUser.firstName) == true)
