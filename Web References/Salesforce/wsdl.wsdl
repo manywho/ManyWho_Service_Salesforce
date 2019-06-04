@@ -2355,6 +2355,9 @@
           <xsd:enumeration value="All" />
         </xsd:restriction>
       </xsd:simpleType>
+      <xsd:simpleType name="json">
+        <xsd:restriction base="xsd:string" />
+      </xsd:simpleType>
       <xsd:complexType name="ProcessResult">
         <xsd:sequence>
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="actorIds" type="tns:ID" />
@@ -2584,6 +2587,7 @@
           <xsd:enumeration value="anyType" />
           <xsd:enumeration value="complexvalue" />
           <xsd:enumeration value="long" />
+          <xsd:enumeration value="json" />
         </xsd:restriction>
       </xsd:simpleType>
       <xsd:simpleType name="soapType">
@@ -2607,6 +2611,7 @@
           <xsd:enumeration value="urn:SearchLayoutButtonsDisplayed" />
           <xsd:enumeration value="urn:SearchLayoutButton" />
           <xsd:enumeration value="urn:RecordTypesSupported" />
+          <xsd:enumeration value="tns:json" />
           <xsd:enumeration value="tns:StringList" />
           <xsd:enumeration value="tns:ChangeEventHeader" />
         </xsd:restriction>

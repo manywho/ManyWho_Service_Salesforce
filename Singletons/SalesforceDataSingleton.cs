@@ -1919,7 +1919,7 @@ namespace ManyWho.Service.Salesforce.Singletons
             }
 
             // Log the user into the main authentication endpoint
-            sforceService.Url = authenticationUrl + "/services/Soap/u/38.0";
+            sforceService.Url = authenticationUrl + "/services/Soap/u/45.0";
             loginResult = sforceService.login(username, password + securityToken);
 
             if (loginResult.passwordExpired)

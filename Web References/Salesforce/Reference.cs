@@ -7894,7 +7894,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private string labelField;
         
-        private ListViewRecordColumn[][] recordsField;
+        private ListViewRecordColumn[] recordsField;
         
         private int sizeField;
         
@@ -7951,7 +7951,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayItemAttribute("columns", typeof(ListViewRecordColumn), IsNullable=false)]
-        public ListViewRecordColumn[][] records {
+        public ListViewRecordColumn[] records {
             get {
                 return this.recordsField;
             }
@@ -8212,6 +8212,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         @long,
+        
+        /// <remarks/>
+        json,
     }
     
     /// <remarks/>
@@ -11440,6 +11443,10 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         /// <remarks/>
         [System.Xml.Serialization.XmlEnumAttribute("urn:RecordTypesSupported")]
         urnRecordTypesSupported,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("tns:json")]
+        tnsjson,
         
         /// <remarks/>
         [System.Xml.Serialization.XmlEnumAttribute("tns:StringList")]
