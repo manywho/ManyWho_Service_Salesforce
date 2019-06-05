@@ -1881,7 +1881,7 @@ All Rights Reserved
 			<simpleType name="json">
 				<restriction base="xsd:string"/>
 			</simpleType>
-
+            <!-- end manually modification -->
             <complexType name="ProcessResult">
                 <sequence>
                     <element name="actorIds"        type="tns:ID" nillable="false" minOccurs="0" maxOccurs="unbounded"/>
@@ -2147,7 +2147,7 @@ All Rights Reserved
 
 					<!-- added manually -->
 					<enumeration value="json"/>
-
+                    <!-- end manually modification -->
                 </restriction>
             </simpleType>
 
@@ -2174,6 +2174,7 @@ All Rights Reserved
                     <enumeration value="urn:RecordTypesSupported" />
 					<!-- added manually -->
 					<enumeration value="tns:json" />
+                    <!-- end manually modification -->
                     <enumeration value="tns:StringList" />
                     <enumeration value="tns:ChangeEventHeader" />
                 </restriction>

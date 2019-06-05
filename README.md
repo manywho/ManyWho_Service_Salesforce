@@ -11,7 +11,7 @@ There is a wiki for documentation https://github.com/manywho/ManyWho_Service_Sal
 
 ## Development Notes
 
-The salesforce partner WSDL have been modified, a copy of the modified WSDL is located at the folder docs
+The salesforce partner WSDL has been modified, a copy of the modified WSDL is located at the folder `docs`, the modifications are between the comments: `added manually`
 
 ## Contributions
 
