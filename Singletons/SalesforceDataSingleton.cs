@@ -1306,7 +1306,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 // https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_sosl_find.htm#reserved_chars
                 // for list of reserved chars
                 String escapedSearch = listFilterAPI.search;
-                foreach (char r in ("?&|!{}[]()^~*:\\\"'+-").ToCharArray())
+                foreach (char r in ("\\?&|!{}[]()^~*:\"'+-").ToCharArray())
                 {
                     escapedSearch = escapedSearch.Replace(r.ToString(), "\\"+r);
                 }
