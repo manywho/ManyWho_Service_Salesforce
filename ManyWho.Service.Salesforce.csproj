@@ -22,6 +22,7 @@
     <IISExpressUseClassicPipelineMode />
     <NuGetPackageImportStamp>a164ede5</NuGetPackageImportStamp>
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -271,6 +272,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="docs\modified-wsdl.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
     <None Include="Properties\Settings.settings">
@@ -299,9 +303,6 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Content>
     <Content Include="Web References\Salesforce\DescribeDataCategoryGroupStructureResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </Content>
-    <Content Include="Web References\Salesforce\DescribeFlexiPageResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </Content>
     <Content Include="Web References\Salesforce\DescribeGlobalResult.datasource">
@@ -400,6 +401,15 @@
     <Content Include="Web References\Salesforce\FindDuplicatesResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </Content>
+    <Content Include="Web References\Salesforce\ChangeOwnPasswordResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DeleteByExampleResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <Content Include="Web References\Salesforce\DescribeDataCategoryMappingResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
     <None Include="Web References\Salesforce\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -431,7 +441,12 @@
     <Content Include="Web References\Salesforce\UpsertResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </Content>
-    <None Include="Web References\Salesforce\wsdl.wsdl" />
+    <Content Include="Web References\Salesforce\RenderStoredEmailTemplateResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </Content>
+    <None Include="Web References\Salesforce\wsdL.wsdl">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Web.template.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.template.config</DependentUpon>
@@ -454,10 +469,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="C:\Users\stevewood\Desktop\wsdl.jsp.xml">
+    <WebReferenceUrl Include="C:\Users\josec\wsdL.xml">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\Salesforce\</RelPath>
-      <UpdateFromURL>C:\Users\stevewood\Desktop\wsdl.jsp.xml</UpdateFromURL>
+      <UpdateFromURL>C:\Users\josec\wsdL.xml</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

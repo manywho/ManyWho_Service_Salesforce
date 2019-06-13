@@ -23,11 +23,12 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="SoapBinding", Namespace="urn:partner.soap.sforce.com")]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ApiFault))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ChangeEventHeader))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(NameObjectValuePair))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SearchLayoutFieldsDisplayed))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SearchLayoutButtonsDisplayed))]
@@ -58,9 +59,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private System.Threading.SendOrPostCallback describeDataCategoryGroupStructuresOperationCompleted;
         
-        private System.Threading.SendOrPostCallback describeKnowledgeSettingsOperationCompleted;
+        private System.Threading.SendOrPostCallback describeDataCategoryMappingsOperationCompleted;
         
-        private System.Threading.SendOrPostCallback describeFlexiPagesOperationCompleted;
+        private System.Threading.SendOrPostCallback describeKnowledgeSettingsOperationCompleted;
         
         private System.Threading.SendOrPostCallback describeAppMenuOperationCompleted;
         
@@ -162,9 +163,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private System.Threading.SendOrPostCallback setPasswordOperationCompleted;
         
+        private System.Threading.SendOrPostCallback changeOwnPasswordOperationCompleted;
+        
         private System.Threading.SendOrPostCallback resetPasswordOperationCompleted;
         
         private System.Threading.SendOrPostCallback getUserInfoOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback deleteByExampleOperationCompleted;
         
         private System.Threading.SendOrPostCallback sendEmailMessageOperationCompleted;
         
@@ -172,17 +177,25 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private System.Threading.SendOrPostCallback renderEmailTemplateOperationCompleted;
         
+        private System.Threading.SendOrPostCallback renderStoredEmailTemplateOperationCompleted;
+        
         private System.Threading.SendOrPostCallback performQuickActionsOperationCompleted;
         
         private System.Threading.SendOrPostCallback describeQuickActionsOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback describeQuickActionsForRecordTypeOperationCompleted;
         
         private System.Threading.SendOrPostCallback describeAvailableQuickActionsOperationCompleted;
         
         private System.Threading.SendOrPostCallback retrieveQuickActionTemplatesOperationCompleted;
         
+        private System.Threading.SendOrPostCallback retrieveMassQuickActionTemplatesOperationCompleted;
+        
         private System.Threading.SendOrPostCallback describeVisualForceOperationCompleted;
         
         private System.Threading.SendOrPostCallback findDuplicatesOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback findDuplicatesByIdsOperationCompleted;
         
         private System.Threading.SendOrPostCallback describeNounsOperationCompleted;
         
@@ -414,10 +427,10 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         public event describeDataCategoryGroupStructuresCompletedEventHandler describeDataCategoryGroupStructuresCompleted;
         
         /// <remarks/>
-        public event describeKnowledgeSettingsCompletedEventHandler describeKnowledgeSettingsCompleted;
+        public event describeDataCategoryMappingsCompletedEventHandler describeDataCategoryMappingsCompleted;
         
         /// <remarks/>
-        public event describeFlexiPagesCompletedEventHandler describeFlexiPagesCompleted;
+        public event describeKnowledgeSettingsCompletedEventHandler describeKnowledgeSettingsCompleted;
         
         /// <remarks/>
         public event describeAppMenuCompletedEventHandler describeAppMenuCompleted;
@@ -531,10 +544,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         public event setPasswordCompletedEventHandler setPasswordCompleted;
         
         /// <remarks/>
+        public event changeOwnPasswordCompletedEventHandler changeOwnPasswordCompleted;
+        
+        /// <remarks/>
         public event resetPasswordCompletedEventHandler resetPasswordCompleted;
         
         /// <remarks/>
         public event getUserInfoCompletedEventHandler getUserInfoCompleted;
+        
+        /// <remarks/>
+        public event deleteByExampleCompletedEventHandler deleteByExampleCompleted;
         
         /// <remarks/>
         public event sendEmailMessageCompletedEventHandler sendEmailMessageCompleted;
@@ -546,10 +565,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         public event renderEmailTemplateCompletedEventHandler renderEmailTemplateCompleted;
         
         /// <remarks/>
+        public event renderStoredEmailTemplateCompletedEventHandler renderStoredEmailTemplateCompleted;
+        
+        /// <remarks/>
         public event performQuickActionsCompletedEventHandler performQuickActionsCompleted;
         
         /// <remarks/>
         public event describeQuickActionsCompletedEventHandler describeQuickActionsCompleted;
+        
+        /// <remarks/>
+        public event describeQuickActionsForRecordTypeCompletedEventHandler describeQuickActionsForRecordTypeCompleted;
         
         /// <remarks/>
         public event describeAvailableQuickActionsCompletedEventHandler describeAvailableQuickActionsCompleted;
@@ -558,10 +583,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         public event retrieveQuickActionTemplatesCompletedEventHandler retrieveQuickActionTemplatesCompleted;
         
         /// <remarks/>
+        public event retrieveMassQuickActionTemplatesCompletedEventHandler retrieveMassQuickActionTemplatesCompleted;
+        
+        /// <remarks/>
         public event describeVisualForceCompletedEventHandler describeVisualForceCompleted;
         
         /// <remarks/>
         public event findDuplicatesCompletedEventHandler findDuplicatesCompleted;
+        
+        /// <remarks/>
+        public event findDuplicatesByIdsCompletedEventHandler findDuplicatesByIdsCompleted;
         
         /// <remarks/>
         public event describeNounsCompletedEventHandler describeNounsCompleted;
@@ -782,6 +813,39 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public DescribeDataCategoryMappingResult[] describeDataCategoryMappings() {
+            object[] results = this.Invoke("describeDataCategoryMappings", new object[0]);
+            return ((DescribeDataCategoryMappingResult[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void describeDataCategoryMappingsAsync() {
+            this.describeDataCategoryMappingsAsync(null);
+        }
+        
+        /// <remarks/>
+        public void describeDataCategoryMappingsAsync(object userState) {
+            if ((this.describeDataCategoryMappingsOperationCompleted == null)) {
+                this.describeDataCategoryMappingsOperationCompleted = new System.Threading.SendOrPostCallback(this.OndescribeDataCategoryMappingsOperationCompleted);
+            }
+            this.InvokeAsync("describeDataCategoryMappings", new object[0], this.describeDataCategoryMappingsOperationCompleted, userState);
+        }
+        
+        private void OndescribeDataCategoryMappingsOperationCompleted(object arg) {
+            if ((this.describeDataCategoryMappingsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.describeDataCategoryMappingsCompleted(this, new describeDataCategoryMappingsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
         public KnowledgeSettings describeKnowledgeSettings() {
             object[] results = this.Invoke("describeKnowledgeSettings", new object[0]);
             return ((KnowledgeSettings)(results[0]));
@@ -804,42 +868,6 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             if ((this.describeKnowledgeSettingsCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.describeKnowledgeSettingsCompleted(this, new describeKnowledgeSettingsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
-        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
-        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
-        [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        [return: System.Xml.Serialization.XmlElementAttribute("result")]
-        public DescribeFlexiPageResult[] describeFlexiPages([System.Xml.Serialization.XmlElementAttribute("flexiPages")] string[] flexiPages, [System.Xml.Serialization.XmlElementAttribute("contexts")] FlexipageContext[] contexts) {
-            object[] results = this.Invoke("describeFlexiPages", new object[] {
-                        flexiPages,
-                        contexts});
-            return ((DescribeFlexiPageResult[])(results[0]));
-        }
-        
-        /// <remarks/>
-        public void describeFlexiPagesAsync(string[] flexiPages, FlexipageContext[] contexts) {
-            this.describeFlexiPagesAsync(flexiPages, contexts, null);
-        }
-        
-        /// <remarks/>
-        public void describeFlexiPagesAsync(string[] flexiPages, FlexipageContext[] contexts, object userState) {
-            if ((this.describeFlexiPagesOperationCompleted == null)) {
-                this.describeFlexiPagesOperationCompleted = new System.Threading.SendOrPostCallback(this.OndescribeFlexiPagesOperationCompleted);
-            }
-            this.InvokeAsync("describeFlexiPages", new object[] {
-                        flexiPages,
-                        contexts}, this.describeFlexiPagesOperationCompleted, userState);
-        }
-        
-        private void OndescribeFlexiPagesOperationCompleted(object arg) {
-            if ((this.describeFlexiPagesCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.describeFlexiPagesCompleted(this, new describeFlexiPagesCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -1092,22 +1120,26 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         [return: System.Xml.Serialization.XmlElementAttribute("result")]
-        public DescribeSearchScopeOrderResult[] describeSearchScopeOrder() {
-            object[] results = this.Invoke("describeSearchScopeOrder", new object[0]);
+        public DescribeSearchScopeOrderResult[] describeSearchScopeOrder(bool includeRealTimeEntities, [System.Xml.Serialization.XmlIgnoreAttribute()] bool includeRealTimeEntitiesSpecified) {
+            object[] results = this.Invoke("describeSearchScopeOrder", new object[] {
+                        includeRealTimeEntities,
+                        includeRealTimeEntitiesSpecified});
             return ((DescribeSearchScopeOrderResult[])(results[0]));
         }
         
         /// <remarks/>
-        public void describeSearchScopeOrderAsync() {
-            this.describeSearchScopeOrderAsync(null);
+        public void describeSearchScopeOrderAsync(bool includeRealTimeEntities, bool includeRealTimeEntitiesSpecified) {
+            this.describeSearchScopeOrderAsync(includeRealTimeEntities, includeRealTimeEntitiesSpecified, null);
         }
         
         /// <remarks/>
-        public void describeSearchScopeOrderAsync(object userState) {
+        public void describeSearchScopeOrderAsync(bool includeRealTimeEntities, bool includeRealTimeEntitiesSpecified, object userState) {
             if ((this.describeSearchScopeOrderOperationCompleted == null)) {
                 this.describeSearchScopeOrderOperationCompleted = new System.Threading.SendOrPostCallback(this.OndescribeSearchScopeOrderOperationCompleted);
             }
-            this.InvokeAsync("describeSearchScopeOrder", new object[0], this.describeSearchScopeOrderOperationCompleted, userState);
+            this.InvokeAsync("describeSearchScopeOrder", new object[] {
+                        includeRealTimeEntities,
+                        includeRealTimeEntitiesSpecified}, this.describeSearchScopeOrderOperationCompleted, userState);
         }
         
         private void OndescribeSearchScopeOrderOperationCompleted(object arg) {
@@ -2205,6 +2237,41 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public ChangeOwnPasswordResult changeOwnPassword(string oldPassword, string newPassword) {
+            object[] results = this.Invoke("changeOwnPassword", new object[] {
+                        oldPassword,
+                        newPassword});
+            return ((ChangeOwnPasswordResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void changeOwnPasswordAsync(string oldPassword, string newPassword) {
+            this.changeOwnPasswordAsync(oldPassword, newPassword, null);
+        }
+        
+        /// <remarks/>
+        public void changeOwnPasswordAsync(string oldPassword, string newPassword, object userState) {
+            if ((this.changeOwnPasswordOperationCompleted == null)) {
+                this.changeOwnPasswordOperationCompleted = new System.Threading.SendOrPostCallback(this.OnchangeOwnPasswordOperationCompleted);
+            }
+            this.InvokeAsync("changeOwnPassword", new object[] {
+                        oldPassword,
+                        newPassword}, this.changeOwnPasswordOperationCompleted, userState);
+        }
+        
+        private void OnchangeOwnPasswordOperationCompleted(object arg) {
+            if ((this.changeOwnPasswordCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.changeOwnPasswordCompleted(this, new changeOwnPasswordCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
         [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("EmailHeaderValue")]
@@ -2265,6 +2332,50 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             if ((this.getUserInfoCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.getUserInfoCompleted(this, new getUserInfoCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("DebuggingHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("UserTerritoryDeleteHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("AllOrNoneHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("StreamingEnabledHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("DisableFeedTrackingHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("DebuggingInfoValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("AllowFieldTruncationHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("EmailHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("DuplicateRuleHeaderValue")]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public DeleteByExampleResult[] deleteByExample([System.Xml.Serialization.XmlElementAttribute("sObjects")] sObject[] sObjects) {
+            object[] results = this.Invoke("deleteByExample", new object[] {
+                        sObjects});
+            return ((DeleteByExampleResult[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void deleteByExampleAsync(sObject[] sObjects) {
+            this.deleteByExampleAsync(sObjects, null);
+        }
+        
+        /// <remarks/>
+        public void deleteByExampleAsync(sObject[] sObjects, object userState) {
+            if ((this.deleteByExampleOperationCompleted == null)) {
+                this.deleteByExampleOperationCompleted = new System.Threading.SendOrPostCallback(this.OndeleteByExampleOperationCompleted);
+            }
+            this.InvokeAsync("deleteByExample", new object[] {
+                        sObjects}, this.deleteByExampleOperationCompleted, userState);
+        }
+        
+        private void OndeleteByExampleOperationCompleted(object arg) {
+            if ((this.deleteByExampleCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.deleteByExampleCompleted(this, new deleteByExampleCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -2369,6 +2480,39 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public RenderStoredEmailTemplateResult renderStoredEmailTemplate(RenderStoredEmailTemplateRequest request) {
+            object[] results = this.Invoke("renderStoredEmailTemplate", new object[] {
+                        request});
+            return ((RenderStoredEmailTemplateResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void renderStoredEmailTemplateAsync(RenderStoredEmailTemplateRequest request) {
+            this.renderStoredEmailTemplateAsync(request, null);
+        }
+        
+        /// <remarks/>
+        public void renderStoredEmailTemplateAsync(RenderStoredEmailTemplateRequest request, object userState) {
+            if ((this.renderStoredEmailTemplateOperationCompleted == null)) {
+                this.renderStoredEmailTemplateOperationCompleted = new System.Threading.SendOrPostCallback(this.OnrenderStoredEmailTemplateOperationCompleted);
+            }
+            this.InvokeAsync("renderStoredEmailTemplate", new object[] {
+                        request}, this.renderStoredEmailTemplateOperationCompleted, userState);
+        }
+        
+        private void OnrenderStoredEmailTemplateOperationCompleted(object arg) {
+            if ((this.renderStoredEmailTemplateCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.renderStoredEmailTemplateCompleted(this, new renderStoredEmailTemplateCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("OwnerChangeOptionsValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("StreamingEnabledHeaderValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
@@ -2455,6 +2599,43 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public DescribeQuickActionResult[] describeQuickActionsForRecordType([System.Xml.Serialization.XmlElementAttribute("quickActions")] string[] quickActions, string recordTypeId) {
+            object[] results = this.Invoke("describeQuickActionsForRecordType", new object[] {
+                        quickActions,
+                        recordTypeId});
+            return ((DescribeQuickActionResult[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void describeQuickActionsForRecordTypeAsync(string[] quickActions, string recordTypeId) {
+            this.describeQuickActionsForRecordTypeAsync(quickActions, recordTypeId, null);
+        }
+        
+        /// <remarks/>
+        public void describeQuickActionsForRecordTypeAsync(string[] quickActions, string recordTypeId, object userState) {
+            if ((this.describeQuickActionsForRecordTypeOperationCompleted == null)) {
+                this.describeQuickActionsForRecordTypeOperationCompleted = new System.Threading.SendOrPostCallback(this.OndescribeQuickActionsForRecordTypeOperationCompleted);
+            }
+            this.InvokeAsync("describeQuickActionsForRecordType", new object[] {
+                        quickActions,
+                        recordTypeId}, this.describeQuickActionsForRecordTypeOperationCompleted, userState);
+        }
+        
+        private void OndescribeQuickActionsForRecordTypeOperationCompleted(object arg) {
+            if ((this.describeQuickActionsForRecordTypeCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.describeQuickActionsForRecordTypeCompleted(this, new describeQuickActionsForRecordTypeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
         public DescribeAvailableQuickActionResult[] describeAvailableQuickActions([System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] string contextType) {
             object[] results = this.Invoke("describeAvailableQuickActions", new object[] {
                         contextType});
@@ -2516,6 +2697,43 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             if ((this.retrieveQuickActionTemplatesCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.retrieveQuickActionTemplatesCompleted(this, new retrieveQuickActionTemplatesCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public QuickActionTemplateResult[] retrieveMassQuickActionTemplates(string quickActionName, [System.Xml.Serialization.XmlElementAttribute("contextIds")] string[] contextIds) {
+            object[] results = this.Invoke("retrieveMassQuickActionTemplates", new object[] {
+                        quickActionName,
+                        contextIds});
+            return ((QuickActionTemplateResult[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void retrieveMassQuickActionTemplatesAsync(string quickActionName, string[] contextIds) {
+            this.retrieveMassQuickActionTemplatesAsync(quickActionName, contextIds, null);
+        }
+        
+        /// <remarks/>
+        public void retrieveMassQuickActionTemplatesAsync(string quickActionName, string[] contextIds, object userState) {
+            if ((this.retrieveMassQuickActionTemplatesOperationCompleted == null)) {
+                this.retrieveMassQuickActionTemplatesOperationCompleted = new System.Threading.SendOrPostCallback(this.OnretrieveMassQuickActionTemplatesOperationCompleted);
+            }
+            this.InvokeAsync("retrieveMassQuickActionTemplates", new object[] {
+                        quickActionName,
+                        contextIds}, this.retrieveMassQuickActionTemplatesOperationCompleted, userState);
+        }
+        
+        private void OnretrieveMassQuickActionTemplatesOperationCompleted(object arg) {
+            if ((this.retrieveMassQuickActionTemplatesCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.retrieveMassQuickActionTemplatesCompleted(this, new retrieveMassQuickActionTemplatesCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -2595,6 +2813,41 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
         [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("DuplicateRuleHeaderValue")]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public FindDuplicatesResult[] findDuplicatesByIds([System.Xml.Serialization.XmlElementAttribute("ids")] string[] ids) {
+            object[] results = this.Invoke("findDuplicatesByIds", new object[] {
+                        ids});
+            return ((FindDuplicatesResult[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void findDuplicatesByIdsAsync(string[] ids) {
+            this.findDuplicatesByIdsAsync(ids, null);
+        }
+        
+        /// <remarks/>
+        public void findDuplicatesByIdsAsync(string[] ids, object userState) {
+            if ((this.findDuplicatesByIdsOperationCompleted == null)) {
+                this.findDuplicatesByIdsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnfindDuplicatesByIdsOperationCompleted);
+            }
+            this.InvokeAsync("findDuplicatesByIds", new object[] {
+                        ids}, this.findDuplicatesByIdsOperationCompleted, userState);
+        }
+        
+        private void OnfindDuplicatesByIdsOperationCompleted(object arg) {
+            if ((this.findDuplicatesByIdsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.findDuplicatesByIdsCompleted(this, new findDuplicatesByIdsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("LimitInfoHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.Out)]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("CallOptionsValue")]
+        [System.Web.Services.Protocols.SoapHeaderAttribute("PackageVersionHeaderValue")]
         [System.Web.Services.Protocols.SoapHeaderAttribute("LocaleOptionsValue")]
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="urn:partner.soap.sforce.com", ResponseNamespace="urn:partner.soap.sforce.com", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         [return: System.Xml.Serialization.XmlElementAttribute("result", IsNullable=true)]
@@ -2649,7 +2902,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2685,6 +2938,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnexpectedErrorFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidIdFault))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidOldPasswordFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidNewPasswordFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidQueryLocatorFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LoginFault))]
@@ -2693,7 +2947,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(MalformedQueryFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidSObjectFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidFieldFault))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2739,10 +2993,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:fault.partner.soap.sforce.com")]
     public enum ExceptionCode {
+        
+        /// <remarks/>
+        APEX_REST_SERVICES_DISABLED,
         
         /// <remarks/>
         APEX_TRIGGER_COUPLING_LIMIT,
@@ -2790,6 +3047,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         CLIENT_REQUIRE_UPDATE_FOR_USER,
         
         /// <remarks/>
+        CONTENT_ALREADY_AN_ASSET_EXCEPTION,
+        
+        /// <remarks/>
         CONTENT_CUSTOM_DOWNLOAD_EXCEPTION,
         
         /// <remarks/>
@@ -2797,6 +3057,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         CONTENT_HUB_FILE_DOWNLOAD_EXCEPTION,
+        
+        /// <remarks/>
+        CONTENT_HUB_FILE_HAS_NO_URL_EXCEPTION,
         
         /// <remarks/>
         CONTENT_HUB_FILE_NOT_FOUND_EXCEPTION,
@@ -2832,6 +3095,21 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         CONTENT_HUB_UNEXPECTED_EXCEPTION,
         
         /// <remarks/>
+        CONTENT_IMAGE_SCALING_INVALID_ARGUMENTS_EXCEPTION,
+        
+        /// <remarks/>
+        CONTENT_IMAGE_SCALING_INVALID_IMAGE_EXCEPTION,
+        
+        /// <remarks/>
+        CONTENT_IMAGE_SCALING_MAX_RENDITIONS_EXCEPTION,
+        
+        /// <remarks/>
+        CONTENT_IMAGE_SCALING_TIMEOUT_EXCEPTION,
+        
+        /// <remarks/>
+        CONTENT_IMAGE_SCALING_UNKNOWN_EXCEPTION,
+        
+        /// <remarks/>
         CUSTOM_METADATA_LIMIT_EXCEEDED,
         
         /// <remarks/>
@@ -2857,6 +3135,24 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         DATACLOUD_API_UNAVAILABLE,
+        
+        /// <remarks/>
+        DATA_INTEGRATION_INPUT_ERROR,
+        
+        /// <remarks/>
+        DATA_INTEGRATION_NOT_FOUND,
+        
+        /// <remarks/>
+        DATA_INTEGRATION_NO_ACCESS,
+        
+        /// <remarks/>
+        DATA_INTEGRATION_PACKAGE_ERROR,
+        
+        /// <remarks/>
+        DATA_INTEGRATION_SERVER_ERROR,
+        
+        /// <remarks/>
+        DATA_INTEGRATION_VENDOR_SETUP_ERROR,
         
         /// <remarks/>
         DUPLICATE_ARGUMENT_VALUE,
@@ -2887,6 +3183,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         EXCEEDED_LEAD_CONVERT_LIMIT,
+        
+        /// <remarks/>
+        EXCEEDED_MAX_FILTER_ENTITIES,
         
         /// <remarks/>
         EXCEEDED_MAX_SIZE_REQUEST,
@@ -2925,6 +3224,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         FUNCTIONALITY_TEMPORARILY_UNAVAILABLE,
         
         /// <remarks/>
+        ID_REQUIRED,
+        
+        /// <remarks/>
         ILLEGAL_QUERY_PARAMETER_VALUE,
         
         /// <remarks/>
@@ -2937,13 +3239,25 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         INSERT_UPDATE_DELETE_NOT_ALLOWED_DURING_MAINTENANCE,
         
         /// <remarks/>
+        INSTALL_KEY_INVALID,
+        
+        /// <remarks/>
+        INSTALL_KEY_REQUIRED,
+        
+        /// <remarks/>
         INSUFFICIENT_ACCESS,
+        
+        /// <remarks/>
+        INSUFFICIENT_ACCESS_APEX_METADATA_DEPLOY,
         
         /// <remarks/>
         INTERNAL_CANVAS_ERROR,
         
         /// <remarks/>
         INVALID_ASSIGNMENT_RULE,
+        
+        /// <remarks/>
+        INVALID_AUTH_HEADER,
         
         /// <remarks/>
         INVALID_BATCH_REQUEST,
@@ -2989,6 +3303,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         INVALID_NEW_PASSWORD,
+        
+        /// <remarks/>
+        INVALID_OLD_PASSWORD,
         
         /// <remarks/>
         INVALID_OPERATION,
@@ -3087,6 +3404,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         MALFORMED_SEARCH,
         
         /// <remarks/>
+        MISMATCHING_VERSIONS,
+        
+        /// <remarks/>
         MISSING_ARGUMENT,
         
         /// <remarks/>
@@ -3106,6 +3426,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         NO_ACTIVE_DUPLICATE_RULE,
+        
+        /// <remarks/>
+        NO_RECIPIENTS,
         
         /// <remarks/>
         NO_SOFTPHONE_LAYOUT,
@@ -3141,10 +3464,22 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         POST_BODY_PARSE_ERROR,
         
         /// <remarks/>
+        QAT_HETEROGENOUS_CONTEXT_IDS,
+        
+        /// <remarks/>
+        QAT_INVALID_CONTEXT_ID,
+        
+        /// <remarks/>
+        QAT_INVALID_QUICK_ACTION,
+        
+        /// <remarks/>
         QUERY_TIMEOUT,
         
         /// <remarks/>
         QUERY_TOO_COMPLICATED,
+        
+        /// <remarks/>
+        REALTIME_PROCESSING_TIME_EXCEEDED_LIMIT,
         
         /// <remarks/>
         REQUEST_LIMIT_EXCEEDED,
@@ -3174,6 +3509,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         SST_ADMIN_FILE_DOWNLOAD_EXCEPTION,
         
         /// <remarks/>
+        STATE_TRANSITION_NOT_ALLOWED,
+        
+        /// <remarks/>
         TOO_MANY_APEX_REQUESTS,
         
         /// <remarks/>
@@ -3186,10 +3524,22 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         TRIAL_EXPIRED,
         
         /// <remarks/>
+        TXN_SECURITY_APEX_ERROR,
+        
+        /// <remarks/>
         TXN_SECURITY_END_A_SESSION,
         
         /// <remarks/>
+        TXN_SECURITY_FAIL_CLOSE,
+        
+        /// <remarks/>
+        TXN_SECURITY_METERING_ERROR,
+        
+        /// <remarks/>
         TXN_SECURITY_NO_ACCESS,
+        
+        /// <remarks/>
+        TXN_SECURITY_RUNTIME_ERROR,
         
         /// <remarks/>
         TXN_SECURITY_TWO_FA_REQUIRED,
@@ -3223,19 +3573,19 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public partial class ExtendedErrorDetails {
         
-        private string extendedErrorCodeField;
+        private ExtendedErrorCode extendedErrorCodeField;
         
         private System.Xml.XmlElement[] anyField;
         
         /// <remarks/>
-        public string extendedErrorCode {
+        public ExtendedErrorCode extendedErrorCode {
             get {
                 return this.extendedErrorCodeField;
             }
@@ -3257,7 +3607,950 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum ExtendedErrorCode {
+        
+        /// <remarks/>
+        ACTIONCALL_DUPLICATE_INPUT_PARAM,
+        
+        /// <remarks/>
+        ACTIONCALL_DUPLICATE_OUTPUT_PARAM,
+        
+        /// <remarks/>
+        ACTIONCALL_MISSING_NAME,
+        
+        /// <remarks/>
+        ACTIONCALL_MISSING_REQUIRED_PARAM,
+        
+        /// <remarks/>
+        ACTIONCALL_MISSING_REQUIRED_TYPE,
+        
+        /// <remarks/>
+        ACTIONCALL_NOT_FOUND_WITH_NAME_AND_TYPE,
+        
+        /// <remarks/>
+        ACTIONCALL_NOT_SUPPORTED_FOR_PROCESSTYPE,
+        
+        /// <remarks/>
+        APEXCALLOUT_INPUT_DUPLICATE,
+        
+        /// <remarks/>
+        APEXCALLOUT_INPUT_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        APEXCALLOUT_INVALID,
+        
+        /// <remarks/>
+        APEXCALLOUT_MISSING_CLASSNAME,
+        
+        /// <remarks/>
+        APEXCALLOUT_NOT_FOUND,
+        
+        /// <remarks/>
+        APEXCALLOUT_OUTPUT_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        APEXCALLOUT_OUTPUT_NOT_FOUND,
+        
+        /// <remarks/>
+        APEXCALLOUT_REQUIRED_INPUT_MISSING,
+        
+        /// <remarks/>
+        APEXCLASS_MISSING_INTERFACE,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_ELEMENT_MISSING_DATATYPE,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_ELEMENT_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_FIELD_INVALID_DATATYPE,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_FIELD_INVALID_DATATYPE_WITH_ELEMENT,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_INCOMPATIBLE_DATATYPES,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_INVALID_COLLECTION,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_INVALID_DATATYPE_IN_ELEMENT,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_INVALID_MERGE_FIELD,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_INVALID_REFERENCE,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_LEFT_DATATYPE_INVALID_FOR_OPERATOR,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_MODIFIES_NONVARIABLE,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_NONEXISTENT_REFERENCE,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_REQUIRED,
+        
+        /// <remarks/>
+        ASSIGNMENTITEM_RIGHT_DATATYPE_INVALID_FOR_OPERATOR,
+        
+        /// <remarks/>
+        AUTOLAUNCHED_CHOICELOOKUP_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        AUTOLAUNCHED_CHOICE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        AUTOLAUNCHED_SCREEN_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        AUTOLAUNCHED_STEP_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        AUTOLAUNCHED_SUBFLOW_INCOMPATIBLE_FLOWTYPE,
+        
+        /// <remarks/>
+        AUTOLAUNCHED_WAIT_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        CHOICEFIELD_DEFAULT_CHOICE_NOT_FOUND,
+        
+        /// <remarks/>
+        CHOICEFIELD_MISSING_CHOICE,
+        
+        /// <remarks/>
+        CHOICELOOKUP_DATATYPE_INCOMPATIBLE_WITH_CHOICEFIELD,
+        
+        /// <remarks/>
+        CHOICE_DATATYPE_INCOMPATIBLE_WITH_CHOICEFIELD,
+        
+        /// <remarks/>
+        CHOICE_NOT_SUPPORTED_FOR_SCREENFIELDTYPE,
+        
+        /// <remarks/>
+        CHOICE_USED_MULTIPLE_TIMES_IN_SAME_FIELD,
+        
+        /// <remarks/>
+        CONDITION_BUILDER_MISSING_FLOW_VARIABLE,
+        
+        /// <remarks/>
+        CONDITION_BUILDER_MISSING_REQUIRED_PERMISSIONS,
+        
+        /// <remarks/>
+        CONDITION_BUILDER_UNSUPPORTED_FLOW_VARIABLE,
+        
+        /// <remarks/>
+        CONDITION_DATATYPE_INCOMPATIBLE,
+        
+        /// <remarks/>
+        CONDITION_DATATYPE_INCOMPATIBLE_WITH_ELEMENT,
+        
+        /// <remarks/>
+        CONDITION_ELEMENT_DATATYPES_INCOMPATIBLE,
+        
+        /// <remarks/>
+        CONDITION_INVALID_LEFTOPERAND,
+        
+        /// <remarks/>
+        CONDITION_INVALID_LEFT_ELEMENT,
+        
+        /// <remarks/>
+        CONDITION_LOGIC_EXCEEDS_LIMIT,
+        
+        /// <remarks/>
+        CONDITION_LOGIC_INVALID,
+        
+        /// <remarks/>
+        CONDITION_LOGIC_MISSING,
+        
+        /// <remarks/>
+        CONDITION_MISSING_DATATYPE,
+        
+        /// <remarks/>
+        CONDITION_MISSING_OPERATOR,
+        
+        /// <remarks/>
+        CONDITION_REFERENCED_ELEMENT_NOT_FOUND,
+        
+        /// <remarks/>
+        CONDITION_RIGHTOPERAND_NULL,
+        
+        /// <remarks/>
+        CONNECTOR_MISSING_TARGET,
+        
+        /// <remarks/>
+        CONSTANT_INCLUDES_REFERENCES,
+        
+        /// <remarks/>
+        CUSTOMEVENTS_NOT_ENABLED,
+        
+        /// <remarks/>
+        CUSTOMEVENT_MISSING_PROCESSMETADATAVALUES,
+        
+        /// <remarks/>
+        CUSTOMEVENT_OBJECTTYPE_NOT_FOUND,
+        
+        /// <remarks/>
+        CUSTOMEVENT_OBJECTTYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        CUSTOMEVENT_PROCESSMETADATAVALUES_MISSING_NAME,
+        
+        /// <remarks/>
+        CUSTOMEVENT_PROCESSMETADATAVALUES_MORE_THAN_ONE_NAME,
+        
+        /// <remarks/>
+        DATATYPE_INVALID,
+        
+        /// <remarks/>
+        DATATYPE_MISSING,
+        
+        /// <remarks/>
+        DECISION_DEFAULT_CONNECTOR_MISSING_LABEL,
+        
+        /// <remarks/>
+        DECISION_MISSING_OUTCOME,
+        
+        /// <remarks/>
+        ELEMENT_CONNECTS_TO_SELF,
+        
+        /// <remarks/>
+        ELEMENT_COORDINATES_INVALID,
+        
+        /// <remarks/>
+        ELEMENT_INVALID_CONNECTOR,
+        
+        /// <remarks/>
+        ELEMENT_INVALID_REFERENCE,
+        
+        /// <remarks/>
+        ELEMENT_MISSING_CONNECTOR,
+        
+        /// <remarks/>
+        ELEMENT_MISSING_LABEL,
+        
+        /// <remarks/>
+        ELEMENT_MISSING_NAME,
+        
+        /// <remarks/>
+        ELEMENT_MISSING_REFERENCE,
+        
+        /// <remarks/>
+        ELEMENT_MORE_THAN_ONE_FIELD,
+        
+        /// <remarks/>
+        ELEMENT_NAME_INVALID,
+        
+        /// <remarks/>
+        ELEMENT_NEVER_USED,
+        
+        /// <remarks/>
+        ELEMENT_SCALE_SMALLER_THAN_DEFAULTVALUE,
+        
+        /// <remarks/>
+        EXTERNAL_OBJECTS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        EXTERNAL_OBJECT_FIELDS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        EX_AUTOLAUNCHED_SUBFLOW_INCOMPATIBLE_FLOWTYPE,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_FIELD_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_INVALID_DATATYPE,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_INVALID_ELEMENT,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_INVALID_REFERENCE,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_MULTIPLE_REFERENCES_SAME_FIELD,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_PICKLISTFIELD_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        FIELDASSIGNMENT_REFERENCED_ELEMENT_MISSING_DATATYPE,
+        
+        /// <remarks/>
+        FIELDSERVICE_UNSUPPORTED_FIELD_TYPE,
+        
+        /// <remarks/>
+        FIELD_INVALID_VALUE,
+        
+        /// <remarks/>
+        FIELD_NOT_FOUND,
+        
+        /// <remarks/>
+        FIELD_RELATIONSHIP_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_ATTRIBUTE_EXPRESSION_EXCEPTION,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_ATTRIBUTE_GENERIC_EXCEPTION,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_ATTRIBUTE_MISSING_REQUIRED,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_ATTRIBUTE_TOO_LONG,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_CUSTOM_VALIDATION_EXCEPTION,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_MAX_LIMIT_EXCEPTION,
+        
+        /// <remarks/>
+        FLEXIPAGE_COMPONENT_RULE_VALIDATION_EXCEPTION,
+        
+        /// <remarks/>
+        FLEXIPAGE_PICKLIST_INVALID_VALUE_EXCEPTION,
+        
+        /// <remarks/>
+        FLEXIPAGE_TEMPLATE_INVALID_SWITCH,
+        
+        /// <remarks/>
+        FLOW_ELEMENT_SCALE_LESS_THAN_ZERO,
+        
+        /// <remarks/>
+        FLOW_INCLUDES_STEP,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_BULK_EXECUTION,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_HANDLED_ERROR,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_INPUT_VALIDATION,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_INTERACTION_NOT_FOUND,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_INVALID_CHOICE_USER_INPUT,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_INVALID_FIELD_VALUE,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_INVALID_START_REQUEST,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_LIMIT_EXCEEDED,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_MISSING_CHOICE_FOR_REQUIRED_CHOICE_FIELD,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_MISSING_VALUE_FOR_REQUIRED_INPUT_FIELD,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_NAVIGATE,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_RANGE_VALIDATION,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_REGEX_VALIDATION,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_RESUME_INTERVIEW,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_SAVE_RESULT,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_SET_CHOICE_SELECTED,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_START_INTERVIEW,
+        
+        /// <remarks/>
+        FLOW_INTERVIEW_TYPE_CONVERSION,
+        
+        /// <remarks/>
+        FLOW_INVALID_NAME,
+        
+        /// <remarks/>
+        FLOW_NAME_USED_IN_OTHER_CLIENT,
+        
+        /// <remarks/>
+        FLOW_STAGE_INCLUDES_REFERENCES,
+        
+        /// <remarks/>
+        FLOW_STAGE_ORDER_DUPLICATE,
+        
+        /// <remarks/>
+        FLOW_STAGE_ORDER_OUT_OF_RANGE,
+        
+        /// <remarks/>
+        FORMULA_EXPRESSION_INVALID,
+        
+        /// <remarks/>
+        INPUTPARAM_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        INPUTPARAM_INCOMPATIBLE_WITH_COLLECTION_VARIABLE,
+        
+        /// <remarks/>
+        INPUTPARAM_INCOMPATIBLE_WITH_NONCOLLECTION_VARIABLE,
+        
+        /// <remarks/>
+        INPUTPARAM_MISMATCHED_OBJECTTYPE,
+        
+        /// <remarks/>
+        INVALID_FLOW,
+        
+        /// <remarks/>
+        INVALID_FLOW_INTERVIEW,
+        
+        /// <remarks/>
+        INVALID_SURVEY_VARIABLE_NAME_OR_TYPE,
+        
+        /// <remarks/>
+        LOOP_ASSIGNNEXTVALUETO_MISMATCHED_DATATYPE,
+        
+        /// <remarks/>
+        LOOP_ASSIGNNEXTVALUETO_MISMATCHED_OBJECTTYPE,
+        
+        /// <remarks/>
+        LOOP_ASSIGNNEXTVALUETO_MISSING,
+        
+        /// <remarks/>
+        LOOP_ASSIGNNEXTVALUETO_MISSING_VARIABLE,
+        
+        /// <remarks/>
+        LOOP_ASSIGNNEXTVALUETO_REFERENCE_NOT_FOUND,
+        
+        /// <remarks/>
+        LOOP_COLLECTION_ELEMENT_NOT_FOUND,
+        
+        /// <remarks/>
+        LOOP_COLLECTION_NOT_FOUND,
+        
+        /// <remarks/>
+        LOOP_COLLECTION_NOT_SUPPORTED_FOR_FIELD,
+        
+        /// <remarks/>
+        LOOP_MISSING_COLLECTION,
+        
+        /// <remarks/>
+        OBJECTTYPE_INVALID,
+        
+        /// <remarks/>
+        OBJECT_CANNOT_BE_CREATED,
+        
+        /// <remarks/>
+        OBJECT_CANNOT_BE_DELETED,
+        
+        /// <remarks/>
+        OBJECT_CANNOT_BE_QUERIED,
+        
+        /// <remarks/>
+        OBJECT_CANNOT_BE_UPDATED,
+        
+        /// <remarks/>
+        OBJECT_ENCRYPTED_FIELDS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        OBJECT_NOT_FOUND,
+        
+        /// <remarks/>
+        OUTPUTPARAM_ASSIGNTOREFERENCE_NOTFOUND,
+        
+        /// <remarks/>
+        OUTPUTPARAM_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        OUTPUTPARAM_MISMATCHED_OBJECTTYPE,
+        
+        /// <remarks/>
+        OUTPUTPARAM_MISMATCHED_WITH_COLLECTION_VARIABLE,
+        
+        /// <remarks/>
+        OUTPUTPARAM_MISSING_ASSIGNTOREFERENCE,
+        
+        /// <remarks/>
+        OUTPUTPARAM_MISTMATCHED_WITH_NONCOLLECTION_VARIABLE,
+        
+        /// <remarks/>
+        PARAM_DATATYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        PROCESSMETADATAVALUES_NOT_SUPPORTED_FOR_PROCESSTYPE,
+        
+        /// <remarks/>
+        PROCESSMETADATAVALUE_NONEXISTENT_ELEMENT,
+        
+        /// <remarks/>
+        PROCESSTYPE_COMPONENTTYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        PROCESSTYPE_ELEMENT_CONFIG_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        PROCESSTYPE_ELEMENT_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        PROCESSTYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        PROCESSTYPE_SCREEN_FIELDTYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        PROCESS_TYPE_INCOMPATIBLE,
+        
+        /// <remarks/>
+        RECOMMENDATION_STRATEGY_EXCEPTION,
+        
+        /// <remarks/>
+        RECORDFILTER_ENCRYPTED_FIELDS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        RECORDFILTER_GEOLOCATION_FIELDS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        RECORDFILTER_INVALID_DATATYPE,
+        
+        /// <remarks/>
+        RECORDFILTER_INVALID_ELEMENT,
+        
+        /// <remarks/>
+        RECORDFILTER_INVALID_OPERATOR,
+        
+        /// <remarks/>
+        RECORDFILTER_INVALID_REFERENCE,
+        
+        /// <remarks/>
+        RECORDFILTER_MISSING_DATATYPE,
+        
+        /// <remarks/>
+        RECORDFILTER_MULTIPLE_QUERIES_SAME_FIELD,
+        
+        /// <remarks/>
+        RECORDLOOKUP_IDASSIGNMENT_VARIABLE_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        RECORDLOOKUP_IDASSIGNMENT_VARIABLE_NOT_FOUND,
+        
+        /// <remarks/>
+        RECORDUPDATE_MISSING_FILTERS,
+        
+        /// <remarks/>
+        REFERENCED_ELEMENT_NOT_FOUND,
+        
+        /// <remarks/>
+        RULE_MISSING_CONDITION,
+        
+        /// <remarks/>
+        SCREENFIELD_API_VERSION_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_BOOLEAN_ISREQUIRED_IS_FALSE,
+        
+        /// <remarks/>
+        SCREENFIELD_DEFAULTVALUE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_COMPONENT_NOT_GLOBAL,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_DUPLICATE_INPUT_PARAM,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_DUPLICATE_OUTPUT_PARAM,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_IMPLEMENTATION_INVALID,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_INPUT_ATTRIBUTE_INVALID,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_NAME_INVALID,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_NAME_MISSING,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_NAME_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_OUTPUT_ATTRIBUTE_INVALID,
+        
+        /// <remarks/>
+        SCREENFIELD_EXTENSION_REQUIRED_INPUT_MISSING,
+        
+        /// <remarks/>
+        SCREENFIELD_INPUTS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_INVALID_DATATYPE,
+        
+        /// <remarks/>
+        SCREENFIELD_MULTISELECTCHOICE_SEMICOLON_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_OUTPUTS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_TYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENFIELD_USERINPUT_NOT_SUPPORTED_FOR_CHOICETYPE,
+        
+        /// <remarks/>
+        SCREENFIELD_VALIDATIONRULE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SCREENRULE_ACTION_INVALID_ATTRIBUTE,
+        
+        /// <remarks/>
+        SCREENRULE_ACTION_INVALID_ATTRIBUTE_FOR_API_VERSION,
+        
+        /// <remarks/>
+        SCREENRULE_ACTION_INVALID_VALUE,
+        
+        /// <remarks/>
+        SCREENRULE_ACTION_MISSING_ATTRIBUTE,
+        
+        /// <remarks/>
+        SCREENRULE_ACTION_MISSING_FIELDREFERENCE,
+        
+        /// <remarks/>
+        SCREENRULE_ACTION_MISSING_VALUE,
+        
+        /// <remarks/>
+        SCREENRULE_ATTRIBUTE_NOT_SUPPORTED_FOR_SCREENFIELD,
+        
+        /// <remarks/>
+        SCREENRULE_FIELD_NOT_FOUND_ON_SCREEN,
+        
+        /// <remarks/>
+        SCREENRULE_MISSING_ACTION,
+        
+        /// <remarks/>
+        SCREENRULE_NOT_SUPPORTED_IN_ORG,
+        
+        /// <remarks/>
+        SCREENRULE_SCREENFIELD_NOT_VISIBLE,
+        
+        /// <remarks/>
+        SCREENRULE_VISIBILITY_NOT_SUPPORTED_IN_ORG,
+        
+        /// <remarks/>
+        SCREEN_ALLOWBACK_ALLOWFINISH_BOTH_FALSE,
+        
+        /// <remarks/>
+        SCREEN_CONTAINS_LIGHTNING_COMPONENT,
+        
+        /// <remarks/>
+        SCREEN_MISSING_FOOTER_AND_LIGHTNING_COMPONENT,
+        
+        /// <remarks/>
+        SCREEN_MISSING_LABEL,
+        
+        /// <remarks/>
+        SCREEN_MULTISELECTFIELD_DOESNT_SUPPORT_CHOICE_WITH_USERINPUT,
+        
+        /// <remarks/>
+        SCREEN_PAUSEDTEXT_NOT_SHOWN_WHEN_ALLOWPAUSE_IS_FALSE,
+        
+        /// <remarks/>
+        SETTING_FIELD_MAKES_OTHER_FIELD_REQUIRED,
+        
+        /// <remarks/>
+        SETTING_FIELD_MAKES_OTHER_FIELD_UNSUPPORTED,
+        
+        /// <remarks/>
+        SOBJECT_ELEMENT_INCOMPATIBLE_DATATYPE,
+        
+        /// <remarks/>
+        SOBJECT_ELEMENT_MISMATCHED_OBJECTTYPE,
+        
+        /// <remarks/>
+        SORT_ENCRYPTED_FIELDS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SORT_FIELD_MISSING,
+        
+        /// <remarks/>
+        SORT_FIELD_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SORT_GEOLOCATION_FIELDS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SORT_LIMIT_INVALID,
+        
+        /// <remarks/>
+        SORT_ORDER_MISSING,
+        
+        /// <remarks/>
+        SPECIFIC_FIELD_VALUE_MAKES_OTHER_FIELD_REQUIRED,
+        
+        /// <remarks/>
+        STAGE_NAME_NOT_FULLY_QUALIFIED,
+        
+        /// <remarks/>
+        START_ELEMENT_MISSING,
+        
+        /// <remarks/>
+        SUBFLOW_DESKTOP_DESIGNER_FLOWS_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_ELEMENT_INCOMPATIBLE_DATATYPES,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_INVALID_VALUE,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_MISMATCHED_COLLECTIONTYPES,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_MISMATCHED_OBJECTS,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_MISSING_NAME,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_MULTIPLE_ASSIGNMENTS_TO_ONE_VARIABLE,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_REFERENCES_FIELD_ON_SOBJECT_VARIABLE,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_VALUE_INCOMPATIBLE_DATATYPES,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_VARIABLE_NOT_FOUND_IN_MASTERFLOW,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_VARIABLE_NOT_FOUND_IN_REFERENCEDFLOW,
+        
+        /// <remarks/>
+        SUBFLOW_INPUT_VARIABLE_NO_INPUT_ACCESS,
+        
+        /// <remarks/>
+        SUBFLOW_INVALID_NAME,
+        
+        /// <remarks/>
+        SUBFLOW_INVALID_REFERENCE,
+        
+        /// <remarks/>
+        SUBFLOW_MASTER_FLOW_TYPE_NOT_AUTOLAUNCHED,
+        
+        /// <remarks/>
+        SUBFLOW_MISSING_NAME,
+        
+        /// <remarks/>
+        SUBFLOW_NO_ACTIVE_VERSION,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_INCOMPATIBLE_DATATYPES,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_MISMATCHED_COLLECTIONTYPES,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_MISMATCHED_OBJECTS,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_MISSING_ASSIGNTOREFERENCE,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_MISSING_NAME,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_MULTIPLE_ASSIGNMENTS_TO_ONE_VARIABLE,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_REFERENCES_FIELD_ON_SOBJECT_VARIABLE,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_TARGET_DOES_NOT_EXIST_IN_MASTER_FLOW,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_VARIABLE_NOT_FOUND_IN_MASTERFLOW,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_VARIABLE_NOT_FOUND_IN_REFERENCEDFLOW,
+        
+        /// <remarks/>
+        SUBFLOW_OUTPUT_VARIABLE_NO_OUTPUT_ACCESS,
+        
+        /// <remarks/>
+        SUBFLOW_PROCESS_TYPE_INCOMPATIBLE,
+        
+        /// <remarks/>
+        SUBFLOW_REFERENCES_MASTERFLOW,
+        
+        /// <remarks/>
+        SURVEY_ADVANCED_CONDITION_LOGIC_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        SURVEY_CHOICE_NOT_REFERENCED_BY_A_QUESTION,
+        
+        /// <remarks/>
+        SURVEY_CHOICE_REFERENCED_BY_MULTIPLE_QUESTIONS,
+        
+        /// <remarks/>
+        SURVEY_ELEMENT_NEVER_REACHED,
+        
+        /// <remarks/>
+        SURVEY_INACTIVE_SUBFLOWS,
+        
+        /// <remarks/>
+        SURVEY_MISSING_QUESTION_OR_SUBFLOW,
+        
+        /// <remarks/>
+        SURVEY_MISSING_REQUIRED_VARIABLES,
+        
+        /// <remarks/>
+        SURVEY_MULTIPLE_SCREENS_CANNOT_CONNECT_TO_SAME_DECISION,
+        
+        /// <remarks/>
+        SURVEY_NESTED_SUBFLOWS,
+        
+        /// <remarks/>
+        SURVEY_NONSURVEY_SUBFLOWS,
+        
+        /// <remarks/>
+        SURVEY_RULE_INVALID_RIGHT_OPERAND,
+        
+        /// <remarks/>
+        SURVEY_SCREENFIELD_TYPE_NOT_SUPPORTED_FOR_QUESTION,
+        
+        /// <remarks/>
+        SURVEY_START_ELEMENT_INVALID,
+        
+        /// <remarks/>
+        SURVEY_VARIABLE_ACCESS_INVALID,
+        
+        /// <remarks/>
+        UNEXPECTED_ERROR,
+        
+        /// <remarks/>
+        VALUE_CHAR_LIMIT_EXCEEDED,
+        
+        /// <remarks/>
+        VARIABLE_FIELD_NOT_SUPPORTED_FOR_DATATYPE,
+        
+        /// <remarks/>
+        VARIABLE_FIELD_NOT_SUPPORTED_FOR_DATATYPE_AND_COLLECTION,
+        
+        /// <remarks/>
+        VARIABLE_FIELD_REQUIRED_FOR_DATATYPE,
+        
+        /// <remarks/>
+        VARIABLE_SCALE_EXCEEDS_LIMIT,
+        
+        /// <remarks/>
+        VARIABLE_SCALE_NEGATIVE_INTEGER,
+        
+        /// <remarks/>
+        VARIABLE_SCALE_NULL,
+        
+        /// <remarks/>
+        WAITEVENT_DEFAULT_CONNECTOR_MISSING_LABEL,
+        
+        /// <remarks/>
+        WAITEVENT_DUPLICATE_INPUT_PARAM,
+        
+        /// <remarks/>
+        WAITEVENT_INPUT_NOT_SUPPORTED_FOR_EVENTTYPE,
+        
+        /// <remarks/>
+        WAITEVENT_INPUT_REQUIRES_LITERAL_VALUE,
+        
+        /// <remarks/>
+        WAITEVENT_INVALID_CONDITION_LOGIC,
+        
+        /// <remarks/>
+        WAITEVENT_MISSING,
+        
+        /// <remarks/>
+        WAITEVENT_MISSING_CONNECTOR,
+        
+        /// <remarks/>
+        WAITEVENT_MISSING_EVENTTYPE,
+        
+        /// <remarks/>
+        WAITEVENT_OBJECT_NOT_SUPPORTED_FOR_EVENTTYPE,
+        
+        /// <remarks/>
+        WAITEVENT_OUTPUT_NOT_SUPPORTED_FOR_EVENTTYPE,
+        
+        /// <remarks/>
+        WAITEVENT_RELATIVEALARM_INVALID_DATETIME_FIELD,
+        
+        /// <remarks/>
+        WAITEVENT_RELATIVEALARM_INVALID_FIELD,
+        
+        /// <remarks/>
+        WAITEVENT_RELATIVEALARM_INVALID_OBJECTTYPE,
+        
+        /// <remarks/>
+        WAITEVENT_RELATIVEALARM_INVALID_OFFSETNUMBER,
+        
+        /// <remarks/>
+        WAITEVENT_RELATIVEALARM_INVALID_OFFSETUNIT,
+        
+        /// <remarks/>
+        WAITEVENT_REQUIRED_INPUT_MISSING,
+        
+        /// <remarks/>
+        WAITEVENT_TYPE_INVALID_OR_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        WORKFLOW_MISSING_PROCESSMETADATAVALUES,
+        
+        /// <remarks/>
+        WORKFLOW_OBJECTTYPE_NOT_FOUND,
+        
+        /// <remarks/>
+        WORKFLOW_OBJECTTYPE_NOT_SUPPORTED,
+        
+        /// <remarks/>
+        WORKFLOW_OBJECTVARIABLE_AND_OLDOBJECTVARIABLE_REFERENCE_SAME_SOBJECT_VARIABLE,
+        
+        /// <remarks/>
+        WORKFLOW_OBJECTVARIABLE_DOESNT_SUPPORT_INPUT,
+        
+        /// <remarks/>
+        WORKFLOW_OLDOBJECTVARIABLE_DOESNT_SUPPORT_INPUT,
+        
+        /// <remarks/>
+        WORKFLOW_PROCESSMETADATAVALUES_MORE_THAN_ONE_NAME,
+        
+        /// <remarks/>
+        WORKFLOW_PROCESS_METADATAVALUES_MISSING_NAME,
+        
+        /// <remarks/>
+        WORKFLOW_RECURSIVECOUNTVARIABLE_DOESNT_SUPPORT_INPUT,
+        
+        /// <remarks/>
+        WORKFLOW_TRIGGERTYPE_INVALID_VALUE,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3266,7 +4559,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3275,7 +4568,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:fault.partner.soap.sforce.com")]
+    public partial class InvalidOldPasswordFault : ApiFault {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3284,7 +4586,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3293,7 +4595,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3306,7 +4608,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(MalformedQueryFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidSObjectFault))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvalidFieldFault))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3339,7 +4641,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3348,7 +4650,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3357,7 +4659,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3366,7 +4668,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3375,7 +4677,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3408,7 +4710,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum OwnerChangeOptionType {
@@ -3429,6 +4731,15 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         TransferOwnedOpenOpportunities,
         
         /// <remarks/>
+        TransferOwnedClosedOpportunities,
+        
+        /// <remarks/>
+        TransferOwnedOpenCases,
+        
+        /// <remarks/>
+        TransferAllOwnedCases,
+        
+        /// <remarks/>
         TransferContracts,
         
         /// <remarks/>
@@ -3436,10 +4747,19 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         TransferContacts,
+        
+        /// <remarks/>
+        KeepAccountTeam,
+        
+        /// <remarks/>
+        KeepSalesTeam,
+        
+        /// <remarks/>
+        KeepSalesTeamGrantCurrentOwnerReadWriteAccess,
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3472,7 +4792,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum LogCategory {
@@ -3506,7 +4826,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum LogCategoryLevel {
@@ -3537,29 +4857,18 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class RenderEmailTemplateResult {
-        
-        private RenderEmailTemplateBodyResult[] bodyResultsField;
+    public partial class RenderStoredEmailTemplateResult {
         
         private Error[] errorsField;
         
-        private bool successField;
+        private SingleEmailMessage renderedEmailField;
         
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("bodyResults")]
-        public RenderEmailTemplateBodyResult[] bodyResults {
-            get {
-                return this.bodyResultsField;
-            }
-            set {
-                this.bodyResultsField = value;
-            }
-        }
+        private bool successField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("errors")]
@@ -3573,49 +4882,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
-        public bool success {
-            get {
-                return this.successField;
-            }
-            set {
-                this.successField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class RenderEmailTemplateBodyResult {
-        
-        private RenderEmailTemplateError[] errorsField;
-        
-        private string mergedBodyField;
-        
-        private bool successField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("errors")]
-        public RenderEmailTemplateError[] errors {
-            get {
-                return this.errorsField;
-            }
-            set {
-                this.errorsField = value;
-            }
-        }
-        
-        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string mergedBody {
+        public SingleEmailMessage renderedEmail {
             get {
-                return this.mergedBodyField;
+                return this.renderedEmailField;
             }
             set {
-                this.mergedBodyField = value;
+                this.renderedEmailField = value;
             }
         }
         
@@ -3631,28 +4904,41 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DuplicateError))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class RenderEmailTemplateError {
+    public partial class Error {
         
-        private string fieldNameField;
+        private ExtendedErrorDetails[] extendedErrorDetailsField;
+        
+        private string[] fieldsField;
         
         private string messageField;
-        
-        private int offsetField;
         
         private StatusCode statusCodeField;
         
         /// <remarks/>
-        public string fieldName {
+        [System.Xml.Serialization.XmlElementAttribute("extendedErrorDetails", IsNullable=true)]
+        public ExtendedErrorDetails[] extendedErrorDetails {
             get {
-                return this.fieldNameField;
+                return this.extendedErrorDetailsField;
             }
             set {
-                this.fieldNameField = value;
+                this.extendedErrorDetailsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("fields", IsNullable=true)]
+        public string[] fields {
+            get {
+                return this.fieldsField;
+            }
+            set {
+                this.fieldsField = value;
             }
         }
         
@@ -3663,16 +4949,6 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.messageField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int offset {
-            get {
-                return this.offsetField;
-            }
-            set {
-                this.offsetField = value;
             }
         }
         
@@ -3688,7 +4964,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum StatusCode {
@@ -3707,6 +4983,12 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         AURA_COMPILE_ERROR,
+        
+        /// <remarks/>
+        AUTH_PROVIDER_NEEDS_AUTH,
+        
+        /// <remarks/>
+        AUTH_PROVIDER_NOT_FOUND,
         
         /// <remarks/>
         BAD_CUSTOM_ENTITY_PARENT_DOMAIN,
@@ -3799,6 +5081,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         COLLISION_DETECTED,
         
         /// <remarks/>
+        COMMERCIAL_CONTROL_ERROR,
+        
+        /// <remarks/>
         COMMUNITY_NOT_ACCESSIBLE,
         
         /// <remarks/>
@@ -3829,10 +5114,19 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         CUSTOM_METADATA_LIMIT_EXCEEDED,
         
         /// <remarks/>
+        CUSTOM_METADATA_REL_FIELD_MANAGEABILITY,
+        
+        /// <remarks/>
         CUSTOM_SETTINGS_LIMIT_EXCEEDED,
         
         /// <remarks/>
         CUSTOM_TAB_LIMIT_EXCEEDED,
+        
+        /// <remarks/>
+        DATAASSESSMENT_CONFIG_ASSESSMENT_IN_PROGRESS_ERROR,
+        
+        /// <remarks/>
+        DATAASSESSMENT_CONFIG_SERVICE_ERROR,
         
         /// <remarks/>
         DATACLOUDADDRESS_NO_RECORDS_FOUND,
@@ -3845,6 +5139,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         DELETE_FAILED,
+        
+        /// <remarks/>
+        DELETE_NOT_ALLOWED,
         
         /// <remarks/>
         DELETE_OPERATION_TOO_LARGE,
@@ -3895,6 +5192,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         EMAIL_EXTERNAL_TRANSPORT_CONNECTION_ERROR,
         
         /// <remarks/>
+        EMAIL_EXTERNAL_TRANSPORT_PERMISSION_ERROR,
+        
+        /// <remarks/>
         EMAIL_EXTERNAL_TRANSPORT_TOKEN_ERROR,
         
         /// <remarks/>
@@ -3926,6 +5226,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         EMPTY_SCONTROL_FILE_NAME,
+        
+        /// <remarks/>
+        ENHANCED_EMAIL_TEMPLATE_COMPILATION_ERROR,
         
         /// <remarks/>
         ENTITY_FAILED_IFLASTMODIFIED_ON_UPDATE,
@@ -3964,6 +5267,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         EXCHANGE_WEB_SERVICES_URL_INVALID,
         
         /// <remarks/>
+        EXTERNAL_RESOURCE_FORBIDDEN,
+        
+        /// <remarks/>
         FAILED_ACTIVATION,
         
         /// <remarks/>
@@ -4000,6 +5306,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         FIND_DUPLICATES_ERROR,
         
         /// <remarks/>
+        FLOW_EXCEPTION,
+        
+        /// <remarks/>
         FUNCTIONALITY_NOT_ENABLED,
         
         /// <remarks/>
@@ -4033,7 +5342,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         INSUFFICIENT_CREDITS,
         
         /// <remarks/>
+        INTERNAL_ERROR,
+        
+        /// <remarks/>
         INVALID_ACCESS_LEVEL,
+        
+        /// <remarks/>
+        INVALID_ACCESS_TOKEN,
+        
+        /// <remarks/>
+        INVALID_API_INPUT,
         
         /// <remarks/>
         INVALID_ARGUMENT_TYPE,
@@ -4043,6 +5361,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         INVALID_ASSIGNMENT_RULE,
+        
+        /// <remarks/>
+        INVALID_AUTH_HEADER,
         
         /// <remarks/>
         INVALID_BATCH_OPERATION,
@@ -4067,6 +5388,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         INVALID_CURRENCY_ISO,
+        
+        /// <remarks/>
+        INVALID_DATASET_REFERENCE_INPUT,
         
         /// <remarks/>
         INVALID_DATA_CATEGORY_GROUP_REFERENCE,
@@ -4096,7 +5420,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         INVALID_EVENT_DELIVERY,
         
         /// <remarks/>
+        INVALID_EVENT_INPUT,
+        
+        /// <remarks/>
         INVALID_EVENT_SUBSCRIPTION,
+        
+        /// <remarks/>
+        INVALID_EXTENSION_ID,
         
         /// <remarks/>
         INVALID_FIELD,
@@ -4121,6 +5451,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         INVALID_INPUT,
+        
+        /// <remarks/>
+        INVALID_KEY_FIELD_INPUT,
         
         /// <remarks/>
         INVALID_LINEITEM_CLONE_STATE,
@@ -4162,7 +5495,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         INVALID_PARTNER_NETWORK_STATUS,
         
         /// <remarks/>
+        INVALID_PAYLOAD_VERSION,
+        
+        /// <remarks/>
         INVALID_PERSON_ACCOUNT_OPERATION,
+        
+        /// <remarks/>
+        INVALID_PROVIDER_TYPE,
         
         /// <remarks/>
         INVALID_QUERY_LOCATOR,
@@ -4171,10 +5510,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         INVALID_READ_ONLY_USER_DML,
         
         /// <remarks/>
+        INVALID_REFRESH_TOKEN,
+        
+        /// <remarks/>
         INVALID_RUNTIME_VALUE,
         
         /// <remarks/>
         INVALID_SAVE_AS_ACTIVITY_FLAG,
+        
+        /// <remarks/>
+        INVALID_SCS_INBOUND_USER,
         
         /// <remarks/>
         INVALID_SESSION_ID,
@@ -4204,6 +5549,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         INVALID_SUBDOMAIN,
         
         /// <remarks/>
+        INVALID_TEXT_REPRESENTATION,
+        
+        /// <remarks/>
         INVALID_TYPE,
         
         /// <remarks/>
@@ -4217,6 +5565,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         IP_RANGE_LIMIT_EXCEEDED,
+        
+        /// <remarks/>
+        ITEM_NOT_FOUND,
         
         /// <remarks/>
         JIGSAW_IMPORT_LIMIT_EXCEEDED,
@@ -4324,6 +5675,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         MAX_FORMULAS_PER_RULE_EXCEEDED,
         
         /// <remarks/>
+        MAX_LIMIT_EXCEEDED,
+        
+        /// <remarks/>
         MAX_RULES_EXCEEDED,
         
         /// <remarks/>
@@ -4337,6 +5691,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         MAX_TM_RULE_ITEMS_EXCEEDED,
+        
+        /// <remarks/>
+        MAX_TRIGGERS_EXCEEDED,
         
         /// <remarks/>
         MERGE_FAILED,
@@ -4357,10 +5714,19 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         NONUNIQUE_SHIPPING_ADDRESS,
         
         /// <remarks/>
+        NO_ACCESS_TOKEN,
+        
+        /// <remarks/>
+        NO_ACCESS_TOKEN_FROM_REFRESH,
+        
+        /// <remarks/>
         NO_APPLICABLE_PROCESS,
         
         /// <remarks/>
         NO_ATTACHMENT_PERMISSION,
+        
+        /// <remarks/>
+        NO_AUTH_PROVIDER,
         
         /// <remarks/>
         NO_INACTIVE_DIVISION_MEMBERS,
@@ -4372,7 +5738,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         NO_PARTNER_PERMISSION,
         
         /// <remarks/>
+        NO_REFRESH_TOKEN,
+        
+        /// <remarks/>
         NO_SUCH_USER_EXISTS,
+        
+        /// <remarks/>
+        NO_TOKEN_ENDPOINT,
         
         /// <remarks/>
         NUMBER_OUTSIDE_VALID_RANGE,
@@ -4385,6 +5757,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         OP_WITH_INVALID_USER_TYPE_EXCEPTION,
+        
+        /// <remarks/>
+        ORCHESTRATION_INVALID,
         
         /// <remarks/>
         PACKAGE_LICENSE_REQUIRED,
@@ -4420,6 +5795,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         PAL_INVALID_PARAMETERS,
         
         /// <remarks/>
+        PAYLOAD_SIZE_EXCEEDED,
+        
+        /// <remarks/>
         PA_API_EXCEPTION,
         
         /// <remarks/>
@@ -4439,6 +5817,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         PA_VISIBLE_ACTIONS_FILTER_ORDERING_EXCEPTION,
+        
+        /// <remarks/>
+        PLATFORM_EVENT_PUBLISHING_UNAVAILABLE,
         
         /// <remarks/>
         PORTAL_NO_ACCESS,
@@ -4474,6 +5855,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         RECORD_IN_USE_BY_WORKFLOW,
         
         /// <remarks/>
+        RELATED_ENTITY_FILTER_VALIDATION_EXCEPTION,
+        
+        /// <remarks/>
         REL_FIELD_BAD_ACCESSIBILITY,
         
         /// <remarks/>
@@ -4489,6 +5873,15 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         REQUIRED_FIELD_MISSING,
         
         /// <remarks/>
+        REQUIRE_CONNECTED_APP_SCS,
+        
+        /// <remarks/>
+        REQUIRE_CONNECTED_APP_SESSION_SCS,
+        
+        /// <remarks/>
+        REQUIRE_RUNAS_USER,
+        
+        /// <remarks/>
         RETRIEVE_EXCHANGE_ATTACHMENT_FAILED,
         
         /// <remarks/>
@@ -4496,6 +5889,15 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         RETRIEVE_EXCHANGE_EVENT_FAILED,
+        
+        /// <remarks/>
+        RETRIEVE_GOOGLE_EMAIL_FAILED,
+        
+        /// <remarks/>
+        RETRIEVE_GOOGLE_EVENT_FAILED,
+        
+        /// <remarks/>
+        RETRIEVE_USER_CONFIG_ERROR,
         
         /// <remarks/>
         SALESFORCE_INBOX_TRANSPORT_CONNECTION_ERROR,
@@ -4525,6 +5927,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         SOCIAL_ACTION_INVALID,
         
         /// <remarks/>
+        SOCIAL_PERSONA_NOT_FOUND,
+        
+        /// <remarks/>
         SOCIAL_POST_INVALID,
         
         /// <remarks/>
@@ -4550,6 +5955,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         TEMPLATE_NOT_FOUND,
+        
+        /// <remarks/>
+        TERMS_OF_SERVICE_UNREAD,
         
         /// <remarks/>
         TERRITORY_REALIGN_IN_PROGRESS,
@@ -4585,6 +5993,9 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         UNKNOWN_EXCEPTION,
         
         /// <remarks/>
+        UNKNOWN_TOKEN_ERROR,
+        
+        /// <remarks/>
         UNSAFE_HTML_CONTENT,
         
         /// <remarks/>
@@ -4594,7 +6005,13 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         UNSUPPORTED_APEX_TRIGGER_OPERATON,
         
         /// <remarks/>
+        UNSUPPORTED_SOCIAL_PROVIDER,
+        
+        /// <remarks/>
         UNVERIFIED_SENDER_ADDRESS,
+        
+        /// <remarks/>
+        UPDATE_GOOGLE_EMAIL_LABEL_FAILED,
         
         /// <remarks/>
         USER_OWNS_PORTAL_ACCOUNT_EXCEPTION,
@@ -4615,71 +6032,26 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         WRONG_CONTROLLER_TYPE,
         
         /// <remarks/>
+        XCLEAN_DJ_MATCH_IGNORABLE_ERROR,
+        
+        /// <remarks/>
+        XCLEAN_DJ_MATCH_INTERNAL_DJ_ERROR,
+        
+        /// <remarks/>
+        XCLEAN_DJ_MATCH_NON_RETRIABLE_ERROR,
+        
+        /// <remarks/>
+        XCLEAN_DJ_MATCH_RETRIABLE_ERROR,
+        
+        /// <remarks/>
+        XCLEAN_DJ_MATCH_UNKNOWN_ERROR,
+        
+        /// <remarks/>
         XCLEAN_UNEXPECTED_ERROR,
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DuplicateError))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class Error {
-        
-        private ExtendedErrorDetails[] extendedErrorDetailsField;
-        
-        private string[] fieldsField;
-        
-        private string messageField;
-        
-        private StatusCode statusCodeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("extendedErrorDetails", IsNullable=true)]
-        public ExtendedErrorDetails[] extendedErrorDetails {
-            get {
-                return this.extendedErrorDetailsField;
-            }
-            set {
-                this.extendedErrorDetailsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("fields", IsNullable=true)]
-        public string[] fields {
-            get {
-                return this.fieldsField;
-            }
-            set {
-                this.fieldsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string message {
-            get {
-                return this.messageField;
-            }
-            set {
-                this.messageField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public StatusCode statusCode {
-            get {
-                return this.statusCodeField;
-            }
-            set {
-                this.statusCodeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4700,7 +6072,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4748,6 +6120,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string errorMessage {
             get {
                 return this.errorMessageField;
@@ -4770,7 +6143,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4865,7 +6238,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4924,7 +6297,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4957,7 +6330,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4990,7 +6363,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum differenceType {
@@ -5009,7 +6382,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5069,1678 +6442,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class RenderEmailTemplateRequest {
-        
-        private string[] templateBodiesField;
-        
-        private string whatIdField;
-        
-        private string whoIdField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("templateBodies")]
-        public string[] templateBodies {
-            get {
-                return this.templateBodiesField;
-            }
-            set {
-                this.templateBodiesField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string whatId {
-            get {
-                return this.whatIdField;
-            }
-            set {
-                this.whatIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string whoId {
-            get {
-                return this.whoIdField;
-            }
-            set {
-                this.whoIdField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeTab {
-        
-        private DescribeColor[] colorsField;
-        
-        private bool customField;
-        
-        private string iconUrlField;
-        
-        private DescribeIcon[] iconsField;
-        
-        private string labelField;
-        
-        private string miniIconUrlField;
-        
-        private string nameField;
-        
-        private string sobjectNameField;
-        
-        private string urlField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("colors")]
-        public DescribeColor[] colors {
-            get {
-                return this.colorsField;
-            }
-            set {
-                this.colorsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool custom {
-            get {
-                return this.customField;
-            }
-            set {
-                this.customField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string iconUrl {
-            get {
-                return this.iconUrlField;
-            }
-            set {
-                this.iconUrlField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("icons")]
-        public DescribeIcon[] icons {
-            get {
-                return this.iconsField;
-            }
-            set {
-                this.iconsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string miniIconUrl {
-            get {
-                return this.miniIconUrlField;
-            }
-            set {
-                this.miniIconUrlField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string sobjectName {
-            get {
-                return this.sobjectNameField;
-            }
-            set {
-                this.sobjectNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string url {
-            get {
-                return this.urlField;
-            }
-            set {
-                this.urlField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeColor {
-        
-        private string colorField;
-        
-        private string contextField;
-        
-        private string themeField;
-        
-        /// <remarks/>
-        public string color {
-            get {
-                return this.colorField;
-            }
-            set {
-                this.colorField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string context {
-            get {
-                return this.contextField;
-            }
-            set {
-                this.contextField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string theme {
-            get {
-                return this.themeField;
-            }
-            set {
-                this.themeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeIcon {
-        
-        private string contentTypeField;
-        
-        private System.Nullable<int> heightField;
-        
-        private string themeField;
-        
-        private string urlField;
-        
-        private System.Nullable<int> widthField;
-        
-        /// <remarks/>
-        public string contentType {
-            get {
-                return this.contentTypeField;
-            }
-            set {
-                this.contentTypeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<int> height {
-            get {
-                return this.heightField;
-            }
-            set {
-                this.heightField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string theme {
-            get {
-                return this.themeField;
-            }
-            set {
-                this.themeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string url {
-            get {
-                return this.urlField;
-            }
-            set {
-                this.urlField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<int> width {
-            get {
-                return this.widthField;
-            }
-            set {
-                this.widthField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeTabSetResult {
-        
-        private string descriptionField;
-        
-        private string labelField;
-        
-        private string logoUrlField;
-        
-        private string namespaceField;
-        
-        private bool selectedField;
-        
-        private string tabSetIdField;
-        
-        private DescribeTab[] tabsField;
-        
-        /// <remarks/>
-        public string description {
-            get {
-                return this.descriptionField;
-            }
-            set {
-                this.descriptionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string logoUrl {
-            get {
-                return this.logoUrlField;
-            }
-            set {
-                this.logoUrlField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string @namespace {
-            get {
-                return this.namespaceField;
-            }
-            set {
-                this.namespaceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool selected {
-            get {
-                return this.selectedField;
-            }
-            set {
-                this.selectedField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tabSetId {
-            get {
-                return this.tabSetIdField;
-            }
-            set {
-                this.tabSetIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("tabs")]
-        public DescribeTab[] tabs {
-            get {
-                return this.tabsField;
-            }
-            set {
-                this.tabsField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeSearchableEntityResult {
-        
-        private string labelField;
-        
-        private string nameField;
-        
-        private string pluralLabelField;
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string pluralLabel {
-            get {
-                return this.pluralLabelField;
-            }
-            set {
-                this.pluralLabelField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeSearchScopeOrderResult {
-        
-        private string keyPrefixField;
-        
-        private string nameField;
-        
-        /// <remarks/>
-        public string keyPrefix {
-            get {
-                return this.keyPrefixField;
-            }
-            set {
-                this.keyPrefixField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeColumn {
-        
-        private string fieldField;
-        
-        private string formatField;
-        
-        private string labelField;
-        
-        private string nameField;
-        
-        /// <remarks/>
-        public string field {
-            get {
-                return this.fieldField;
-            }
-            set {
-                this.fieldField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string format {
-            get {
-                return this.formatField;
-            }
-            set {
-                this.formatField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeSearchLayoutResult {
-        
-        private string errorMsgField;
-        
-        private string labelField;
-        
-        private System.Nullable<int> limitRowsField;
-        
-        private string objectTypeField;
-        
-        private DescribeColumn[] searchColumnsField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string errorMsg {
-            get {
-                return this.errorMsgField;
-            }
-            set {
-                this.errorMsgField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<int> limitRows {
-            get {
-                return this.limitRowsField;
-            }
-            set {
-                this.limitRowsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string objectType {
-            get {
-                return this.objectTypeField;
-            }
-            set {
-                this.objectTypeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("searchColumns", IsNullable=true)]
-        public DescribeColumn[] searchColumns {
-            get {
-                return this.searchColumnsField;
-            }
-            set {
-                this.searchColumnsField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class ListViewRecordColumn {
-        
-        private string fieldNameOrPathField;
-        
-        private string valueField;
-        
-        /// <remarks/>
-        public string fieldNameOrPath {
-            get {
-                return this.fieldNameOrPathField;
-            }
-            set {
-                this.fieldNameOrPathField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string value {
-            get {
-                return this.valueField;
-            }
-            set {
-                this.valueField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class ListViewRecord {
-        
-        private ListViewRecordColumn[] columnsField;
-        
-        private string tmpField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("columns")]
-        public ListViewRecordColumn[] columns {
-            get {
-                return this.columnsField;
-            }
-            set {
-                this.columnsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string tmp {
-            get {
-                return this.tmpField;
-            }
-            set {
-                this.tmpField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class ExecuteListViewResult {
-        
-        private ListViewColumn[] columnsField;
-        
-        private string developerNameField;
-        
-        private bool doneField;
-        
-        private string idField;
-        
-        private string labelField;
-        
-        private ListViewRecord[] recordsField;
-        
-        private int sizeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("columns")]
-        public ListViewColumn[] columns {
-            get {
-                return this.columnsField;
-            }
-            set {
-                this.columnsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string developerName {
-            get {
-                return this.developerNameField;
-            }
-            set {
-                this.developerNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool done {
-            get {
-                return this.doneField;
-            }
-            set {
-                this.doneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("records")]
-        public ListViewRecord[] records {
-            get {
-                return this.recordsField;
-            }
-            set {
-                this.recordsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int size {
-            get {
-                return this.sizeField;
-            }
-            set {
-                this.sizeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class ListViewColumn {
-        
-        private string ascendingLabelField;
-        
-        private string descendingLabelField;
-        
-        private string fieldNameOrPathField;
-        
-        private bool hiddenField;
-        
-        private string labelField;
-        
-        private string selectListItemField;
-        
-        private System.Nullable<orderByDirection> sortDirectionField;
-        
-        private System.Nullable<int> sortIndexField;
-        
-        private bool sortableField;
-        
-        private fieldType typeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string ascendingLabel {
-            get {
-                return this.ascendingLabelField;
-            }
-            set {
-                this.ascendingLabelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string descendingLabel {
-            get {
-                return this.descendingLabelField;
-            }
-            set {
-                this.descendingLabelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fieldNameOrPath {
-            get {
-                return this.fieldNameOrPathField;
-            }
-            set {
-                this.fieldNameOrPathField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool hidden {
-            get {
-                return this.hiddenField;
-            }
-            set {
-                this.hiddenField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string selectListItem {
-            get {
-                return this.selectListItemField;
-            }
-            set {
-                this.selectListItemField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<orderByDirection> sortDirection {
-            get {
-                return this.sortDirectionField;
-            }
-            set {
-                this.sortDirectionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<int> sortIndex {
-            get {
-                return this.sortIndexField;
-            }
-            set {
-                this.sortIndexField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool sortable {
-            get {
-                return this.sortableField;
-            }
-            set {
-                this.sortableField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public fieldType type {
-            get {
-                return this.typeField;
-            }
-            set {
-                this.typeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum orderByDirection {
-        
-        /// <remarks/>
-        ascending,
-        
-        /// <remarks/>
-        descending,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum fieldType {
-        
-        /// <remarks/>
-        @string,
-        
-        /// <remarks/>
-        picklist,
-        
-        /// <remarks/>
-        multipicklist,
-        
-        /// <remarks/>
-        combobox,
-        
-        /// <remarks/>
-        reference,
-        
-        /// <remarks/>
-        base64,
-        
-        /// <remarks/>
-        boolean,
-        
-        /// <remarks/>
-        currency,
-        
-        /// <remarks/>
-        textarea,
-        
-        /// <remarks/>
-        @int,
-        
-        /// <remarks/>
-        @double,
-        
-        /// <remarks/>
-        percent,
-        
-        /// <remarks/>
-        phone,
-        
-        /// <remarks/>
-        id,
-        
-        /// <remarks/>
-        date,
-        
-        /// <remarks/>
-        datetime,
-        
-        /// <remarks/>
-        time,
-        
-        /// <remarks/>
-        url,
-        
-        /// <remarks/>
-        email,
-        
-        /// <remarks/>
-        encryptedstring,
-        
-        /// <remarks/>
-        datacategorygroupreference,
-        
-        /// <remarks/>
-        location,
-        
-        /// <remarks/>
-        address,
-        
-        /// <remarks/>
-        anyType,
-        
-        /// <remarks/>
-        complexvalue,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class ExecuteListViewRequest {
-        
-        private string developerNameOrIdField;
-        
-        private System.Nullable<int> limitField;
-        
-        private System.Nullable<int> offsetField;
-        
-        private ListViewOrderBy[] orderByField;
-        
-        private string sobjectTypeField;
-        
-        /// <remarks/>
-        public string developerNameOrId {
-            get {
-                return this.developerNameOrIdField;
-            }
-            set {
-                this.developerNameOrIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<int> limit {
-            get {
-                return this.limitField;
-            }
-            set {
-                this.limitField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<int> offset {
-            get {
-                return this.offsetField;
-            }
-            set {
-                this.offsetField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("orderBy")]
-        public ListViewOrderBy[] orderBy {
-            get {
-                return this.orderByField;
-            }
-            set {
-                this.orderByField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string sobjectType {
-            get {
-                return this.sobjectTypeField;
-            }
-            set {
-                this.sobjectTypeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class ListViewOrderBy {
-        
-        private string fieldNameOrPathField;
-        
-        private System.Nullable<orderByNullsPosition> nullsPositionField;
-        
-        private System.Nullable<orderByDirection> sortDirectionField;
-        
-        /// <remarks/>
-        public string fieldNameOrPath {
-            get {
-                return this.fieldNameOrPathField;
-            }
-            set {
-                this.fieldNameOrPathField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<orderByNullsPosition> nullsPosition {
-            get {
-                return this.nullsPositionField;
-            }
-            set {
-                this.nullsPositionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<orderByDirection> sortDirection {
-            get {
-                return this.sortDirectionField;
-            }
-            set {
-                this.sortDirectionField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum orderByNullsPosition {
-        
-        /// <remarks/>
-        first,
-        
-        /// <remarks/>
-        last,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeSoqlListViewParams {
-        
-        private string developerNameOrIdField;
-        
-        private string sobjectTypeField;
-        
-        /// <remarks/>
-        public string developerNameOrId {
-            get {
-                return this.developerNameOrIdField;
-            }
-            set {
-                this.developerNameOrIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string sobjectType {
-            get {
-                return this.sobjectTypeField;
-            }
-            set {
-                this.sobjectTypeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlSubQueryCondition))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlConditionGroup))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlNotCondition))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlCondition))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SoqlWhereCondition {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SoqlSubQueryCondition : SoqlWhereCondition {
-        
-        private string fieldField;
-        
-        private soqlOperator operatorField;
-        
-        private string subQueryField;
-        
-        /// <remarks/>
-        public string field {
-            get {
-                return this.fieldField;
-            }
-            set {
-                this.fieldField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public soqlOperator @operator {
-            get {
-                return this.operatorField;
-            }
-            set {
-                this.operatorField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string subQuery {
-            get {
-                return this.subQueryField;
-            }
-            set {
-                this.subQueryField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum soqlOperator {
-        
-        /// <remarks/>
-        equals,
-        
-        /// <remarks/>
-        excludes,
-        
-        /// <remarks/>
-        greaterThan,
-        
-        /// <remarks/>
-        greaterThanOrEqualTo,
-        
-        /// <remarks/>
-        @in,
-        
-        /// <remarks/>
-        includes,
-        
-        /// <remarks/>
-        lessThan,
-        
-        /// <remarks/>
-        lessThanOrEqualTo,
-        
-        /// <remarks/>
-        like,
-        
-        /// <remarks/>
-        notEquals,
-        
-        /// <remarks/>
-        notIn,
-        
-        /// <remarks/>
-        within,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SoqlConditionGroup : SoqlWhereCondition {
-        
-        private SoqlWhereCondition[] conditionsField;
-        
-        private soqlConjunction conjunctionField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("conditions")]
-        public SoqlWhereCondition[] conditions {
-            get {
-                return this.conditionsField;
-            }
-            set {
-                this.conditionsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public soqlConjunction conjunction {
-            get {
-                return this.conjunctionField;
-            }
-            set {
-                this.conjunctionField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum soqlConjunction {
-        
-        /// <remarks/>
-        and,
-        
-        /// <remarks/>
-        or,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SoqlNotCondition : SoqlWhereCondition {
-        
-        private SoqlWhereCondition conditionField;
-        
-        /// <remarks/>
-        public SoqlWhereCondition condition {
-            get {
-                return this.conditionField;
-            }
-            set {
-                this.conditionField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SoqlCondition : SoqlWhereCondition {
-        
-        private string fieldField;
-        
-        private soqlOperator operatorField;
-        
-        private string[] valuesField;
-        
-        /// <remarks/>
-        public string field {
-            get {
-                return this.fieldField;
-            }
-            set {
-                this.fieldField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public soqlOperator @operator {
-            get {
-                return this.operatorField;
-            }
-            set {
-                this.operatorField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("values")]
-        public string[] values {
-            get {
-                return this.valuesField;
-            }
-            set {
-                this.valuesField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeSoqlListView {
-        
-        private ListViewColumn[] columnsField;
-        
-        private string idField;
-        
-        private ListViewOrderBy[] orderByField;
-        
-        private string queryField;
-        
-        private string scopeField;
-        
-        private string sobjectTypeField;
-        
-        private SoqlWhereCondition whereConditionField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("columns")]
-        public ListViewColumn[] columns {
-            get {
-                return this.columnsField;
-            }
-            set {
-                this.columnsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("orderBy")]
-        public ListViewOrderBy[] orderBy {
-            get {
-                return this.orderByField;
-            }
-            set {
-                this.orderByField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string query {
-            get {
-                return this.queryField;
-            }
-            set {
-                this.queryField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string scope {
-            get {
-                return this.scopeField;
-            }
-            set {
-                this.scopeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string sobjectType {
-            get {
-                return this.sobjectTypeField;
-            }
-            set {
-                this.sobjectTypeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public SoqlWhereCondition whereCondition {
-            get {
-                return this.whereConditionField;
-            }
-            set {
-                this.whereConditionField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SendEmailResult {
-        
-        private SendEmailError[] errorsField;
-        
-        private bool successField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("errors")]
-        public SendEmailError[] errors {
-            get {
-                return this.errorsField;
-            }
-            set {
-                this.errorsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool success {
-            get {
-                return this.successField;
-            }
-            set {
-                this.successField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class SendEmailError {
-        
-        private string[] fieldsField;
-        
-        private string messageField;
-        
-        private StatusCode statusCodeField;
-        
-        private string targetObjectIdField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("fields", IsNullable=true)]
-        public string[] fields {
-            get {
-                return this.fieldsField;
-            }
-            set {
-                this.fieldsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string message {
-            get {
-                return this.messageField;
-            }
-            set {
-                this.messageField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public StatusCode statusCode {
-            get {
-                return this.statusCodeField;
-            }
-            set {
-                this.statusCodeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string targetObjectId {
-            get {
-                return this.targetObjectIdField;
-            }
-            set {
-                this.targetObjectIdField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SingleEmailMessage))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MassEmailMessage))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class Email {
-        
-        private System.Nullable<bool> bccSenderField;
-        
-        private System.Nullable<EmailPriority> emailPriorityField;
-        
-        private string replyToField;
-        
-        private System.Nullable<bool> saveAsActivityField;
-        
-        private string senderDisplayNameField;
-        
-        private string subjectField;
-        
-        private System.Nullable<bool> useSignatureField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<bool> bccSender {
-            get {
-                return this.bccSenderField;
-            }
-            set {
-                this.bccSenderField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<EmailPriority> emailPriority {
-            get {
-                return this.emailPriorityField;
-            }
-            set {
-                this.emailPriorityField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string replyTo {
-            get {
-                return this.replyToField;
-            }
-            set {
-                this.replyToField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<bool> saveAsActivity {
-            get {
-                return this.saveAsActivityField;
-            }
-            set {
-                this.saveAsActivityField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string senderDisplayName {
-            get {
-                return this.senderDisplayNameField;
-            }
-            set {
-                this.senderDisplayNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string subject {
-            get {
-                return this.subjectField;
-            }
-            set {
-                this.subjectField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<bool> useSignature {
-            get {
-                return this.useSignatureField;
-            }
-            set {
-                this.useSignatureField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum EmailPriority {
-        
-        /// <remarks/>
-        Highest,
-        
-        /// <remarks/>
-        High,
-        
-        /// <remarks/>
-        Normal,
-        
-        /// <remarks/>
-        Low,
-        
-        /// <remarks/>
-        Lowest,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6774,6 +6476,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private string targetObjectIdField;
         
         private string templateIdField;
+        
+        private string templateNameField;
         
         private string[] toAddressesField;
         
@@ -6938,6 +6642,17 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string templateName {
+            get {
+                return this.templateNameField;
+            }
+            set {
+                this.templateNameField = value;
+            }
+        }
+        
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("toAddresses", IsNullable=true)]
         public string[] toAddresses {
             get {
@@ -6983,7 +6698,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6995,6 +6710,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private string contentTypeField;
         
         private string fileNameField;
+        
+        private string idField;
         
         private bool inlineField;
         
@@ -7033,6 +6750,17 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
         public bool inline {
             get {
                 return this.inlineField;
@@ -7055,7 +6783,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum SendEmailOptOutPolicy {
@@ -7071,7 +6799,131 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SingleEmailMessage))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MassEmailMessage))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class Email {
+        
+        private System.Nullable<bool> bccSenderField;
+        
+        private System.Nullable<EmailPriority> emailPriorityField;
+        
+        private string replyToField;
+        
+        private System.Nullable<bool> saveAsActivityField;
+        
+        private string senderDisplayNameField;
+        
+        private string subjectField;
+        
+        private System.Nullable<bool> useSignatureField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> bccSender {
+            get {
+                return this.bccSenderField;
+            }
+            set {
+                this.bccSenderField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<EmailPriority> emailPriority {
+            get {
+                return this.emailPriorityField;
+            }
+            set {
+                this.emailPriorityField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string replyTo {
+            get {
+                return this.replyToField;
+            }
+            set {
+                this.replyToField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> saveAsActivity {
+            get {
+                return this.saveAsActivityField;
+            }
+            set {
+                this.saveAsActivityField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string senderDisplayName {
+            get {
+                return this.senderDisplayNameField;
+            }
+            set {
+                this.senderDisplayNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string subject {
+            get {
+                return this.subjectField;
+            }
+            set {
+                this.subjectField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> useSignature {
+            get {
+                return this.useSignatureField;
+            }
+            set {
+                this.useSignatureField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum EmailPriority {
+        
+        /// <remarks/>
+        Highest,
+        
+        /// <remarks/>
+        High,
+        
+        /// <remarks/>
+        Normal,
+        
+        /// <remarks/>
+        Low,
+        
+        /// <remarks/>
+        Lowest,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7131,7 +6983,1841 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class RenderStoredEmailTemplateRequest {
+        
+        private System.Nullable<AttachmentRetrievalOption> attachmentRetrievalOptionField;
+        
+        private string templateIdField;
+        
+        private bool updateTemplateUsageField;
+        
+        private bool updateTemplateUsageFieldSpecified;
+        
+        private string whatIdField;
+        
+        private string whoIdField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<AttachmentRetrievalOption> attachmentRetrievalOption {
+            get {
+                return this.attachmentRetrievalOptionField;
+            }
+            set {
+                this.attachmentRetrievalOptionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string templateId {
+            get {
+                return this.templateIdField;
+            }
+            set {
+                this.templateIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool updateTemplateUsage {
+            get {
+                return this.updateTemplateUsageField;
+            }
+            set {
+                this.updateTemplateUsageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool updateTemplateUsageSpecified {
+            get {
+                return this.updateTemplateUsageFieldSpecified;
+            }
+            set {
+                this.updateTemplateUsageFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string whatId {
+            get {
+                return this.whatIdField;
+            }
+            set {
+                this.whatIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string whoId {
+            get {
+                return this.whoIdField;
+            }
+            set {
+                this.whoIdField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum AttachmentRetrievalOption {
+        
+        /// <remarks/>
+        None,
+        
+        /// <remarks/>
+        MetadataOnly,
+        
+        /// <remarks/>
+        MetadataWithBody,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class RenderEmailTemplateResult {
+        
+        private RenderEmailTemplateBodyResult[] bodyResultsField;
+        
+        private Error[] errorsField;
+        
+        private bool successField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("bodyResults")]
+        public RenderEmailTemplateBodyResult[] bodyResults {
+            get {
+                return this.bodyResultsField;
+            }
+            set {
+                this.bodyResultsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("errors")]
+        public Error[] errors {
+            get {
+                return this.errorsField;
+            }
+            set {
+                this.errorsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool success {
+            get {
+                return this.successField;
+            }
+            set {
+                this.successField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class RenderEmailTemplateBodyResult {
+        
+        private RenderEmailTemplateError[] errorsField;
+        
+        private string mergedBodyField;
+        
+        private bool successField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("errors")]
+        public RenderEmailTemplateError[] errors {
+            get {
+                return this.errorsField;
+            }
+            set {
+                this.errorsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string mergedBody {
+            get {
+                return this.mergedBodyField;
+            }
+            set {
+                this.mergedBodyField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool success {
+            get {
+                return this.successField;
+            }
+            set {
+                this.successField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class RenderEmailTemplateError {
+        
+        private string fieldNameField;
+        
+        private string messageField;
+        
+        private int offsetField;
+        
+        private StatusCode statusCodeField;
+        
+        /// <remarks/>
+        public string fieldName {
+            get {
+                return this.fieldNameField;
+            }
+            set {
+                this.fieldNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string message {
+            get {
+                return this.messageField;
+            }
+            set {
+                this.messageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int offset {
+            get {
+                return this.offsetField;
+            }
+            set {
+                this.offsetField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public StatusCode statusCode {
+            get {
+                return this.statusCodeField;
+            }
+            set {
+                this.statusCodeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class RenderEmailTemplateRequest {
+        
+        private bool escapeHtmlInMergeFieldsField;
+        
+        private bool escapeHtmlInMergeFieldsFieldSpecified;
+        
+        private string[] templateBodiesField;
+        
+        private string whatIdField;
+        
+        private string whoIdField;
+        
+        /// <remarks/>
+        public bool escapeHtmlInMergeFields {
+            get {
+                return this.escapeHtmlInMergeFieldsField;
+            }
+            set {
+                this.escapeHtmlInMergeFieldsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool escapeHtmlInMergeFieldsSpecified {
+            get {
+                return this.escapeHtmlInMergeFieldsFieldSpecified;
+            }
+            set {
+                this.escapeHtmlInMergeFieldsFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("templateBodies")]
+        public string[] templateBodies {
+            get {
+                return this.templateBodiesField;
+            }
+            set {
+                this.templateBodiesField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string whatId {
+            get {
+                return this.whatIdField;
+            }
+            set {
+                this.whatIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string whoId {
+            get {
+                return this.whoIdField;
+            }
+            set {
+                this.whoIdField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeTab {
+        
+        private DescribeColor[] colorsField;
+        
+        private bool customField;
+        
+        private string iconUrlField;
+        
+        private DescribeIcon[] iconsField;
+        
+        private string labelField;
+        
+        private string miniIconUrlField;
+        
+        private string nameField;
+        
+        private string sobjectNameField;
+        
+        private string urlField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("colors")]
+        public DescribeColor[] colors {
+            get {
+                return this.colorsField;
+            }
+            set {
+                this.colorsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool custom {
+            get {
+                return this.customField;
+            }
+            set {
+                this.customField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string iconUrl {
+            get {
+                return this.iconUrlField;
+            }
+            set {
+                this.iconUrlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("icons")]
+        public DescribeIcon[] icons {
+            get {
+                return this.iconsField;
+            }
+            set {
+                this.iconsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string miniIconUrl {
+            get {
+                return this.miniIconUrlField;
+            }
+            set {
+                this.miniIconUrlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string sobjectName {
+            get {
+                return this.sobjectNameField;
+            }
+            set {
+                this.sobjectNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string url {
+            get {
+                return this.urlField;
+            }
+            set {
+                this.urlField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeColor {
+        
+        private string colorField;
+        
+        private string contextField;
+        
+        private string themeField;
+        
+        /// <remarks/>
+        public string color {
+            get {
+                return this.colorField;
+            }
+            set {
+                this.colorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string context {
+            get {
+                return this.contextField;
+            }
+            set {
+                this.contextField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string theme {
+            get {
+                return this.themeField;
+            }
+            set {
+                this.themeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeIcon {
+        
+        private string contentTypeField;
+        
+        private System.Nullable<int> heightField;
+        
+        private string themeField;
+        
+        private string urlField;
+        
+        private System.Nullable<int> widthField;
+        
+        /// <remarks/>
+        public string contentType {
+            get {
+                return this.contentTypeField;
+            }
+            set {
+                this.contentTypeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> height {
+            get {
+                return this.heightField;
+            }
+            set {
+                this.heightField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string theme {
+            get {
+                return this.themeField;
+            }
+            set {
+                this.themeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string url {
+            get {
+                return this.urlField;
+            }
+            set {
+                this.urlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> width {
+            get {
+                return this.widthField;
+            }
+            set {
+                this.widthField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeTabSetResult {
+        
+        private string descriptionField;
+        
+        private string labelField;
+        
+        private string logoUrlField;
+        
+        private string namespaceField;
+        
+        private bool selectedField;
+        
+        private string tabSetIdField;
+        
+        private DescribeTab[] tabsField;
+        
+        /// <remarks/>
+        public string description {
+            get {
+                return this.descriptionField;
+            }
+            set {
+                this.descriptionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string logoUrl {
+            get {
+                return this.logoUrlField;
+            }
+            set {
+                this.logoUrlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string @namespace {
+            get {
+                return this.namespaceField;
+            }
+            set {
+                this.namespaceField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool selected {
+            get {
+                return this.selectedField;
+            }
+            set {
+                this.selectedField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string tabSetId {
+            get {
+                return this.tabSetIdField;
+            }
+            set {
+                this.tabSetIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("tabs")]
+        public DescribeTab[] tabs {
+            get {
+                return this.tabsField;
+            }
+            set {
+                this.tabsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeSearchableEntityResult {
+        
+        private string labelField;
+        
+        private string nameField;
+        
+        private string pluralLabelField;
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string pluralLabel {
+            get {
+                return this.pluralLabelField;
+            }
+            set {
+                this.pluralLabelField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeSearchScopeOrderResult {
+        
+        private string keyPrefixField;
+        
+        private string nameField;
+        
+        /// <remarks/>
+        public string keyPrefix {
+            get {
+                return this.keyPrefixField;
+            }
+            set {
+                this.keyPrefixField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeColumn {
+        
+        private string fieldField;
+        
+        private string formatField;
+        
+        private string labelField;
+        
+        private string nameField;
+        
+        /// <remarks/>
+        public string field {
+            get {
+                return this.fieldField;
+            }
+            set {
+                this.fieldField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string format {
+            get {
+                return this.formatField;
+            }
+            set {
+                this.formatField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeSearchLayoutResult {
+        
+        private string errorMsgField;
+        
+        private string labelField;
+        
+        private System.Nullable<int> limitRowsField;
+        
+        private string objectTypeField;
+        
+        private DescribeColumn[] searchColumnsField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string errorMsg {
+            get {
+                return this.errorMsgField;
+            }
+            set {
+                this.errorMsgField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> limitRows {
+            get {
+                return this.limitRowsField;
+            }
+            set {
+                this.limitRowsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string objectType {
+            get {
+                return this.objectTypeField;
+            }
+            set {
+                this.objectTypeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("searchColumns", IsNullable=true)]
+        public DescribeColumn[] searchColumns {
+            get {
+                return this.searchColumnsField;
+            }
+            set {
+                this.searchColumnsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ListViewRecordColumn {
+        
+        private string fieldNameOrPathField;
+        
+        private string valueField;
+        
+        /// <remarks/>
+        public string fieldNameOrPath {
+            get {
+                return this.fieldNameOrPathField;
+            }
+            set {
+                this.fieldNameOrPathField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string value {
+            get {
+                return this.valueField;
+            }
+            set {
+                this.valueField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ExecuteListViewResult {
+        
+        private ListViewColumn[] columnsField;
+        
+        private string developerNameField;
+        
+        private bool doneField;
+        
+        private string idField;
+        
+        private string labelField;
+        
+        private ListViewRecordColumn[] recordsField;
+        
+        private int sizeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("columns")]
+        public ListViewColumn[] columns {
+            get {
+                return this.columnsField;
+            }
+            set {
+                this.columnsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string developerName {
+            get {
+                return this.developerNameField;
+            }
+            set {
+                this.developerNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool done {
+            get {
+                return this.doneField;
+            }
+            set {
+                this.doneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("columns", typeof(ListViewRecordColumn), IsNullable=false)]
+        public ListViewRecordColumn[] records {
+            get {
+                return this.recordsField;
+            }
+            set {
+                this.recordsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int size {
+            get {
+                return this.sizeField;
+            }
+            set {
+                this.sizeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ListViewColumn {
+        
+        private string ascendingLabelField;
+        
+        private string descendingLabelField;
+        
+        private string fieldNameOrPathField;
+        
+        private bool hiddenField;
+        
+        private string labelField;
+        
+        private bool searchableField;
+        
+        private string selectListItemField;
+        
+        private System.Nullable<orderByDirection> sortDirectionField;
+        
+        private System.Nullable<int> sortIndexField;
+        
+        private bool sortableField;
+        
+        private fieldType typeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string ascendingLabel {
+            get {
+                return this.ascendingLabelField;
+            }
+            set {
+                this.ascendingLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string descendingLabel {
+            get {
+                return this.descendingLabelField;
+            }
+            set {
+                this.descendingLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fieldNameOrPath {
+            get {
+                return this.fieldNameOrPathField;
+            }
+            set {
+                this.fieldNameOrPathField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool hidden {
+            get {
+                return this.hiddenField;
+            }
+            set {
+                this.hiddenField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool searchable {
+            get {
+                return this.searchableField;
+            }
+            set {
+                this.searchableField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string selectListItem {
+            get {
+                return this.selectListItemField;
+            }
+            set {
+                this.selectListItemField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<orderByDirection> sortDirection {
+            get {
+                return this.sortDirectionField;
+            }
+            set {
+                this.sortDirectionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> sortIndex {
+            get {
+                return this.sortIndexField;
+            }
+            set {
+                this.sortIndexField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool sortable {
+            get {
+                return this.sortableField;
+            }
+            set {
+                this.sortableField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public fieldType type {
+            get {
+                return this.typeField;
+            }
+            set {
+                this.typeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum orderByDirection {
+        
+        /// <remarks/>
+        ascending,
+        
+        /// <remarks/>
+        descending,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum fieldType {
+        
+        /// <remarks/>
+        @string,
+        
+        /// <remarks/>
+        picklist,
+        
+        /// <remarks/>
+        multipicklist,
+        
+        /// <remarks/>
+        combobox,
+        
+        /// <remarks/>
+        reference,
+        
+        /// <remarks/>
+        base64,
+        
+        /// <remarks/>
+        boolean,
+        
+        /// <remarks/>
+        currency,
+        
+        /// <remarks/>
+        textarea,
+        
+        /// <remarks/>
+        @int,
+        
+        /// <remarks/>
+        @double,
+        
+        /// <remarks/>
+        percent,
+        
+        /// <remarks/>
+        phone,
+        
+        /// <remarks/>
+        id,
+        
+        /// <remarks/>
+        date,
+        
+        /// <remarks/>
+        datetime,
+        
+        /// <remarks/>
+        time,
+        
+        /// <remarks/>
+        url,
+        
+        /// <remarks/>
+        email,
+        
+        /// <remarks/>
+        encryptedstring,
+        
+        /// <remarks/>
+        datacategorygroupreference,
+        
+        /// <remarks/>
+        location,
+        
+        /// <remarks/>
+        address,
+        
+        /// <remarks/>
+        anyType,
+        
+        /// <remarks/>
+        complexvalue,
+        
+        /// <remarks/>
+        @long,
+        
+        /// <remarks/>
+        json,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ExecuteListViewRequest {
+        
+        private string developerNameOrIdField;
+        
+        private System.Nullable<int> limitField;
+        
+        private System.Nullable<int> offsetField;
+        
+        private ListViewOrderBy[] orderByField;
+        
+        private string sobjectTypeField;
+        
+        /// <remarks/>
+        public string developerNameOrId {
+            get {
+                return this.developerNameOrIdField;
+            }
+            set {
+                this.developerNameOrIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> limit {
+            get {
+                return this.limitField;
+            }
+            set {
+                this.limitField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> offset {
+            get {
+                return this.offsetField;
+            }
+            set {
+                this.offsetField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("orderBy")]
+        public ListViewOrderBy[] orderBy {
+            get {
+                return this.orderByField;
+            }
+            set {
+                this.orderByField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string sobjectType {
+            get {
+                return this.sobjectTypeField;
+            }
+            set {
+                this.sobjectTypeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ListViewOrderBy {
+        
+        private string fieldNameOrPathField;
+        
+        private System.Nullable<orderByNullsPosition> nullsPositionField;
+        
+        private System.Nullable<orderByDirection> sortDirectionField;
+        
+        /// <remarks/>
+        public string fieldNameOrPath {
+            get {
+                return this.fieldNameOrPathField;
+            }
+            set {
+                this.fieldNameOrPathField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<orderByNullsPosition> nullsPosition {
+            get {
+                return this.nullsPositionField;
+            }
+            set {
+                this.nullsPositionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<orderByDirection> sortDirection {
+            get {
+                return this.sortDirectionField;
+            }
+            set {
+                this.sortDirectionField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum orderByNullsPosition {
+        
+        /// <remarks/>
+        first,
+        
+        /// <remarks/>
+        last,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeSoqlListViewParams {
+        
+        private string developerNameOrIdField;
+        
+        private string sobjectTypeField;
+        
+        /// <remarks/>
+        public string developerNameOrId {
+            get {
+                return this.developerNameOrIdField;
+            }
+            set {
+                this.developerNameOrIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string sobjectType {
+            get {
+                return this.sobjectTypeField;
+            }
+            set {
+                this.sobjectTypeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlSubQueryCondition))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlConditionGroup))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlNotCondition))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoqlCondition))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SoqlWhereCondition {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SoqlSubQueryCondition : SoqlWhereCondition {
+        
+        private string fieldField;
+        
+        private soqlOperator operatorField;
+        
+        private string subQueryField;
+        
+        /// <remarks/>
+        public string field {
+            get {
+                return this.fieldField;
+            }
+            set {
+                this.fieldField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public soqlOperator @operator {
+            get {
+                return this.operatorField;
+            }
+            set {
+                this.operatorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string subQuery {
+            get {
+                return this.subQueryField;
+            }
+            set {
+                this.subQueryField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum soqlOperator {
+        
+        /// <remarks/>
+        equals,
+        
+        /// <remarks/>
+        excludes,
+        
+        /// <remarks/>
+        greaterThan,
+        
+        /// <remarks/>
+        greaterThanOrEqualTo,
+        
+        /// <remarks/>
+        @in,
+        
+        /// <remarks/>
+        includes,
+        
+        /// <remarks/>
+        lessThan,
+        
+        /// <remarks/>
+        lessThanOrEqualTo,
+        
+        /// <remarks/>
+        like,
+        
+        /// <remarks/>
+        notEquals,
+        
+        /// <remarks/>
+        notIn,
+        
+        /// <remarks/>
+        within,
+        
+        /// <remarks/>
+        notLike,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SoqlConditionGroup : SoqlWhereCondition {
+        
+        private SoqlWhereCondition[] conditionsField;
+        
+        private soqlConjunction conjunctionField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("conditions")]
+        public SoqlWhereCondition[] conditions {
+            get {
+                return this.conditionsField;
+            }
+            set {
+                this.conditionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public soqlConjunction conjunction {
+            get {
+                return this.conjunctionField;
+            }
+            set {
+                this.conjunctionField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum soqlConjunction {
+        
+        /// <remarks/>
+        and,
+        
+        /// <remarks/>
+        or,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SoqlNotCondition : SoqlWhereCondition {
+        
+        private SoqlWhereCondition conditionField;
+        
+        /// <remarks/>
+        public SoqlWhereCondition condition {
+            get {
+                return this.conditionField;
+            }
+            set {
+                this.conditionField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SoqlCondition : SoqlWhereCondition {
+        
+        private string fieldField;
+        
+        private soqlOperator operatorField;
+        
+        private string[] valuesField;
+        
+        /// <remarks/>
+        public string field {
+            get {
+                return this.fieldField;
+            }
+            set {
+                this.fieldField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public soqlOperator @operator {
+            get {
+                return this.operatorField;
+            }
+            set {
+                this.operatorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("values")]
+        public string[] values {
+            get {
+                return this.valuesField;
+            }
+            set {
+                this.valuesField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeSoqlListView {
+        
+        private ListViewColumn[] columnsField;
+        
+        private string idField;
+        
+        private ListViewOrderBy[] orderByField;
+        
+        private string queryField;
+        
+        private string relatedEntityIdField;
+        
+        private string scopeField;
+        
+        private string scopeEntityIdField;
+        
+        private string sobjectTypeField;
+        
+        private SoqlWhereCondition whereConditionField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("columns")]
+        public ListViewColumn[] columns {
+            get {
+                return this.columnsField;
+            }
+            set {
+                this.columnsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("orderBy")]
+        public ListViewOrderBy[] orderBy {
+            get {
+                return this.orderByField;
+            }
+            set {
+                this.orderByField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string query {
+            get {
+                return this.queryField;
+            }
+            set {
+                this.queryField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string relatedEntityId {
+            get {
+                return this.relatedEntityIdField;
+            }
+            set {
+                this.relatedEntityIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string scope {
+            get {
+                return this.scopeField;
+            }
+            set {
+                this.scopeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string scopeEntityId {
+            get {
+                return this.scopeEntityIdField;
+            }
+            set {
+                this.scopeEntityIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string sobjectType {
+            get {
+                return this.sobjectTypeField;
+            }
+            set {
+                this.sobjectTypeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SoqlWhereCondition whereCondition {
+            get {
+                return this.whereConditionField;
+            }
+            set {
+                this.whereConditionField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SendEmailResult {
+        
+        private SendEmailError[] errorsField;
+        
+        private bool successField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("errors")]
+        public SendEmailError[] errors {
+            get {
+                return this.errorsField;
+            }
+            set {
+                this.errorsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool success {
+            get {
+                return this.successField;
+            }
+            set {
+                this.successField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SendEmailError {
+        
+        private string[] fieldsField;
+        
+        private string messageField;
+        
+        private StatusCode statusCodeField;
+        
+        private string targetObjectIdField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("fields", IsNullable=true)]
+        public string[] fields {
+            get {
+                return this.fieldsField;
+            }
+            set {
+                this.fieldsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string message {
+            get {
+                return this.messageField;
+            }
+            set {
+                this.messageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public StatusCode statusCode {
+            get {
+                return this.statusCodeField;
+            }
+            set {
+                this.statusCodeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string targetObjectId {
+            get {
+                return this.targetObjectIdField;
+            }
+            set {
+                this.targetObjectIdField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7152,16 +8838,20 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public partial class RecordTypeMapping {
         
+        private bool activeField;
+        
         private bool availableField;
         
         private bool defaultRecordTypeMappingField;
+        
+        private string developerNameField;
         
         private string layoutIdField;
         
@@ -7172,6 +8862,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private PicklistForRecordType[] picklistsForRecordTypeField;
         
         private string recordTypeIdField;
+        
+        /// <remarks/>
+        public bool active {
+            get {
+                return this.activeField;
+            }
+            set {
+                this.activeField = value;
+            }
+        }
         
         /// <remarks/>
         public bool available {
@@ -7190,6 +8890,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.defaultRecordTypeMappingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string developerName {
+            get {
+                return this.developerNameField;
+            }
+            set {
+                this.developerNameField = value;
             }
         }
         
@@ -7247,7 +8957,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7281,7 +8991,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7352,7 +9062,88 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeLayoutSaveOption {
+        
+        private bool defaultValueField;
+        
+        private bool isDisplayedField;
+        
+        private string labelField;
+        
+        private string nameField;
+        
+        private string restHeaderNameField;
+        
+        private string soapHeaderNameField;
+        
+        /// <remarks/>
+        public bool defaultValue {
+            get {
+                return this.defaultValueField;
+            }
+            set {
+                this.defaultValueField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isDisplayed {
+            get {
+                return this.isDisplayedField;
+            }
+            set {
+                this.isDisplayedField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string restHeaderName {
+            get {
+                return this.restHeaderNameField;
+            }
+            set {
+                this.restHeaderNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string soapHeaderName {
+            get {
+                return this.soapHeaderNameField;
+            }
+            set {
+                this.soapHeaderNameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7385,7 +9176,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7403,6 +9194,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private string lookupIdField;
         
         private string nameField;
+        
+        private bool sortableField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
@@ -7466,10 +9259,20 @@ namespace ManyWho.Service.Salesforce.Salesforce {
                 this.nameField = value;
             }
         }
+        
+        /// <remarks/>
+        public bool sortable {
+            get {
+                return this.sortableField;
+            }
+            set {
+                this.sortableField = value;
+            }
+        }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7604,7 +9407,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum ShareAccessLevel {
@@ -7620,7 +9423,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7952,7 +9755,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum WebLinkWindowType {
@@ -7974,7 +9777,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum WebLinkType {
@@ -7996,7 +9799,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum WebLinkPosition {
@@ -8012,7 +9815,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8033,7 +9836,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8123,7 +9926,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(VisualforcePage))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(FieldLayoutComponent))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(FieldComponent))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8181,7 +9984,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum layoutComponentType {
@@ -8221,7 +10024,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8242,7 +10045,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8335,7 +10138,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8428,7 +10231,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum ReportChartSize {
@@ -8444,7 +10247,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8525,7 +10328,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8594,7 +10397,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8628,7 +10431,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8649,7 +10452,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8657,6 +10460,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     public partial class Field {
         
         private bool aggregatableField;
+        
+        private bool aiPredictionFieldField;
         
         private bool autoNumberField;
         
@@ -8712,6 +10517,10 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private FilteredLookupInfo filteredLookupInfoField;
         
+        private bool formulaTreatNullNumberAsZeroField;
+        
+        private bool formulaTreatNullNumberAsZeroFieldSpecified;
+        
         private bool groupableField;
         
         private bool highScaleNumberField;
@@ -8748,6 +10557,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private PicklistEntry[] picklistValuesField;
         
+        private bool polymorphicForeignKeyField;
+        
         private int precisionField;
         
         private bool queryByDistanceField;
@@ -8769,6 +10580,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private bool restrictedPicklistField;
         
         private int scaleField;
+        
+        private bool searchPrefilterableField;
         
         private soapType soapTypeField;
         
@@ -8793,6 +10606,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.aggregatableField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool aiPredictionField {
+            get {
+                return this.aiPredictionFieldField;
+            }
+            set {
+                this.aiPredictionFieldField = value;
             }
         }
         
@@ -9073,6 +10896,27 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        public bool formulaTreatNullNumberAsZero {
+            get {
+                return this.formulaTreatNullNumberAsZeroField;
+            }
+            set {
+                this.formulaTreatNullNumberAsZeroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool formulaTreatNullNumberAsZeroSpecified {
+            get {
+                return this.formulaTreatNullNumberAsZeroFieldSpecified;
+            }
+            set {
+                this.formulaTreatNullNumberAsZeroFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
         public bool groupable {
             get {
                 return this.groupableField;
@@ -9257,6 +11101,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        public bool polymorphicForeignKey {
+            get {
+                return this.polymorphicForeignKeyField;
+            }
+            set {
+                this.polymorphicForeignKeyField = value;
+            }
+        }
+        
+        /// <remarks/>
         public int precision {
             get {
                 return this.precisionField;
@@ -9370,6 +11224,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        public bool searchPrefilterable {
+            get {
+                return this.searchPrefilterableField;
+            }
+            set {
+                this.searchPrefilterableField = value;
+            }
+        }
+        
+        /// <remarks/>
         public soapType soapType {
             get {
                 return this.soapTypeField;
@@ -9453,7 +11317,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9499,7 +11363,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum soapType {
@@ -9579,374 +11443,22 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         /// <remarks/>
         [System.Xml.Serialization.XmlEnumAttribute("urn:RecordTypesSupported")]
         urnRecordTypesSupported,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("tns:json")]
+        tnsjson,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("tns:StringList")]
+        tnsStringList,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("tns:ChangeEventHeader")]
+        tnsChangeEventHeader,
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeLayoutFeedFilter {
-        
-        private string labelField;
-        
-        private string nameField;
-        
-        private FeedLayoutFilterType typeField;
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FeedLayoutFilterType type {
-            get {
-                return this.typeField;
-            }
-            set {
-                this.typeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum FeedLayoutFilterType {
-        
-        /// <remarks/>
-        AllUpdates,
-        
-        /// <remarks/>
-        FeedItemType,
-        
-        /// <remarks/>
-        Custom,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeLayout {
-        
-        private DescribeLayoutButton[] buttonLayoutSectionField;
-        
-        private DescribeLayoutSection[] detailLayoutSectionsField;
-        
-        private DescribeLayoutSection[] editLayoutSectionsField;
-        
-        private DescribeLayoutFeedFilter[] feedViewField;
-        
-        private DescribeLayoutSection highlightsPanelLayoutSectionField;
-        
-        private string idField;
-        
-        private DescribeQuickActionListItemResult[] quickActionListField;
-        
-        private DescribeRelatedContentItem[] relatedContentField;
-        
-        private RelatedList[] relatedListsField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("detailButtons", IsNullable=false)]
-        public DescribeLayoutButton[] buttonLayoutSection {
-            get {
-                return this.buttonLayoutSectionField;
-            }
-            set {
-                this.buttonLayoutSectionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("detailLayoutSections")]
-        public DescribeLayoutSection[] detailLayoutSections {
-            get {
-                return this.detailLayoutSectionsField;
-            }
-            set {
-                this.detailLayoutSectionsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("editLayoutSections")]
-        public DescribeLayoutSection[] editLayoutSections {
-            get {
-                return this.editLayoutSectionsField;
-            }
-            set {
-                this.editLayoutSectionsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("feedFilters", IsNullable=false)]
-        public DescribeLayoutFeedFilter[] feedView {
-            get {
-                return this.feedViewField;
-            }
-            set {
-                this.feedViewField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public DescribeLayoutSection highlightsPanelLayoutSection {
-            get {
-                return this.highlightsPanelLayoutSectionField;
-            }
-            set {
-                this.highlightsPanelLayoutSectionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("quickActionListItems", IsNullable=false)]
-        public DescribeQuickActionListItemResult[] quickActionList {
-            get {
-                return this.quickActionListField;
-            }
-            set {
-                this.quickActionListField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("relatedContentItems", IsNullable=false)]
-        public DescribeRelatedContentItem[] relatedContent {
-            get {
-                return this.relatedContentField;
-            }
-            set {
-                this.relatedContentField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("relatedLists")]
-        public RelatedList[] relatedLists {
-            get {
-                return this.relatedListsField;
-            }
-            set {
-                this.relatedListsField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeLayoutSection {
-        
-        private bool collapsedField;
-        
-        private int columnsField;
-        
-        private string headingField;
-        
-        private DescribeLayoutRow[] layoutRowsField;
-        
-        private string layoutSectionIdField;
-        
-        private string parentLayoutIdField;
-        
-        private int rowsField;
-        
-        private TabOrderType tabOrderField;
-        
-        private bool useCollapsibleSectionField;
-        
-        private bool useHeadingField;
-        
-        /// <remarks/>
-        public bool collapsed {
-            get {
-                return this.collapsedField;
-            }
-            set {
-                this.collapsedField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int columns {
-            get {
-                return this.columnsField;
-            }
-            set {
-                this.columnsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string heading {
-            get {
-                return this.headingField;
-            }
-            set {
-                this.headingField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("layoutRows")]
-        public DescribeLayoutRow[] layoutRows {
-            get {
-                return this.layoutRowsField;
-            }
-            set {
-                this.layoutRowsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string layoutSectionId {
-            get {
-                return this.layoutSectionIdField;
-            }
-            set {
-                this.layoutSectionIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string parentLayoutId {
-            get {
-                return this.parentLayoutIdField;
-            }
-            set {
-                this.parentLayoutIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int rows {
-            get {
-                return this.rowsField;
-            }
-            set {
-                this.rowsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TabOrderType tabOrder {
-            get {
-                return this.tabOrderField;
-            }
-            set {
-                this.tabOrderField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool useCollapsibleSection {
-            get {
-                return this.useCollapsibleSectionField;
-            }
-            set {
-                this.useCollapsibleSectionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool useHeading {
-            get {
-                return this.useHeadingField;
-            }
-            set {
-                this.useHeadingField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeLayoutRow {
-        
-        private DescribeLayoutItem[] layoutItemsField;
-        
-        private int numItemsField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("layoutItems")]
-        public DescribeLayoutItem[] layoutItems {
-            get {
-                return this.layoutItemsField;
-            }
-            set {
-                this.layoutItemsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int numItems {
-            get {
-                return this.numItemsField;
-            }
-            set {
-                this.numItemsField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum TabOrderType {
-        
-        /// <remarks/>
-        LeftToRight,
-        
-        /// <remarks/>
-        TopToBottom,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10068,7 +11580,385 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeLayoutFeedFilter {
+        
+        private string labelField;
+        
+        private string nameField;
+        
+        private FeedLayoutFilterType typeField;
+        
+        /// <remarks/>
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public FeedLayoutFilterType type {
+            get {
+                return this.typeField;
+            }
+            set {
+                this.typeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum FeedLayoutFilterType {
+        
+        /// <remarks/>
+        AllUpdates,
+        
+        /// <remarks/>
+        FeedItemType,
+        
+        /// <remarks/>
+        Custom,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeLayout {
+        
+        private DescribeLayoutButton[] buttonLayoutSectionField;
+        
+        private DescribeLayoutSection[] detailLayoutSectionsField;
+        
+        private DescribeLayoutSection[] editLayoutSectionsField;
+        
+        private DescribeLayoutFeedFilter[] feedViewField;
+        
+        private DescribeLayoutSection highlightsPanelLayoutSectionField;
+        
+        private string idField;
+        
+        private DescribeQuickActionListItemResult[] quickActionListField;
+        
+        private DescribeRelatedContentItem[] relatedContentField;
+        
+        private RelatedList[] relatedListsField;
+        
+        private DescribeLayoutSaveOption[] saveOptionsField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("detailButtons", IsNullable=false)]
+        public DescribeLayoutButton[] buttonLayoutSection {
+            get {
+                return this.buttonLayoutSectionField;
+            }
+            set {
+                this.buttonLayoutSectionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("detailLayoutSections")]
+        public DescribeLayoutSection[] detailLayoutSections {
+            get {
+                return this.detailLayoutSectionsField;
+            }
+            set {
+                this.detailLayoutSectionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("editLayoutSections")]
+        public DescribeLayoutSection[] editLayoutSections {
+            get {
+                return this.editLayoutSectionsField;
+            }
+            set {
+                this.editLayoutSectionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("feedFilters", IsNullable=false)]
+        public DescribeLayoutFeedFilter[] feedView {
+            get {
+                return this.feedViewField;
+            }
+            set {
+                this.feedViewField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public DescribeLayoutSection highlightsPanelLayoutSection {
+            get {
+                return this.highlightsPanelLayoutSectionField;
+            }
+            set {
+                this.highlightsPanelLayoutSectionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("quickActionListItems", IsNullable=false)]
+        public DescribeQuickActionListItemResult[] quickActionList {
+            get {
+                return this.quickActionListField;
+            }
+            set {
+                this.quickActionListField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("relatedContentItems", IsNullable=false)]
+        public DescribeRelatedContentItem[] relatedContent {
+            get {
+                return this.relatedContentField;
+            }
+            set {
+                this.relatedContentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("relatedLists")]
+        public RelatedList[] relatedLists {
+            get {
+                return this.relatedListsField;
+            }
+            set {
+                this.relatedListsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("saveOptions")]
+        public DescribeLayoutSaveOption[] saveOptions {
+            get {
+                return this.saveOptionsField;
+            }
+            set {
+                this.saveOptionsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeLayoutSection {
+        
+        private bool collapsedField;
+        
+        private int columnsField;
+        
+        private string headingField;
+        
+        private DescribeLayoutRow[] layoutRowsField;
+        
+        private string layoutSectionIdField;
+        
+        private string parentLayoutIdField;
+        
+        private int rowsField;
+        
+        private TabOrderType tabOrderField;
+        
+        private bool useCollapsibleSectionField;
+        
+        private bool useHeadingField;
+        
+        /// <remarks/>
+        public bool collapsed {
+            get {
+                return this.collapsedField;
+            }
+            set {
+                this.collapsedField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int columns {
+            get {
+                return this.columnsField;
+            }
+            set {
+                this.columnsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string heading {
+            get {
+                return this.headingField;
+            }
+            set {
+                this.headingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("layoutRows")]
+        public DescribeLayoutRow[] layoutRows {
+            get {
+                return this.layoutRowsField;
+            }
+            set {
+                this.layoutRowsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string layoutSectionId {
+            get {
+                return this.layoutSectionIdField;
+            }
+            set {
+                this.layoutSectionIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string parentLayoutId {
+            get {
+                return this.parentLayoutIdField;
+            }
+            set {
+                this.parentLayoutIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int rows {
+            get {
+                return this.rowsField;
+            }
+            set {
+                this.rowsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TabOrderType tabOrder {
+            get {
+                return this.tabOrderField;
+            }
+            set {
+                this.tabOrderField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool useCollapsibleSection {
+            get {
+                return this.useCollapsibleSectionField;
+            }
+            set {
+                this.useCollapsibleSectionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool useHeading {
+            get {
+                return this.useHeadingField;
+            }
+            set {
+                this.useHeadingField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeLayoutRow {
+        
+        private DescribeLayoutItem[] layoutItemsField;
+        
+        private int numItemsField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("layoutItems")]
+        public DescribeLayoutItem[] layoutItems {
+            get {
+                return this.layoutItemsField;
+            }
+            set {
+                this.layoutItemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int numItems {
+            get {
+                return this.numItemsField;
+            }
+            set {
+                this.numItemsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum TabOrderType {
+        
+        /// <remarks/>
+        LeftToRight,
+        
+        /// <remarks/>
+        TopToBottom,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10115,7 +12005,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10173,7 +12063,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10230,7 +12120,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10285,6 +12175,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string info {
             get {
                 return this.infoField;
@@ -10295,6 +12186,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public DescribeLayoutSection layoutSection {
             get {
                 return this.layoutSectionField;
@@ -10336,7 +12228,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10432,7 +12324,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10502,7 +12394,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10598,7 +12490,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10645,7 +12537,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10666,7 +12558,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10700,7 +12592,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10745,7 +12637,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10766,7 +12658,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10838,7 +12730,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10884,7 +12776,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10979,309 +12871,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class FlexipageContext {
-        
-        private FlexipageContextTypeEnum typeField;
-        
-        private string valueField;
-        
-        /// <remarks/>
-        public FlexipageContextTypeEnum type {
-            get {
-                return this.typeField;
-            }
-            set {
-                this.typeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string value {
-            get {
-                return this.valueField;
-            }
-            set {
-                this.valueField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum FlexipageContextTypeEnum {
-        
-        /// <remarks/>
-        ENTITYNAME,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeComponentInstanceProperty {
-        
-        private string nameField;
-        
-        private DescribeFlexiPageRegion regionField;
-        
-        private System.Nullable<ComponentInstancePropertyTypeEnum> typeField;
-        
-        private string valueField;
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public DescribeFlexiPageRegion region {
-            get {
-                return this.regionField;
-            }
-            set {
-                this.regionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<ComponentInstancePropertyTypeEnum> type {
-            get {
-                return this.typeField;
-            }
-            set {
-                this.typeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string value {
-            get {
-                return this.valueField;
-            }
-            set {
-                this.valueField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeFlexiPageRegion {
-        
-        private DescribeComponentInstance[] componentsField;
-        
-        private string nameField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("components")]
-        public DescribeComponentInstance[] components {
-            get {
-                return this.componentsField;
-            }
-            set {
-                this.componentsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeComponentInstance {
-        
-        private DescribeComponentInstanceProperty[] propertiesField;
-        
-        private string typeNameField;
-        
-        private string typeNamespaceField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("properties")]
-        public DescribeComponentInstanceProperty[] properties {
-            get {
-                return this.propertiesField;
-            }
-            set {
-                this.propertiesField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string typeName {
-            get {
-                return this.typeNameField;
-            }
-            set {
-                this.typeNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string typeNamespace {
-            get {
-                return this.typeNamespaceField;
-            }
-            set {
-                this.typeNamespaceField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public enum ComponentInstancePropertyTypeEnum {
-        
-        /// <remarks/>
-        decorator,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
-    public partial class DescribeFlexiPageResult {
-        
-        private string idField;
-        
-        private string labelField;
-        
-        private string nameField;
-        
-        private DescribeQuickActionListItemResult[] quickActionListField;
-        
-        private DescribeFlexiPageRegion[] regionsField;
-        
-        private string sobjectTypeField;
-        
-        private string templateField;
-        
-        private string typeField;
-        
-        /// <remarks/>
-        public string id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("quickActionListItems", IsNullable=false)]
-        public DescribeQuickActionListItemResult[] quickActionList {
-            get {
-                return this.quickActionListField;
-            }
-            set {
-                this.quickActionListField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("regions")]
-        public DescribeFlexiPageRegion[] regions {
-            get {
-                return this.regionsField;
-            }
-            set {
-                this.regionsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string sobjectType {
-            get {
-                return this.sobjectTypeField;
-            }
-            set {
-                this.sobjectTypeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string template {
-            get {
-                return this.templateField;
-            }
-            set {
-                this.templateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string type {
-            get {
-                return this.typeField;
-            }
-            set {
-                this.typeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11328,7 +12918,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11390,6 +12980,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string value {
             get {
                 return this.valueField;
@@ -11401,7 +12992,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum Article {
@@ -11417,7 +13008,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum CaseType {
@@ -11514,7 +13105,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum GrammaticalNumber {
@@ -11527,7 +13118,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum Possessive {
@@ -11543,7 +13134,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11628,7 +13219,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum Gender {
@@ -11644,10 +13235,43 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         AnimateMasculine,
+        
+        /// <remarks/>
+        ClassI,
+        
+        /// <remarks/>
+        ClassIII,
+        
+        /// <remarks/>
+        ClassV,
+        
+        /// <remarks/>
+        ClassVII,
+        
+        /// <remarks/>
+        ClassIX,
+        
+        /// <remarks/>
+        ClassXI,
+        
+        /// <remarks/>
+        ClassXIV,
+        
+        /// <remarks/>
+        ClassXV,
+        
+        /// <remarks/>
+        ClassXVI,
+        
+        /// <remarks/>
+        ClassXVII,
+        
+        /// <remarks/>
+        ClassXVIII,
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum StartsWith {
@@ -11663,7 +13287,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11671,6 +13295,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     public partial class KnowledgeLanguageItem {
         
         private bool activeField;
+        
+        private string assigneeIdField;
         
         private string nameField;
         
@@ -11681,6 +13307,17 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.activeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string assigneeId {
+            get {
+                return this.assigneeIdField;
+            }
+            set {
+                this.assigneeIdField = value;
             }
         }
         
@@ -11696,7 +13333,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11742,7 +13379,124 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DescribeDataCategoryMappingResult {
+        
+        private string dataCategoryGroupIdField;
+        
+        private string dataCategoryGroupLabelField;
+        
+        private string dataCategoryGroupNameField;
+        
+        private string dataCategoryIdField;
+        
+        private string dataCategoryLabelField;
+        
+        private string dataCategoryNameField;
+        
+        private string idField;
+        
+        private string mappedEntityField;
+        
+        private string mappedFieldField;
+        
+        /// <remarks/>
+        public string dataCategoryGroupId {
+            get {
+                return this.dataCategoryGroupIdField;
+            }
+            set {
+                this.dataCategoryGroupIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataCategoryGroupLabel {
+            get {
+                return this.dataCategoryGroupLabelField;
+            }
+            set {
+                this.dataCategoryGroupLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataCategoryGroupName {
+            get {
+                return this.dataCategoryGroupNameField;
+            }
+            set {
+                this.dataCategoryGroupNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataCategoryId {
+            get {
+                return this.dataCategoryIdField;
+            }
+            set {
+                this.dataCategoryIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataCategoryLabel {
+            get {
+                return this.dataCategoryLabelField;
+            }
+            set {
+                this.dataCategoryLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataCategoryName {
+            get {
+                return this.dataCategoryNameField;
+            }
+            set {
+                this.dataCategoryNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string mappedEntity {
+            get {
+                return this.mappedEntityField;
+            }
+            set {
+                this.mappedEntityField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string mappedField {
+            get {
+                return this.mappedFieldField;
+            }
+            set {
+                this.mappedFieldField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11775,7 +13529,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11821,7 +13575,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11891,7 +13645,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11960,7 +13714,194 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ChangeEventHeader {
+        
+        private string entityNameField;
+        
+        private string[] recordIdsField;
+        
+        private long commitTimestampField;
+        
+        private long commitNumberField;
+        
+        private string commitUserField;
+        
+        private string[] diffFieldsField;
+        
+        private changeEventType changeTypeField;
+        
+        private string changeOriginField;
+        
+        private string transactionKeyField;
+        
+        private int sequenceNumberField;
+        
+        private bool isTransactionEndField;
+        
+        private string[] nulledFieldsField;
+        
+        /// <remarks/>
+        public string entityName {
+            get {
+                return this.entityNameField;
+            }
+            set {
+                this.entityNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("recordIds")]
+        public string[] recordIds {
+            get {
+                return this.recordIdsField;
+            }
+            set {
+                this.recordIdsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long commitTimestamp {
+            get {
+                return this.commitTimestampField;
+            }
+            set {
+                this.commitTimestampField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long commitNumber {
+            get {
+                return this.commitNumberField;
+            }
+            set {
+                this.commitNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string commitUser {
+            get {
+                return this.commitUserField;
+            }
+            set {
+                this.commitUserField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("diffFields")]
+        public string[] diffFields {
+            get {
+                return this.diffFieldsField;
+            }
+            set {
+                this.diffFieldsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public changeEventType changeType {
+            get {
+                return this.changeTypeField;
+            }
+            set {
+                this.changeTypeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string changeOrigin {
+            get {
+                return this.changeOriginField;
+            }
+            set {
+                this.changeOriginField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string transactionKey {
+            get {
+                return this.transactionKeyField;
+            }
+            set {
+                this.transactionKeyField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int sequenceNumber {
+            get {
+                return this.sequenceNumberField;
+            }
+            set {
+                this.sequenceNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isTransactionEnd {
+            get {
+                return this.isTransactionEndField;
+            }
+            set {
+                this.isTransactionEndField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("nulledFields")]
+        public string[] nulledFields {
+            get {
+                return this.nulledFieldsField;
+            }
+            set {
+                this.nulledFieldsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public enum changeEventType {
+        
+        /// <remarks/>
+        CREATE,
+        
+        /// <remarks/>
+        UPDATE,
+        
+        /// <remarks/>
+        DELETE,
+        
+        /// <remarks/>
+        UNDELETE,
+        
+        /// <remarks/>
+        GAP_CREATE,
+        
+        /// <remarks/>
+        GAP_UPDATE,
+        
+        /// <remarks/>
+        GAP_DELETE,
+        
+        /// <remarks/>
+        GAP_UNDELETE,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11993,7 +13934,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12040,7 +13981,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12074,7 +14015,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12121,7 +14062,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12145,6 +14086,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private bool hasSubtypesField;
         
         private bool idEnabledField;
+        
+        private bool isSubtypeField;
         
         private string keyPrefixField;
         
@@ -12261,6 +14204,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.idEnabledField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isSubtype {
+            get {
+                return this.isSubtypeField;
+            }
+            set {
+                this.isSubtypeField = value;
             }
         }
         
@@ -12407,7 +14360,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12493,7 +14446,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12502,7 +14455,15 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private string accountIdField;
         
+        private sObject accountRecordField;
+        
+        private System.Nullable<bool> bypassAccountDedupeCheckField;
+        
+        private System.Nullable<bool> bypassContactDedupeCheckField;
+        
         private string contactIdField;
+        
+        private sObject contactRecordField;
         
         private string convertedStatusField;
         
@@ -12510,7 +14471,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private string leadIdField;
         
+        private string opportunityIdField;
+        
         private string opportunityNameField;
+        
+        private sObject opportunityRecordField;
         
         private bool overwriteLeadSourceField;
         
@@ -12531,12 +14496,56 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public sObject accountRecord {
+            get {
+                return this.accountRecordField;
+            }
+            set {
+                this.accountRecordField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> bypassAccountDedupeCheck {
+            get {
+                return this.bypassAccountDedupeCheckField;
+            }
+            set {
+                this.bypassAccountDedupeCheckField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> bypassContactDedupeCheck {
+            get {
+                return this.bypassContactDedupeCheckField;
+            }
+            set {
+                this.bypassContactDedupeCheckField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string contactId {
             get {
                 return this.contactIdField;
             }
             set {
                 this.contactIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public sObject contactRecord {
+            get {
+                return this.contactRecordField;
+            }
+            set {
+                this.contactRecordField = value;
             }
         }
         
@@ -12572,12 +14581,34 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string opportunityId {
+            get {
+                return this.opportunityIdField;
+            }
+            set {
+                this.opportunityIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string opportunityName {
             get {
                 return this.opportunityNameField;
             }
             set {
                 this.opportunityNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public sObject opportunityRecord {
+            get {
+                return this.opportunityRecordField;
+            }
+            set {
+                this.opportunityRecordField = value;
             }
         }
         
@@ -12614,7 +14645,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12661,7 +14692,66 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class DeleteByExampleResult {
+        
+        private sObject entityField;
+        
+        private Error[] errorsField;
+        
+        private long rowCountField;
+        
+        private bool successField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public sObject entity {
+            get {
+                return this.entityField;
+            }
+            set {
+                this.entityField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("errors", IsNullable=true)]
+        public Error[] errors {
+            get {
+                return this.errorsField;
+            }
+            set {
+                this.errorsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long rowCount {
+            get {
+                return this.rowCountField;
+            }
+            set {
+                this.rowCountField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool success {
+            get {
+                return this.successField;
+            }
+            set {
+                this.successField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12708,7 +14798,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12755,7 +14845,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12854,7 +14944,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12875,7 +14965,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12909,7 +14999,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12929,6 +15019,10 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private string contextSobjectTypeField;
         
         private DescribeQuickActionDefaultValue[] defaultValuesField;
+        
+        private string flowDevNameField;
+        
+        private string flowRecordIdVarField;
         
         private System.Nullable<int> heightField;
         
@@ -13043,6 +15137,28 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.defaultValuesField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string flowDevName {
+            get {
+                return this.flowDevNameField;
+            }
+            set {
+                this.flowDevNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string flowRecordIdVar {
+            get {
+                return this.flowRecordIdVarField;
+            }
+            set {
+                this.flowRecordIdVarField = value;
             }
         }
         
@@ -13263,7 +15379,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13320,7 +15436,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13369,7 +15485,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProcessWorkitemRequest))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProcessSubmitRequest))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13404,7 +15520,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13437,7 +15553,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13497,7 +15613,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13570,16 +15686,29 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public partial class MergeRequest {
         
+        private AdditionalInformationMap[] additionalInformationMapField;
+        
         private sObject masterRecordField;
         
         private string[] recordToMergeIdsField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("additionalInformationMap")]
+        public AdditionalInformationMap[] additionalInformationMap {
+            get {
+                return this.additionalInformationMapField;
+            }
+            set {
+                this.additionalInformationMapField = value;
+            }
+        }
         
         /// <remarks/>
         public sObject masterRecord {
@@ -13604,12 +15733,14 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public partial class QuickActionTemplateResult {
+        
+        private string contextIdField;
         
         private sObject defaultValueFormulasField;
         
@@ -13618,6 +15749,17 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private Error[] errorsField;
         
         private bool successField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string contextId {
+            get {
+                return this.contextIdField;
+            }
+            set {
+                this.contextIdField = value;
+            }
+        }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
@@ -13664,7 +15806,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13762,7 +15904,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13821,7 +15963,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13868,7 +16010,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13889,7 +16031,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class ChangeOwnPasswordResult {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13898,7 +16049,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13932,7 +16083,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13953,7 +16104,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13986,7 +16137,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14032,7 +16183,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14066,7 +16217,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14100,7 +16251,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14145,7 +16296,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14179,7 +16330,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14212,7 +16363,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14246,22 +16397,36 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public partial class RecordTypeInfo {
         
+        private bool activeField;
+        
         private bool availableField;
         
         private bool defaultRecordTypeMappingField;
+        
+        private string developerNameField;
         
         private bool masterField;
         
         private string nameField;
         
         private string recordTypeIdField;
+        
+        /// <remarks/>
+        public bool active {
+            get {
+                return this.activeField;
+            }
+            set {
+                this.activeField = value;
+            }
+        }
         
         /// <remarks/>
         public bool available {
@@ -14280,6 +16445,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.defaultRecordTypeMappingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string developerName {
+            get {
+                return this.developerNameField;
+            }
+            set {
+                this.developerNameField = value;
             }
         }
         
@@ -14316,7 +16491,212 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class EntitySpellCorrectionMetadata {
+        
+        private string correctedQueryField;
+        
+        private bool hasNonCorrectedResultsField;
+        
+        /// <remarks/>
+        public string correctedQuery {
+            get {
+                return this.correctedQueryField;
+            }
+            set {
+                this.correctedQueryField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool hasNonCorrectedResults {
+            get {
+                return this.hasNonCorrectedResultsField;
+            }
+            set {
+                this.hasNonCorrectedResultsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class EntitySearchPromotionMetadata {
+        
+        private int promotedResultCountField;
+        
+        /// <remarks/>
+        public int promotedResultCount {
+            get {
+                return this.promotedResultCountField;
+            }
+            set {
+                this.promotedResultCountField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class EntityIntentQueryMetadata {
+        
+        private bool intentQueryField;
+        
+        private string messageField;
+        
+        /// <remarks/>
+        public bool intentQuery {
+            get {
+                return this.intentQueryField;
+            }
+            set {
+                this.intentQueryField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string message {
+            get {
+                return this.messageField;
+            }
+            set {
+                this.messageField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class FieldLevelSearchMetadata {
+        
+        private string labelField;
+        
+        private string nameField;
+        
+        private string typeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string type {
+            get {
+                return this.typeField;
+            }
+            set {
+                this.typeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class EntitySearchMetadata {
+        
+        private string entityNameField;
+        
+        private FieldLevelSearchMetadata[] fieldMetadataField;
+        
+        private EntityIntentQueryMetadata intentQueryMetadataField;
+        
+        private EntitySearchPromotionMetadata searchPromotionMetadataField;
+        
+        private EntitySpellCorrectionMetadata spellCorrectionMetadataField;
+        
+        /// <remarks/>
+        public string entityName {
+            get {
+                return this.entityNameField;
+            }
+            set {
+                this.entityNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("fieldMetadata")]
+        public FieldLevelSearchMetadata[] fieldMetadata {
+            get {
+                return this.fieldMetadataField;
+            }
+            set {
+                this.fieldMetadataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public EntityIntentQueryMetadata intentQueryMetadata {
+            get {
+                return this.intentQueryMetadataField;
+            }
+            set {
+                this.intentQueryMetadataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public EntitySearchPromotionMetadata searchPromotionMetadata {
+            get {
+                return this.searchPromotionMetadataField;
+            }
+            set {
+                this.searchPromotionMetadataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public EntitySpellCorrectionMetadata spellCorrectionMetadata {
+            get {
+                return this.spellCorrectionMetadataField;
+            }
+            set {
+                this.spellCorrectionMetadataField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14350,7 +16730,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14383,7 +16763,42 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SearchResultsMetadata {
+        
+        private LabelsSearchMetadata[] entityLabelMetadataField;
+        
+        private EntitySearchMetadata[] entityMetadataField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("entityLabelMetadata")]
+        public LabelsSearchMetadata[] entityLabelMetadata {
+            get {
+                return this.entityLabelMetadataField;
+            }
+            set {
+                this.entityLabelMetadataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("entityMetadata")]
+        public EntitySearchMetadata[] entityMetadata {
+            get {
+                return this.entityMetadataField;
+            }
+            set {
+                this.entityMetadataField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14418,7 +16833,40 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
+    public partial class SearchRecordMetadata {
+        
+        private bool searchPromotedField;
+        
+        private bool spellCorrectedField;
+        
+        /// <remarks/>
+        public bool searchPromoted {
+            get {
+                return this.searchPromotedField;
+            }
+            set {
+                this.searchPromotedField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool spellCorrected {
+            get {
+                return this.spellCorrectedField;
+            }
+            set {
+                this.spellCorrectedField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14426,6 +16874,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     public partial class SearchRecord {
         
         private sObject recordField;
+        
+        private SearchRecordMetadata searchRecordMetadataField;
         
         private SearchSnippet snippetField;
         
@@ -14436,6 +16886,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.recordField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SearchRecordMetadata searchRecordMetadata {
+            get {
+                return this.searchRecordMetadataField;
+            }
+            set {
+                this.searchRecordMetadataField = value;
             }
         }
         
@@ -14452,7 +16912,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14463,7 +16923,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         
         private SearchRecord[] searchRecordsField;
         
-        private LabelsSearchMetadata[] searchResultsMetadataField;
+        private SearchResultsMetadata searchResultsMetadataField;
         
         /// <remarks/>
         public string queryId {
@@ -14487,9 +16947,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(IsNullable=true)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("entityLabelMetadata", IsNullable=false)]
-        public LabelsSearchMetadata[] searchResultsMetadata {
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public SearchResultsMetadata searchResultsMetadata {
             get {
                 return this.searchResultsMetadataField;
             }
@@ -14500,7 +16959,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14560,7 +17019,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(address))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14595,7 +17054,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14708,7 +17167,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14828,7 +17287,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14886,6 +17345,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         }
         
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string url {
             get {
                 return this.urlField;
@@ -14897,7 +17357,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14929,6 +17389,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
         private bool hasSubtypesField;
         
         private bool idEnabledField;
+        
+        private bool isSubtypeField;
         
         private string keyPrefixField;
         
@@ -15108,6 +17570,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.idEnabledField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isSubtype {
+            get {
+                return this.isSubtypeField;
+            }
+            set {
+                this.isSubtypeField = value;
             }
         }
         
@@ -15363,7 +17835,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15408,7 +17880,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15453,7 +17925,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15461,6 +17933,8 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     public partial class GetUserInfoResult {
         
         private bool accessibilityModeField;
+        
+        private bool chatterExternalField;
         
         private string currencySymbolField;
         
@@ -15513,6 +17987,16 @@ namespace ManyWho.Service.Salesforce.Salesforce {
             }
             set {
                 this.accessibilityModeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool chatterExternal {
+            get {
+                return this.chatterExternalField;
+            }
+            set {
+                this.chatterExternalField = value;
             }
         }
         
@@ -15743,7 +18227,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15840,7 +18324,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15863,7 +18347,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15885,7 +18369,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15921,7 +18405,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15957,7 +18441,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15979,7 +18463,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16002,7 +18486,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16049,7 +18533,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16072,7 +18556,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16094,7 +18578,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16140,7 +18624,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16162,7 +18646,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16184,7 +18668,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16206,7 +18690,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16241,7 +18725,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum DebugLevel {
@@ -16266,7 +18750,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16288,7 +18772,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16323,7 +18807,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16346,7 +18830,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16392,7 +18876,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum AppMenuType {
@@ -16408,7 +18892,7 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3056.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:partner.soap.sforce.com")]
     public enum listViewIsSoqlCompatible {
@@ -16424,11 +18908,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void loginCompletedEventHandler(object sender, loginCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class loginCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16450,11 +18934,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSObjectCompletedEventHandler(object sender, describeSObjectCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSObjectCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16476,11 +18960,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSObjectsCompletedEventHandler(object sender, describeSObjectsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSObjectsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16502,11 +18986,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeGlobalCompletedEventHandler(object sender, describeGlobalCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeGlobalCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16528,11 +19012,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeDataCategoryGroupsCompletedEventHandler(object sender, describeDataCategoryGroupsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeDataCategoryGroupsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16554,11 +19038,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeDataCategoryGroupStructuresCompletedEventHandler(object sender, describeDataCategoryGroupStructuresCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeDataCategoryGroupStructuresCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16580,11 +19064,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void describeDataCategoryMappingsCompletedEventHandler(object sender, describeDataCategoryMappingsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class describeDataCategoryMappingsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal describeDataCategoryMappingsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public DescribeDataCategoryMappingResult[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((DescribeDataCategoryMappingResult[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeKnowledgeSettingsCompletedEventHandler(object sender, describeKnowledgeSettingsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeKnowledgeSettingsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16606,37 +19116,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
-    public delegate void describeFlexiPagesCompletedEventHandler(object sender, describeFlexiPagesCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class describeFlexiPagesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal describeFlexiPagesCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public DescribeFlexiPageResult[] Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((DescribeFlexiPageResult[])(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeAppMenuCompletedEventHandler(object sender, describeAppMenuCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeAppMenuCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16658,11 +19142,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeGlobalThemeCompletedEventHandler(object sender, describeGlobalThemeCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeGlobalThemeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16684,11 +19168,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeThemeCompletedEventHandler(object sender, describeThemeCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeThemeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16710,11 +19194,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeLayoutCompletedEventHandler(object sender, describeLayoutCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeLayoutCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16736,11 +19220,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSoftphoneLayoutCompletedEventHandler(object sender, describeSoftphoneLayoutCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSoftphoneLayoutCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16762,11 +19246,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSearchLayoutsCompletedEventHandler(object sender, describeSearchLayoutsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSearchLayoutsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16788,11 +19272,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSearchableEntitiesCompletedEventHandler(object sender, describeSearchableEntitiesCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSearchableEntitiesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16814,11 +19298,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSearchScopeOrderCompletedEventHandler(object sender, describeSearchScopeOrderCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSearchScopeOrderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16840,11 +19324,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeCompactLayoutsCompletedEventHandler(object sender, describeCompactLayoutsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeCompactLayoutsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16866,11 +19350,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describePathAssistantsCompletedEventHandler(object sender, describePathAssistantsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describePathAssistantsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16892,11 +19376,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeApprovalLayoutCompletedEventHandler(object sender, describeApprovalLayoutCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeApprovalLayoutCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16918,11 +19402,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSoqlListViewsCompletedEventHandler(object sender, describeSoqlListViewsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSoqlListViewsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16944,11 +19428,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void executeListViewCompletedEventHandler(object sender, executeListViewCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class executeListViewCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16970,11 +19454,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeSObjectListViewsCompletedEventHandler(object sender, describeSObjectListViewsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeSObjectListViewsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -16996,11 +19480,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeTabsCompletedEventHandler(object sender, describeTabsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeTabsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17022,11 +19506,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeAllTabsCompletedEventHandler(object sender, describeAllTabsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeAllTabsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17048,11 +19532,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describePrimaryCompactLayoutsCompletedEventHandler(object sender, describePrimaryCompactLayoutsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describePrimaryCompactLayoutsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17074,11 +19558,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void createCompletedEventHandler(object sender, createCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class createCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17100,11 +19584,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void updateCompletedEventHandler(object sender, updateCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class updateCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17126,11 +19610,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void upsertCompletedEventHandler(object sender, upsertCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class upsertCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17152,11 +19636,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void mergeCompletedEventHandler(object sender, mergeCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class mergeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17178,11 +19662,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void deleteCompletedEventHandler(object sender, deleteCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class deleteCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17204,11 +19688,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void undeleteCompletedEventHandler(object sender, undeleteCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class undeleteCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17230,11 +19714,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void emptyRecycleBinCompletedEventHandler(object sender, emptyRecycleBinCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class emptyRecycleBinCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17256,11 +19740,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void retrieveCompletedEventHandler(object sender, retrieveCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class retrieveCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17282,11 +19766,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void processCompletedEventHandler(object sender, processCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class processCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17308,11 +19792,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void convertLeadCompletedEventHandler(object sender, convertLeadCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class convertLeadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17334,15 +19818,15 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void logoutCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void invalidateSessionsCompletedEventHandler(object sender, invalidateSessionsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class invalidateSessionsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17364,11 +19848,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void getDeletedCompletedEventHandler(object sender, getDeletedCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getDeletedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17390,11 +19874,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void getUpdatedCompletedEventHandler(object sender, getUpdatedCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getUpdatedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17416,11 +19900,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void queryCompletedEventHandler(object sender, queryCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class queryCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17442,11 +19926,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void queryAllCompletedEventHandler(object sender, queryAllCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class queryAllCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17468,11 +19952,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void queryMoreCompletedEventHandler(object sender, queryMoreCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class queryMoreCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17494,11 +19978,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void searchCompletedEventHandler(object sender, searchCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class searchCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17520,11 +20004,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void getServerTimestampCompletedEventHandler(object sender, getServerTimestampCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getServerTimestampCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17546,11 +20030,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void setPasswordCompletedEventHandler(object sender, setPasswordCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class setPasswordCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17572,11 +20056,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void changeOwnPasswordCompletedEventHandler(object sender, changeOwnPasswordCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class changeOwnPasswordCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal changeOwnPasswordCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ChangeOwnPasswordResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ChangeOwnPasswordResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void resetPasswordCompletedEventHandler(object sender, resetPasswordCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class resetPasswordCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17598,11 +20108,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void getUserInfoCompletedEventHandler(object sender, getUserInfoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getUserInfoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17624,11 +20134,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void deleteByExampleCompletedEventHandler(object sender, deleteByExampleCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class deleteByExampleCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal deleteByExampleCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public DeleteByExampleResult[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((DeleteByExampleResult[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void sendEmailMessageCompletedEventHandler(object sender, sendEmailMessageCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class sendEmailMessageCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17650,11 +20186,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void sendEmailCompletedEventHandler(object sender, sendEmailCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class sendEmailCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17676,11 +20212,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void renderEmailTemplateCompletedEventHandler(object sender, renderEmailTemplateCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class renderEmailTemplateCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17702,11 +20238,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void renderStoredEmailTemplateCompletedEventHandler(object sender, renderStoredEmailTemplateCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class renderStoredEmailTemplateCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal renderStoredEmailTemplateCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public RenderStoredEmailTemplateResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((RenderStoredEmailTemplateResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void performQuickActionsCompletedEventHandler(object sender, performQuickActionsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class performQuickActionsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17728,11 +20290,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeQuickActionsCompletedEventHandler(object sender, describeQuickActionsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeQuickActionsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17754,11 +20316,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void describeQuickActionsForRecordTypeCompletedEventHandler(object sender, describeQuickActionsForRecordTypeCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class describeQuickActionsForRecordTypeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal describeQuickActionsForRecordTypeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public DescribeQuickActionResult[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((DescribeQuickActionResult[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeAvailableQuickActionsCompletedEventHandler(object sender, describeAvailableQuickActionsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeAvailableQuickActionsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17780,11 +20368,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void retrieveQuickActionTemplatesCompletedEventHandler(object sender, retrieveQuickActionTemplatesCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class retrieveQuickActionTemplatesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17806,11 +20394,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void retrieveMassQuickActionTemplatesCompletedEventHandler(object sender, retrieveMassQuickActionTemplatesCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class retrieveMassQuickActionTemplatesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal retrieveMassQuickActionTemplatesCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public QuickActionTemplateResult[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((QuickActionTemplateResult[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeVisualForceCompletedEventHandler(object sender, describeVisualForceCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeVisualForceCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17832,11 +20446,11 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void findDuplicatesCompletedEventHandler(object sender, findDuplicatesCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class findDuplicatesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -17858,11 +20472,37 @@ namespace ManyWho.Service.Salesforce.Salesforce {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void findDuplicatesByIdsCompletedEventHandler(object sender, findDuplicatesByIdsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class findDuplicatesByIdsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal findDuplicatesByIdsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public FindDuplicatesResult[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((FindDuplicatesResult[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     public delegate void describeNounsCompletedEventHandler(object sender, describeNounsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class describeNounsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
