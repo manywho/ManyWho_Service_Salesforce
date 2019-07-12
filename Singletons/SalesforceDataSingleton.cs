@@ -542,7 +542,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                                     var typeElementEntry = new TypeElementPropertyAPI();
                                     typeElementEntry.contentType = this.TranslateToManyWhoContentType(field.type.ToString());
                                     typeElementEntry.developerName = fieldDeveloperName;
-                                    typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
+
+                                    if (typeElementEntry.contentType.EqualsOneOf(ManyWhoConstants.CONTENT_TYPE_OBJECT, ManyWhoConstants.CONTENT_TYPE_LIST))
+                                    {
+                                        typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
+                                    }
 
                                     typeElement.properties.Add(typeElementEntry);
 
@@ -560,7 +564,11 @@ namespace ManyWho.Service.Salesforce.Singletons
                                         typeElementEntry = new TypeElementPropertyAPI();
                                         typeElementEntry.contentType = this.TranslateToManyWhoContentType(field.type.ToString());
                                         typeElementEntry.developerName = fieldDeveloperName + " Name";
-                                        typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
+
+                                        if (typeElementEntry.contentType.EqualsOneOf(ManyWhoConstants.CONTENT_TYPE_OBJECT, ManyWhoConstants.CONTENT_TYPE_LIST))
+                                        {
+                                            typeElementEntry.typeElementDeveloperName = describeSObjectResult.name;
+                                        }
 
                                         typeElement.properties.Add(typeElementEntry);
                                     }
