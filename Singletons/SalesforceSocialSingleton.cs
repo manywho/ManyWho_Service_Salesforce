@@ -478,7 +478,7 @@ namespace ManyWho.Service.Salesforce.Singletons
                 attachment.description = chatterMessage.Attachment.Description;
                 attachment.type = chatterMessage.Attachment.FileType;
                 attachment.size = chatterMessage.Attachment.FileSize;
-                attachment.downloadUrl = chatterMessage.Attachment.DownloadUrl;
+                attachment.downloadUrl = chatterMessage.Attachment.Type == "Link" ? chatterMessage.Attachment.Url : chatterMessage.Attachment.DownloadUrl;
 
                 // We need to scrub the download url as this url is the REST API that does not work through the browser
                 if (string.IsNullOrWhiteSpace(chatterMessage.Attachment.DownloadUrl) == false &&
