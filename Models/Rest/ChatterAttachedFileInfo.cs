@@ -86,5 +86,23 @@ namespace ManyWho.Service.Salesforce.Models.Rest
         /// </value>
         [DataMember(Name = "fileType")]
         public string FileType { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the attachment type.
+        /// </summary>
+        /// <value>
+        /// The type of the attachment.
+        /// </value>
+        [DataMember(Name = "type")]
+        public string Type { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the url of the link attachment.
+        /// </summary>
+        /// <value>
+        /// The url of the link attachment.
+        /// </value>
+        [DataMember(Name = "url")]
+        public string Url { get; set; }
     }
 }
