@@ -1032,7 +1032,7 @@ namespace ManyWho.Service.Salesforce
                 // We need to add a little more the list filter to make sure we're only loading active users
                 if (listFilterAPI == null)
                 {
-                    listFilterAPI = new ListFilterAPI();
+                    listFilterAPI = objectDataRequestAPI.listFilter ?? new ListFilterAPI();
                 }
 
                 if (listFilterAPI.where == null)
@@ -1198,7 +1198,8 @@ namespace ManyWho.Service.Salesforce
                     typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
 
                     // If the user has provided object data, we want to filter our request by the provided object data
-                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "DeveloperName");
+                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "DeveloperName") ??
+                                    objectDataRequestAPI.listFilter;
 
                     // If we don't have a list filter, we need to create one to filter by queues
                     if (listFilterAPI == null)
@@ -1248,7 +1249,8 @@ namespace ManyWho.Service.Salesforce
                     typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
 
                     // If the user has provided object data, we want to filter our request by the provided object data
-                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "DeveloperName");
+                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "DeveloperName") ??
+                                    objectDataRequestAPI.listFilter;
 
                     // Do the actual selection to populate one or many of these object types
                     objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "Group", typePropertyAPIs, listFilterAPI, true);
@@ -1293,7 +1295,8 @@ namespace ManyWho.Service.Salesforce
                     typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Name" });
 
                     // If the user has provided object data, we want to filter our request by the provided object data
-                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "Name");
+                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "Name") ??
+                                    objectDataRequestAPI.listFilter;
 
                     // Do the actual selection to populate one or many of these object types
                     objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "Profile", typePropertyAPIs, listFilterAPI, true);
@@ -1342,7 +1345,8 @@ namespace ManyWho.Service.Salesforce
                     typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Description" });
 
                     // If the user has provided object data, we want to filter our request by the provided object data
-                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "Name");
+                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "Name") ??
+                                    objectDataRequestAPI.listFilter;
 
                     // Do the actual selection to populate one or many of these object types
                     objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "UserRole", typePropertyAPIs, listFilterAPI, true);
@@ -1392,7 +1396,8 @@ namespace ManyWho.Service.Salesforce
                     typePropertyAPIs.Add(new ObjectDataTypePropertyAPI() { developerName = "Description" });
 
                     // If the user has provided object data, we want to filter our request by the provided object data
-                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "Id");
+                    listFilterAPI = SalesforceAuthenticationSingleton.GetInstance().CreateFilterFromProvidedObjectData(objectDataRequestAPI.objectData, objectDataRequestAPI.listFilter, "Id") ??
+                                    objectDataRequestAPI.listFilter;
 
                     // Do the actual selection to populate one or many of these object types
                     objectDataResponseAPI.objectData = SalesforceDataSingleton.GetInstance().Select(authenticatedWho, objectDataRequestAPI.configurationValues, "CollaborationGroup", typePropertyAPIs, listFilterAPI, true);
